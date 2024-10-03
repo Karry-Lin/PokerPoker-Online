@@ -1,11 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Edu+AU+VIC+WA+NT+Dots:wght@400..700&family=Foldit:wght@100..900&family=LXGW+WenKai+TC:wght@300;400;700&family=Nabla&display=swap');
-.body {
-    height: 100vh;
-}
-
 .title{
     padding-top: 5%;
-    font-family: "LXGW WenKai TC", cursive;
     font-size: 200px;
     text-align: center;
     color: white;
@@ -22,7 +16,6 @@
 }
 
 .intro{
-    font-family: "LXGW WenKai TC", cursive;
     color: #ffffff;
     font-size: 40px;
     font-weight: 900;
@@ -34,7 +27,6 @@
 
 .btn {
     width: 110%;
-    font-family: "LXGW WenKai TC", cursive;
     font-size: 50px;
     border-radius: 40px;
     border: none;
@@ -55,7 +47,6 @@
 }
 
 .gameinfo{
-    font-family: "LXGW WenKai TC", cursive;
     margin-top: 1%;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

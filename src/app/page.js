@@ -171,7 +171,7 @@ export default function Home() {
             <li>紅9至K各為10分</li>
             <li>黑桃A為30分</li>
             <li>梅花A為40分</li>
-            <li>以紅5吃紅5為吃雙紅五，其他玩家需再給10分</li>
+            <li>以紅5吃紅5為雙紅五，其他玩家需再給10分</li>
           </ul>
           <p><strong>標準分：</strong>70分</p>
           <p><strong>計分：</strong>每位玩家總分減去標準分</p>
@@ -182,7 +182,7 @@ export default function Home() {
 
   ];
   return (
-    <div className={styles.body}>
+    <div>
       <img src="/welcome-background.jpg" alt="background" className={styles.background}/>
       <div className={styles.title}>PokerPoker</div>
       <div className={styles.info}>
