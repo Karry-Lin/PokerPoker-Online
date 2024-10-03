@@ -1,7 +1,7 @@
 export default function Page() {
-    return (
-        <div>
-            user page
-        </div>
-    );
+  return (
+    <div>
+      user page
+    </div>
+  );
 }
