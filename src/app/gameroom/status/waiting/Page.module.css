@@ -1,0 +1,82 @@
+.body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('/gameroom-waiting-page.jpg');
+  /* background-image: url('/gameroom-waiting-page.jpg'); */
+  background-size: cover;
+  background-position: center;
+  padding: 2rem;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  width: 300px;
+  height: 420px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 20px;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.avator {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 10px auto;
+}
+
+.card_body {
+  text-align: center;
+}
+
+.card_title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.list-group-item {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #555;
+}
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.4;
+}
+.button:hover {
+  background-color: #808080;
+  transform: translateY(-2px);
+  transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+  .body {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .card {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
