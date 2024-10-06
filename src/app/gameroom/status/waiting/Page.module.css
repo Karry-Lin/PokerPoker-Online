@@ -22,6 +22,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   margin: 20px;
+  flex-wrap: nowrap;
 }
 
 .card:hover {
@@ -30,11 +31,11 @@
 }
 
 .avator {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   object-fit: cover;
-  margin: 10px auto;
+  margin: 40px auto;
 }
 
 .card_body {
@@ -63,10 +64,15 @@
   z-index: -1;
   opacity: 0.4;
 }
+.button{
+  transform: scale(2);
+  margin-right: 200px;
+  margin-left: 200px;
+}
 .button:hover {
   background-color: #808080;
   transform: translateY(-2px);
-  transform: scale(1.2);
+  transform: scale(2.2);
 }
 
 @media (max-width: 768px) {
