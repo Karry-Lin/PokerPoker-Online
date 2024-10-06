@@ -5,43 +5,37 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import initializeFirebase from "@/utils/firebase.js";
-import "firebase/compat/auth";
-import "firebase/compat/firestore";
+import { firebase } from "@/utils/firebase.js";
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function Page() {
   const router = useRouter();
+  const [validated, setValidated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firebase, setFirebase] = useState(null);
   const [error, setError] = useState('');
-  useEffect(() => {
-    const initFirebase = async () => {
-      const firebaseApp = await initializeFirebase();
-      setFirebase(firebaseApp);
-    };
-    initFirebase().then();
-  }, []);
-  const isEmailValid = (email) => {
-    const regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
-    return regex.test(email);
-  };
-  const submit = async() => {
-    setError('');
-    if (!isEmailValid(email)) {
-      setError('無效的帳號');
-      return;
+  const submit = async(event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.stopPropagation();
     }
-    const db = firebase.firestore();
-    const userQuery = await db.collection('user').where('email', '==', email).where('password', '==', password).get();
-    if (!userQuery.empty) {
+    setValidated(true);
+    setError('');
+    const db = getFirestore(firebase);
+    const userQuery = query(
+      collection(db, 'user'),
+      where('email', '==', email),
+      where('password', '==', password)
+    );
+    const queryResult = await getDocs(userQuery);
+    if (!queryResult.empty) {
       router.push('/lobby');
     }
     else{
       setError('帳號或密碼錯誤');
-      return;
     }
   };
   return (
@@ -51,30 +45,37 @@ export default function Page() {
         <Card className={styles.card}>
           <Card.Body>
             <div className={styles.title}>Login</div>
-            <FloatingLabel controlId="floatingInput" label="Email address">
-              <Form.Control
-                type="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </FloatingLabel>
-            <FloatingLabel controlId="floatingPassword" label="Password">
-              <Form.Control
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </FloatingLabel>
-
-            <button className={styles.button} type="submit" onClick={submit}>
-              Log in
-            </button>
-            <Link href="/signup">
-              <Button variant="light" size="lg">Signup</Button>
-            </Link>
-            {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+            <Form noValidate validated={ validated } onSubmit={ submit }>
+              <FloatingLabel className={ styles.floatingLabel } controlId="floatingInput" label="Email address">
+                <Form.Control
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Form.Control.Feedback type="invalid">
+                  Please enter your email.
+                </Form.Control.Feedback>
+              </FloatingLabel>
+              <FloatingLabel className={ styles.floatingLabel } controlId="floatingPassword" label="Password">
+                <Form.Control
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  minLength={6}
+                  required
+                />
+              </FloatingLabel>
+              <button className={styles.button} type="submit">
+                Login
+              </button>
+              <Link href="/signup">
+                <Button variant="light" size="lg">Signup</Button>
+              </Link>
+              {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+            </Form>
           </Card.Body>
         </Card>
       </div>
