@@ -182,7 +182,7 @@ export default function Home() {
 
   ];
   return (
-    <div>
+    <div className={styles.container}>
       <img src="/welcome-background.jpg" alt="background" className={styles.background}/>
       <div className={styles.title}>PokerPoker</div>
       <div className={styles.info}>
