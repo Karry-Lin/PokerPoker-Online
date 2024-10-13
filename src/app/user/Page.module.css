@@ -1,0 +1,23 @@
+.title {
+    font-size: 60px;
+    text-align: center;
+    margin-top: 90px;
+    margin-bottom: 20px;
+}
+
+.avatar{
+    width: 100px;
+    height: 100px;
+}
+
+.card {
+    max-width: 540px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.button{
+    text-align: center;
+}

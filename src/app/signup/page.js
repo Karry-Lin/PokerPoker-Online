@@ -3,12 +3,8 @@ import styles from "./Page.module.css";
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-import { database, storage } from "@/utils/firebase.js";
-import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { ref as refFS, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { v4 as uuidv4 } from 'uuid';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import {useRouter} from 'next/navigation';
+import {useState} from 'react';
 
 export default function Page() {
   const router = useRouter();
@@ -22,53 +18,38 @@ export default function Page() {
   /** @type {(file: File | null) => void} */
   const setFile = fileState[1];
   const [error, setError] = useState('');
+  const registerUser = async (email, username, password, file) => {
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('username', username);
+    formData.append('password', password);
+    formData.append('file', file);
+    const response = await fetch('/api/signup', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error);
+    }
+    return data.message;
+  };
   const submit = async(event) => {
     event.preventDefault();
     const form = event.currentTarget;
+    setError('');
     if (form.checkValidity() === false) {
       event.stopPropagation();
-    }
-    setValidated(true);
-    setError('');
-    if (password.length < 6) {
-      setError('密碼長度不可小於6');
+      setValidated(true);
       return;
     }
-    const checkUsernameExists = async (username) => {
-      const usersCollection = collection(database, 'user');
-      const userList = query(usersCollection, where("username", "==", username));
-      const querySnapshot = await getDocs(userList);
-      return !querySnapshot.empty;
-    };
-    if (await checkUsernameExists(username)) {
-      setError("username已存在");
-      return;
+    try {
+      const message = await registerUser(email, username, password, file);
+      alert(message);
+      router.push('/login');
+    } catch (error) {
+      setError(error.message);
     }
-    const checkEmailExists = async (email) => {
-      const usersCollection = collection(database, 'user');
-      const userList = query(usersCollection, where("email", "==", email));
-      const querySnapshot = await getDocs(userList);
-      return !querySnapshot.empty;
-    };
-    const emailExists = await checkEmailExists(email);
-    if (emailExists) {
-      setError("此email已被註冊");
-      return;
-    }
-    const storageRef = refFS(storage, `userAvatar/${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    const userId = uuidv4();
-    const userRef = doc(database, `user/${userId}`);
-    await setDoc(userRef, {
-      email,
-      username,
-      password,
-      avatar: url,
-      money: 0
-    });
-    alert('註冊成功');
-    router.push('/login');
   };
   return (
     <div className={styles.body}>
@@ -82,6 +63,7 @@ export default function Page() {
                 <Form.Control
                   type="email"
                   placeholder="name@example.com"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -94,6 +76,7 @@ export default function Page() {
                   <Form.Control
                     type="text"
                     placeholder="Username"
+                    autoComplete="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -106,9 +89,9 @@ export default function Page() {
                 <Form.Control
                   type="password"
                   placeholder="Password"
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  minLength={6}
                   required
                 />
                 <Form.Control.Feedback type="invalid">
@@ -119,6 +102,7 @@ export default function Page() {
                 <Form.Control
                   placeholder="avatar"
                   type="file"
+                  accept="image/*"
                   onChange={(e) => setFile(e.target.files[0])}
                   required
                 />
