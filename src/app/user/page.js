@@ -32,6 +32,7 @@ export default function Page() {
     setPassword(data.password || '');
     setMoney(data.money || 0);
     setAvatar(data.avatar || '');
+    setFile(null);
   };
   const addMoney = async () => {
     const response = await fetch(`/api/money`, {method: 'PUT', body: JSON.stringify({userId, money})});
@@ -79,6 +80,7 @@ export default function Page() {
     setPassword(originalData.password);
     setAvatar(originalData.avatar);
     setConfirmPassword("");
+    setFile(null);
   };
   return (
     <div>
