@@ -3,8 +3,10 @@ import {useEffect, useState} from 'react';
 import NavBar from '../components/navBar';
 import {Button, Card, Col, Form, Image, Row, Spinner} from 'react-bootstrap';
 import styles from './Page.module.css';
+import {useUserStore} from "@/app/stores/userStore.js";
 
 export default function Page() {
+  const userStore = useUserStore();
   const [originalData, setOriginalData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("loading...");
@@ -12,7 +14,6 @@ export default function Page() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [avatar, setAvatar] = useState(originalData.avatar);
   const [isPasswordChanged, setIsPasswordChanged] = useState(false);
-  const [userId, setUserId] = useState("280658b1-e885-419c-937b-5402809439ec");
   const email = originalData?.email ?? "loading...";
   const [money, setMoney] = useState("loading...");
   const fileState = useState(null);
@@ -22,20 +23,25 @@ export default function Page() {
   const setFile = fileState[1];
   const [error, setError] = useState('');
   const fetchUserData = async () => {
-    const response = await fetch(`/api/user?id=${userId}`, {method: 'GET'});
-    const data = await response.json();
-    if (!response.ok) {
-      setError(data.error);
+    if (userStore.userId) {
+      const response = await fetch(`/api/user?id=${userStore.userId}`, {method: 'GET'});
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error);
+      }
+      setOriginalData(data);
+      setUsername(data.username || '');
+      setPassword(data.password || '');
+      setMoney(data.money || 0);
+      setAvatar(data.avatar || '');
+      setFile(null);
     }
-    setOriginalData(data);
-    setUsername(data.username || '');
-    setPassword(data.password || '');
-    setMoney(data.money || 0);
-    setAvatar(data.avatar || '');
-    setFile(null);
   };
   const addMoney = async () => {
-    const response = await fetch(`/api/money`, {method: 'PUT', body: JSON.stringify({userId, money})});
+    const response = await fetch(`/api/money`, {
+      method: 'PUT',
+      body: JSON.stringify({userId: userStore.userId, money})
+    });
     const data = await response.json();
     if (!response.ok) {
       setError(data.error);
@@ -45,10 +51,10 @@ export default function Page() {
   };
   useEffect(() => {
     fetchUserData().then();
-  }, [userId, money]);
+  }, [userStore.userId, money]);
   const handleSaveClick = async () => {
     const formData = new FormData();
-    formData.append('userId', userId);
+    formData.append('userId', userStore.userId);
     formData.append('username', username === originalData.username ? "" : username);
     formData.append('password', isPasswordChanged ? password : "");
     formData.append('confirmPassword', confirmPassword);
@@ -84,7 +90,7 @@ export default function Page() {
   };
   return (
     <div>
-      <NavBar/>
+      <NavBar avatar={avatar} setAvatar={setAvatar}/>
       <h1 className={styles.title}>個人檔案</h1>
       <Card className={styles.card}>
         <Card.Body>

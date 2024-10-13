@@ -7,13 +7,14 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import {useRouter} from 'next/navigation';
 import {useState} from 'react';
+import {useUserStore} from "@/app/stores/userStore.js";
 
 export default function Page() {
+  const userStore = useUserStore();
   const router = useRouter();
   const [validated, setValidated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userId, setUserId] = useState('');
   const [error, setError] = useState('');
   const login = async (email, password) => {
     const response = await fetch('/api/login', {
@@ -39,7 +40,8 @@ export default function Page() {
     }
     setError('');
     try {
-      setUserId(await login(email, password));
+      const id = await login(email, password);
+      userStore.login(id);
       router.push('/lobby');
     } catch (error) {
       setError(error.message);

@@ -1,9 +1,10 @@
 "use client";
-import React from 'react';
-import { Navbar, Nav, NavDropdown, Image, Container } from 'react-bootstrap';
-import { useState } from 'react';
+import React, {useState} from 'react';
+import {Container, Image, Nav, Navbar, NavDropdown, Spinner} from 'react-bootstrap';
+import {useUserStore} from "@/app/stores/userStore.js";
 
-const NavBar = () => {
+const NavBar = ({ avatar, setAvatar }) => {
+  const userStore = useUserStore();
   const [showModal, setShowModal] = useState(false);
   return (
     <>
@@ -18,19 +19,18 @@ const NavBar = () => {
             <Nav>
               <NavDropdown
                 title={
-                  <Image
-                    src="/avator_test.jpg"
-                    roundedCircle
-                    width={40}
-                    height={40}
-                  />
+                  !avatar ? (
+                    <Spinner animation="border" />
+                  ) : (
+                    <Image src={avatar} roundedCircle width={45} height={45}/>
+                  )
                 }
                 id="user-dropdown"
               >
                 <NavDropdown.Item onClick={() => setShowModal(true)}>創建房間</NavDropdown.Item>
                 <NavDropdown.Item href="/user">個人檔案</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="/login">登出</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => userStore.logout()} href="/login">登出</NavDropdown.Item>
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>

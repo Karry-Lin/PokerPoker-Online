@@ -4,7 +4,8 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import styles from './Home.module.css';
 import Link from 'next/link';
-import { useState } from 'react';
+import {useState} from 'react';
+import {useUserStore} from "@/app/stores/userStore.js";
 
 
 function MyVerticallyCenteredModal(props) {
@@ -30,6 +31,7 @@ function MyVerticallyCenteredModal(props) {
 export default function Home() {
   const [modalShow, setModalShow] = useState(false);
   const [modalContent, setModalContent] = useState({});
+  const userStore = useUserStore();
   const handleShow = (index) => {
     setModalContent(modalData[index]);
     setModalShow(true);
@@ -190,7 +192,7 @@ export default function Home() {
           The universe's Best poker game platform.
         </div>
         <div className={styles.button}>
-          <Link href="/login">
+          <Link href={userStore.isLogin() ? "/lobby" : "/login"}>
             <button className={styles.btn}>
               PLAY NOW
             </button>
