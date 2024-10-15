@@ -1,10 +1,27 @@
 .page {
-    background-image: url("/lobby_background.jpg");
-    background-size: cover;
-    min-height: 100vh;
-    width: 100%;
-    background-attachment: fixed; /* Keeps background fixed while content scrolls */
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: -1;
-  }
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  z-index: 1;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("/lobby_background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  opacity: 0.6; /* Set opacity for the background image */
+  z-index: -1; /* Place the background behind the content */
+}
+
+.page > * {
+  position: relative;
+  z-index: 1; /* Ensure content appears above the background */
+}
