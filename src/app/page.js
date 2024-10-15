@@ -4,7 +4,8 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import styles from './Home.module.css';
 import Link from 'next/link';
-import { useState } from 'react';
+import {useState} from 'react';
+import {useUserStore} from "@/app/stores/userStore.js";
 
 
 function MyVerticallyCenteredModal(props) {
@@ -30,6 +31,7 @@ function MyVerticallyCenteredModal(props) {
 export default function Home() {
   const [modalShow, setModalShow] = useState(false);
   const [modalContent, setModalContent] = useState({});
+  const userStore = useUserStore();
   const handleShow = (index) => {
     setModalContent(modalData[index]);
     setModalShow(true);
@@ -182,7 +184,7 @@ export default function Home() {
 
   ];
   return (
-    <div>
+    <div className={styles.container}>
       <img src="/welcome-background.jpg" alt="background" className={styles.background}/>
       <div className={styles.title}>PokerPoker</div>
       <div className={styles.info}>
@@ -190,7 +192,7 @@ export default function Home() {
           The universe's Best poker game platform.
         </div>
         <div className={styles.button}>
-          <Link href="/login">
+          <Link href={userStore.isLogin() ? "/lobby" : "/login"}>
             <button className={styles.btn}>
               PLAY NOW
             </button>
@@ -220,7 +222,7 @@ export default function Home() {
           <Card.Header as="h2">撿紅點</Card.Header>
           <Card.Body>
             <Card.Text>
-              撿紅點是一種撲克遊戲，通常由二到四人一同遊玩，每位玩家會拿到六張牌，且桌上會亮出四張牌，根據吃牌分數算出輸贏。
+              撿紅點是一種撲克遊戲，通常由四個人一同遊玩，每位玩家會拿到六張牌，且桌上會亮出四張牌，根據吃牌分數算出輸贏。
             </Card.Text>
             <Button variant="secondary" onClick={() => handleShow(2)}>details</Button>
           </Card.Body>

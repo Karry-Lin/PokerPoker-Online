@@ -5,37 +5,46 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import { firebase } from "@/utils/firebase.js";
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import {useRouter} from 'next/navigation';
+import {useState} from 'react';
+import {useUserStore} from "@/app/stores/userStore.js";
 
 export default function Page() {
+  const userStore = useUserStore();
   const router = useRouter();
   const [validated, setValidated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const login = async (email, password) => {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({email, password}),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error);
+    }
+    return data.userId;
+  };
   const submit = async(event) => {
     event.preventDefault();
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.stopPropagation();
+      setValidated(true);
+      return;
     }
-    setValidated(true);
     setError('');
-    const db = getFirestore(firebase);
-    const userQuery = query(
-      collection(db, 'user'),
-      where('email', '==', email),
-      where('password', '==', password)
-    );
-    const queryResult = await getDocs(userQuery);
-    if (!queryResult.empty) {
+    try {
+      const id = await login(email, password);
+      userStore.login(id);
       router.push('/lobby');
-    }
-    else{
-      setError('帳號或密碼錯誤');
+    } catch (error) {
+      setError(error.message);
     }
   };
   return (
@@ -50,6 +59,7 @@ export default function Page() {
                 <Form.Control
                   type="email"
                   placeholder="name@example.com"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -62,6 +72,7 @@ export default function Page() {
                 <Form.Control
                   type="password"
                   placeholder="Password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   minLength={6}

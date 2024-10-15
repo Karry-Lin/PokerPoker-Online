@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import ClientCookie from "@/app/components/clientCookie.js";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
     <body className={`${geistSans.variable} ${geistMono.variable}`}>
+    <ClientCookie/>
     {children}
     </body>
     </html>
