@@ -1,18 +1,10 @@
-.background {
-    background-image: url("/lobby_background.jpg");
-    position: absolute;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.6;
-    z-index: -1;
-}
 .page {
     background-image: url("/lobby_background.jpg");
     background-size: cover;
     min-height: 100vh;
+    width: 100%;
+    background-attachment: fixed; /* Keeps background fixed while content scrolls */
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
   }
-  
