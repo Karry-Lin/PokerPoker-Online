@@ -6,5 +6,5 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
 export default function Page() {
-  return <Waiting_page/>;
+  return <End_page/>;
 }
