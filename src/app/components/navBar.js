@@ -16,10 +16,11 @@ import { useUserStore } from '@/app/stores/userStore.js';
 const CreateRoomModal = ({ show, handleClose, createRoom }) => {
   const [roomName, setRoomName] = useState('');
   const [password, setPassword] = useState('');
-  const [roomType, setRoomType] = useState('');
-  const [time, setTime] = useState('');
+  const [roomType, setRoomType] = useState('Chinese Poker');
 
   const handleSubmit = () => {
+    const currentTime = new Date().toLocaleString();
+    createRoom(roomName, password, roomType, currentTime);
     handleClose();
   };
 
@@ -80,9 +81,20 @@ const NavBar = ({ avatar, setAvatar }) => {
   const userStore = useUserStore();
   const [showModal, setShowModal] = useState(false);
 
-  const createRoom = (name, password, type, time, state) => {
-    //KARRY me
-    console.log('Room Created:', { name, password, type, time, state });
+  const createRoom = (name, password, type, time) => {
+    const nowCards = [];
+    const players = {};
+    const state = 'wating';
+    //karry me
+    console.log('Room Created:', {
+      name,
+      nowCards,
+      password,
+      players,
+      state,
+      time,
+      type
+    });
   };
 
   return (
@@ -106,6 +118,7 @@ const NavBar = ({ avatar, setAvatar }) => {
                 }
                 id='user-dropdown'
               >
+                <NavDropdown.Item onClick={() => setShowModal(true)}>
                   創建房間
                 </NavDropdown.Item>
                 <NavDropdown.Item href='/user'>個人檔案</NavDropdown.Item>
