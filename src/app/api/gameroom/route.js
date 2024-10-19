@@ -30,10 +30,11 @@ export async function POST(request) {
     },
     nowCards: [],
     state: "waiting",
-    time: new Date().getTime(),
+    time: new Date().toISOString(),
   });
-  return Response.json({message: '創建成功'}, {status: 201});
+  return Response.json({message: '創建成功', roomId}, {status: 201});
 }
+
 
 export async function DELETE(request) {
   const {roomId} = await request.json();
@@ -52,11 +53,18 @@ export async function DELETE(request) {
 export async function GET(request) {
   const {searchParams} = new URL(request.url);
   const id = searchParams.get('id');
-  const docRef = doc(database, `room/${id}`);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return Response.json(docSnap.data(), {status: 200});
+  if (id) {
+    const docRef = doc(database, `room/${id}`);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return Response.json(docSnap.data(), {status: 200});
+    } else {
+      return Response.json({error: `id does not exist`}, {status: 404});
+    }
   } else {
-    return Response.json({error: `id does not exist`}, {status: 404});
+    const roomCollection = collection(database, 'room');
+    const roomList = await getDocs(roomCollection);
+    const rooms = roomList.docs.map(doc => doc.data());
+    return Response.json(rooms, {status: 200});
   }
 }
