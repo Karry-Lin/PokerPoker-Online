@@ -18,10 +18,8 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
   const [password, setPassword] = useState('');
   const [roomType, setRoomType] = useState('');
   const [time, setTime] = useState('');
-  const [roomState, setroomState] = useState('Waiting');
 
   const handleSubmit = () => {
-    createRoom(roomName, password, roomType, time, roomState);
     handleClose();
   };
 
@@ -108,7 +106,6 @@ const NavBar = ({ avatar, setAvatar }) => {
                 }
                 id='user-dropdown'
               >
-                <NavDropdown.Item onClick={() => setShowModal(true)} >
                   創建房間
                 </NavDropdown.Item>
                 <NavDropdown.Item href='/user'>個人檔案</NavDropdown.Item>
