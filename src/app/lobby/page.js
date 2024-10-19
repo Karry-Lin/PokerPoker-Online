@@ -69,60 +69,7 @@ export default function Page() {
       max_player: 4,
       password: null
     },
-    {
-      name: 'room8',
-      state: 'unReady',
-      id: 8,
-      gametype: '13poker',
-      current_player: 1,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: 'room9',
-      state: 'unReady',
-      id: 9,
-      gametype: '13poker',
-      current_player: 1,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: 'room10',
-      state: 'unReady',
-      id: 10,
-      gametype: '13poker',
-      current_player: 1,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: 'room11',
-      state: 'unReady',
-      id: 11,
-      gametype: '13poker',
-      current_player: 1,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: 'room12',
-      state: 'unReady',
-      id: 12,
-      gametype: '13poker',
-      current_player: 1,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: 'room13',
-      state: 'unReady',
-      id: 13,
-      gametype: '13poker',
-      current_player: 1,
-      max_player: 4,
-      password: null
-    }
+    
   ];
 
   const [selectedGameType, setSelectedGameType] = useState('all');
