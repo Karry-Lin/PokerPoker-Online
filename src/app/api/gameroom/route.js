@@ -10,10 +10,13 @@ export async function POST(request) {
     const querySnapshot = await getDocs(roomList);
     return !querySnapshot.empty;
   };
-  if (await checkRoomnameExists(name)) {
-    return Response.json({error: "roomname已存在"}, {status: 400});
+  if(name.length > 15){
+    return Response.json({error: "房間名稱長度不可大於15"}, {status: 400});
   }
-  if (password.length < 6) {
+  if (await checkRoomnameExists(name)) {
+    return Response.json({error: "此房間名稱已存在"}, {status: 400});
+  }
+  if (password && password.length < 6) {
     return Response.json({error: '密碼長度不可小於6'}, {status: 400});
   }
   const roomId = uuidv4();

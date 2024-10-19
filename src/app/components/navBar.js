@@ -37,6 +37,7 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
               type='text'
               placeholder='輸入房間名稱'
               value={roomName}
+              required
               onChange={(e) => setRoomName(e.target.value)}
             />
           </Form.Group>
@@ -52,7 +53,7 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
           </Form.Group>
 
           <Form.Group controlId='roomType' className='mt-3'>
-            <Form.Label>房間類型</Form.Label>
+            <Form.Label>遊戲類型</Form.Label>
             <Form.Control
               as='select'
               value={roomType}
