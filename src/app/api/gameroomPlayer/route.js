@@ -18,11 +18,14 @@ export async function PUT(request) {
   const roomDocSnap = await getDoc(roomDocRef);
   const roomData = roomDocSnap.data();
   const players = roomData.players || {};
-  const playerCount = Object.keys(players).length;
-  const newPlace = (playerCount + 1).toString();
+  const existingPlaces = Object.values(players).map(player => parseInt(player.place));
+  let newPlace = 1;
+  while (existingPlaces.includes(newPlace)) {
+    newPlace++;
+  }
   await updateDoc(roomDocRef, {
     [`players.${userId}`]: {
-      place: newPlace,
+      place: newPlace.toString(),
       handCards: [],
     }
   });
