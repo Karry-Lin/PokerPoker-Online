@@ -1,5 +1,7 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { Search, List } from 'semantic-ui-react'; // Correct import for Search
+import 'semantic-ui-css/semantic.min.css';
+
 import {
   Form,
   Card,
@@ -14,6 +16,7 @@ import { HiLockClosed, HiLockOpen } from 'react-icons/hi2';
 import NavBar from '../components/navBar';
 import styles from './Page.module.css';
 import { useUserStore } from '@/app/stores/userStore.js';
+import { useState, useEffect } from 'react';
 
 export default function Page() {
   const rooms = [
@@ -21,7 +24,7 @@ export default function Page() {
       name: '叫我大帥哥',
       state: 'Ready',
       id: 1,
-      gametype: '13poker',
+      gametype: '十三支',
       current_player: 3,
       max_player: 4,
       password: null
@@ -30,7 +33,7 @@ export default function Page() {
       name: '小明生日房',
       state: 'unReady',
       id: 2,
-      gametype: 'big2',
+      gametype: '大老二',
       current_player: 4,
       max_player: 4,
       password: '123456'
@@ -39,7 +42,7 @@ export default function Page() {
       name: 'room3',
       state: 'Ready',
       id: 3,
-      gametype: 'pickred',
+      gametype: '撿紅點',
       current_player: 2,
       max_player: 4,
       password: '122333'
@@ -48,7 +51,7 @@ export default function Page() {
       name: 'room4',
       state: 'unReady',
       id: 4,
-      gametype: '13poker',
+      gametype: '十三支',
       current_player: 3,
       max_player: 4,
       password: null
@@ -57,7 +60,7 @@ export default function Page() {
       name: 'room5',
       state: 'unReady',
       id: 5,
-      gametype: '13poker',
+      gametype: '十三支',
       current_player: 1,
       max_player: 4,
       password: null
@@ -66,7 +69,7 @@ export default function Page() {
       name: 'room6',
       state: 'unReady',
       id: 6,
-      gametype: '13poker',
+      gametype: '十三支',
       current_player: 1,
       max_player: 4,
       password: null
@@ -75,12 +78,11 @@ export default function Page() {
       name: 'room7',
       state: 'unReady',
       id: 7,
-      gametype: '13poker',
+      gametype: '十三支',
       current_player: 2,
       max_player: 4,
       password: null
-    },
-    
+    }
   ];
 
   const [selectedGameType, setSelectedGameType] = useState('all');
@@ -91,28 +93,26 @@ export default function Page() {
   const [errorMessage, setErrorMessage] = useState('');
   const [avatar, setAvatar] = useState('');
 
-  const userStore = useUserStore(); // Moved here to be accessible
+  const userStore = useUserStore();
 
-  // Fetch user data when component mounts
   useEffect(() => {
-    fetchUserData();
-  }, [userStore.userId]); // Dependency array ensures it runs only when userId changes
+    if (userStore.userId) {
+      fetchUserData();
+    }
+  }, [userStore.userId]);
 
   const fetchUserData = async () => {
-    if (userStore.userId) {
-      const response = await fetch(`/api/user?id=${userStore.userId}`, {
-        method: 'GET'
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        console.log(data.error);
-      } else {
-        setAvatar(data.avatar || '');
-      }
+    const response = await fetch(`/api/user?id=${userStore.userId}`, {
+      method: 'GET'
+    });
+    const data = await response.json();
+    if (response.ok) {
+      setAvatar(data.avatar || '');
+    } else {
+      console.log(data.error);
     }
   };
 
-  // Filter rooms based on selected game type and search term
   const filteredRooms = rooms
     .filter(
       (room) => selectedGameType === 'all' || room.gametype === selectedGameType
@@ -121,25 +121,17 @@ export default function Page() {
       room.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  // Extract unique game types for the select options
   const gameTypes = ['all', ...new Set(rooms.map((room) => room.gametype))];
 
-  // Handle search input
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  // Handle room entry
   const handleEnterRoom = (room) => {
     if (room.password) {
       setSelectedRoom(room);
-      setShowModal(true); // Show password modal if the room has a password
+      setShowModal(true);
     } else {
       alert(`Entering ${room.name}`);
     }
   };
 
-  // Handle password validation
   const handlePasswordSubmit = () => {
     if (selectedRoom.password === passwordInput) {
       alert(`Successfully entered ${selectedRoom.name}`);
@@ -153,33 +145,42 @@ export default function Page() {
 
   return (
     <>
-      <NavBar avatar={avatar} setAvatar={setAvatar}></NavBar>
+      <NavBar avatar={avatar} setAvatar={setAvatar} />
       <Container fluid className={styles.page}>
         <Row>
           <Col xs={12} md={1}></Col>
+
           <Col xs={12} md={3} className='p-4'>
-            {/* Search bar to filter rooms */}
-            <Form.Control
-              type='text'
-              placeholder='輸入房間名稱'
+            <span style={{ fontSize: '35px' }}>搜尋房間</span>
+
+            <Search
+              input={{
+                icon: 'search',
+                iconPosition: 'left',
+                style: { width: '350px', height: '60px', padding: '8px' }
+              }}
               value={searchTerm}
-              onChange={handleSearch}
-              className='mb-3'
+              onSearchChange={(_, { value }) => setSearchTerm(value)}
+              showNoResults={false}
+              placeholder='請輸入房間名稱'
             />
+            <br />
             <Form.Group>
-              <Form.Label>Select Game Type</Form.Label>
-              <Form.Control
-                as='select'
-                value={selectedGameType}
-                onChange={(e) => setSelectedGameType(e.target.value)}
-                className='mb-3'
-              >
-                {gameTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type === 'all' ? 'Select All' : type}
-                  </option>
+              <Form.Label>
+                <span style={{ fontSize: '35px' }}>選擇遊戲</span>
+              </Form.Label>
+              <List animated selection>
+                {gameTypes.map((type, index) => (
+                  <List.Item
+                    style={{ width: '350px', height: '40px', fontSize: '20px' }} // Corrected syntax
+                    key={index}
+                    onClick={() => setSelectedGameType(type)}
+                    active={selectedGameType === type}
+                  >
+                    {type}
+                  </List.Item>
                 ))}
-              </Form.Control>
+              </List>
             </Form.Group>
           </Col>
 
@@ -197,25 +198,31 @@ export default function Page() {
                   )}
                 </Card.Header>
                 <Card.Body>
-                  <Card.Text>
-                    <p className={styles.room_text}>
-                      Game : {room.gametype}
-                      <br />
-                      Players : 
-                      {room.current_player}/{room.max_player}
-                      <Button
-                        style={{ float: 'right' }}
-                        variant={
-                          room.current_player === room.max_player
-                            ? 'secondary'
-                            : 'primary'
-                        }
-                        disabled={room.current_player === room.max_player}
-                        onClick={() => handleEnterRoom(room)}
-                      >
-                        Enter
-                      </Button>
-                    </p>
+                  <Card.Text as='div' className={styles.room_text}>
+                    <div style={{ margin: '1px' }}>
+                      <span style={{ fontSize: '25px' }}>Game : </span>
+                      <span style={{ fontSize: '20px' }}>{room.gametype}</span>
+                    </div>
+                    <br />
+                    <div style={{ margin: '1px' }}>
+                      <span style={{ fontSize: '25px' }}>Players : </span>
+                      <span style={{ fontSize: '20px' }}>
+                        {room.current_player}/{room.max_player}
+                      </span>
+                    </div>
+
+                    <Button
+                      style={{ float: 'right' }}
+                      variant={
+                        room.current_player === room.max_player
+                          ? 'secondary'
+                          : 'primary'
+                      }
+                      disabled={room.current_player === room.max_player}
+                      onClick={() => handleEnterRoom(room)}
+                    >
+                      Enter
+                    </Button>
                   </Card.Text>
                 </Card.Body>
               </Card>
@@ -223,7 +230,6 @@ export default function Page() {
           </Col>
         </Row>
 
-        {/* Password modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>
             <Modal.Title>Enter Room Password</Modal.Title>
