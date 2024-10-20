@@ -37,6 +37,7 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
               type='text'
               placeholder='輸入房間名稱'
               value={roomName}
+              required
               onChange={(e) => setRoomName(e.target.value)}
             />
           </Form.Group>
@@ -52,7 +53,7 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
           </Form.Group>
 
           <Form.Group controlId='roomType' className='mt-3'>
-            <Form.Label>房間類型</Form.Label>
+            <Form.Label>遊戲類型</Form.Label>
             <Form.Control
               as='select'
               value={roomType}
@@ -106,14 +107,15 @@ const NavBar = ({ avatar, setAvatar }) => {
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='me-auto'>
               <Nav.Link href='/lobby'>Lobby</Nav.Link>
+              <Nav.Link href='/about'>About</Nav.Link>
             </Nav>
-            <Nav>
+            {avatar && <Nav>
               <NavDropdown
                 title={
                   !avatar ? (
-                    <Spinner animation='border' />
+                    <Spinner animation='border'/>
                   ) : (
-                    <Image src={avatar} roundedCircle width={45} height={45} />
+                    <Image src={avatar} roundedCircle width={45} height={45}/>
                   )
                 }
                 id='user-dropdown'
@@ -122,7 +124,7 @@ const NavBar = ({ avatar, setAvatar }) => {
                   創建房間
                 </NavDropdown.Item>
                 <NavDropdown.Item href='/user'>個人檔案</NavDropdown.Item>
-                <NavDropdown.Divider />
+                <NavDropdown.Divider/>
                 <NavDropdown.Item
                   onClick={() => userStore.logout()}
                   href='/login'
@@ -130,7 +132,7 @@ const NavBar = ({ avatar, setAvatar }) => {
                   登出
                 </NavDropdown.Item>
               </NavDropdown>
-            </Nav>
+            </Nav>}
           </Navbar.Collapse>
         </Container>
       </Navbar>

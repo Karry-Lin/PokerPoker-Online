@@ -10,10 +10,13 @@ export async function POST(request) {
     const querySnapshot = await getDocs(roomList);
     return !querySnapshot.empty;
   };
-  if (await checkRoomnameExists(name)) {
-    return Response.json({error: "roomname已存在"}, {status: 400});
+  if(name.length > 15){
+    return Response.json({error: "房間名稱長度不可大於15"}, {status: 400});
   }
-  if (password.length < 6) {
+  if (await checkRoomnameExists(name)) {
+    return Response.json({error: "此房間名稱已存在"}, {status: 400});
+  }
+  if (password && password.length < 6) {
     return Response.json({error: '密碼長度不可小於6'}, {status: 400});
   }
   const roomId = uuidv4();
@@ -30,10 +33,11 @@ export async function POST(request) {
     },
     nowCards: [],
     state: "waiting",
-    time: new Date().getTime(),
+    time: new Date().toISOString(),
   });
-  return Response.json({message: '創建成功'}, {status: 201});
+  return Response.json({message: '創建成功', roomId}, {status: 201});
 }
+
 
 export async function DELETE(request) {
   const {roomId} = await request.json();
@@ -52,11 +56,18 @@ export async function DELETE(request) {
 export async function GET(request) {
   const {searchParams} = new URL(request.url);
   const id = searchParams.get('id');
-  const docRef = doc(database, `room/${id}`);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return Response.json(docSnap.data(), {status: 200});
+  if (id) {
+    const docRef = doc(database, `room/${id}`);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return Response.json(docSnap.data(), {status: 200});
+    } else {
+      return Response.json({error: `id does not exist`}, {status: 404});
+    }
   } else {
-    return Response.json({error: `id does not exist`}, {status: 404});
+    const roomCollection = collection(database, 'room');
+    const roomList = await getDocs(roomCollection);
+    const rooms = roomList.docs.map(doc => doc.data());
+    return Response.json(rooms, {status: 200});
   }
 }
