@@ -12,7 +12,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request) {
-  const { userId, name, password, type } = await request.json();
+  const { userId, name, password, type, maxPlayer } = await request.json();
   const checkRoomnameExists = async (name) => {
     const roomCollection = collection(database, 'room');
     const roomList = query(roomCollection, where('name', '==', name));
@@ -40,7 +40,7 @@ export async function POST(request) {
         handCards: []
       }
     },
-    maxPlayer: 4,
+    maxPlayer,
     nowCards: [],
     state: 'waiting',
     time: new Date().toISOString()
