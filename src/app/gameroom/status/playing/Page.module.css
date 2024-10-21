@@ -95,9 +95,10 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: none;
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  /* border-radius: 10px; */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
   width: fit-content;
   margin: 0 auto;
 }
@@ -109,10 +110,10 @@
 }
 
 .card {
-  width: 100px;
-  height: 150px;
+  width: 120px;
+  height: 180px;
   background-color: #eaeaea;
-  border: 2px solid #ccc;
+  border: 2px solid black;
   border-radius: 8px;
   display: flex;
   justify-content: center;

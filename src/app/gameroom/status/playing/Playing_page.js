@@ -8,7 +8,7 @@ export default function Playing_page() {
   ]);
   const [selectedCards, setSelectedCards] = useState([]);
   
-  const OtherPlayersCardNumber = [13, 13, 13]; // Cards count for top, left, right players
+  const OtherPlayersCardNumber = [8, 10, 13]; // Cards count for top, left, right players
 
   // Toggle card selection on click
   const handleCardClick = (card) => {
