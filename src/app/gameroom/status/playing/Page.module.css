@@ -129,8 +129,8 @@
 }
 
 .card.selected {
-  border-color: #007bff;
-  transform: scale(1.1);
+  border-color: gold;
+  transform: translateY(-20px);
 }
 
 .card img {
@@ -151,5 +151,6 @@
 }
 
 .submitButton:hover {
+  
   background-color: #0056b3;
 }
