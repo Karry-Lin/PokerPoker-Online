@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Use next/navigation for app directory
 import { useParams } from 'next/navigation'; // Use useParams for dynamic route parameters
+import End_Page from './status/end/End_page';
+import Playing_page from './status/playing/Playing_page';
+import Waiting_Page from './status/waiting/Waiting_page';
 
 const GameRoom = () => {
   const router = useRouter();
@@ -12,7 +15,7 @@ const GameRoom = () => {
 
   useEffect(() => {
     if (roomId) {
-      console.log(roomId)
+      console.log(roomId);
       // Fetch room data when roomId is available
       const fetchRoomData = async () => {
         try {
@@ -25,24 +28,25 @@ const GameRoom = () => {
           setError(err.message);
         }
       };
-
       fetchRoomData();
     }
   }, [roomId]);
 
   if (error) return <div>Error: {error}</div>;
 
+  if (!roomData) return <p>Loading...</p>;
+
+  // Conditional rendering based on room state
   return (
     <div>
-      {roomData ? (
-        <div>
-          <h1>Room: {roomData.name}</h1>
-          <p>Type: {roomData.type}</p>
-          <p>Created At: {roomData.time}</p>
-          {/* Render other room details */}
-        </div>
+      {roomData.state === 'waiting' ? (
+        <Waiting_Page />
+      ) : roomData.state === 'playing' ? (
+        <Playing_page />
+      ) : roomData.state === 'end' ? (
+        <End_Page />
       ) : (
-        <p>Loading...</p>
+        <div>Unknown state</div>
       )}
     </div>
   );
