@@ -32,6 +32,7 @@ export async function POST(request) {
   const roomId = uuidv4();
   const roomRef = doc(database, `room/${roomId}`);
   await setDoc(roomRef, {
+    id: roomId,
     name,
     password,
     type,
