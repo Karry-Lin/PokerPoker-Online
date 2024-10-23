@@ -12,78 +12,32 @@ import {
   Modal,
   Alert
 } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { HiLockClosed, HiLockOpen } from 'react-icons/hi2';
 import NavBar from '../components/navBar';
 import styles from './Page.module.css';
 import { useUserStore } from '@/app/stores/userStore.js';
-import { useState, useEffect } from 'react';
 
 export default function Page() {
-  const rooms = [
-    {
-      name: '叫我大帥哥',
-      state: 'Ready',
-      id: 1,
-      gametype: '十三支',
-      current_player: 3,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: '小明生日房',
-      state: 'unReady',
-      id: 2,
-      gametype: '大老二',
-      current_player: 4,
-      max_player: 4,
-      password: '123456'
-    },
-    {
-      name: 'room3',
-      state: 'Ready',
-      id: 3,
-      gametype: '撿紅點',
-      current_player: 2,
-      max_player: 4,
-      password: '122333'
-    },
-    {
-      name: 'room4',
-      state: 'unReady',
-      id: 4,
-      gametype: '十三支',
-      current_player: 3,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: 'room5',
-      state: 'unReady',
-      id: 5,
-      gametype: '十三支',
-      current_player: 1,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: 'room6',
-      state: 'unReady',
-      id: 6,
-      gametype: '十三支',
-      current_player: 1,
-      max_player: 4,
-      password: null
-    },
-    {
-      name: 'room7',
-      state: 'unReady',
-      id: 7,
-      gametype: '十三支',
-      current_player: 2,
-      max_player: 4,
-      password: null
-    }
-  ];
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    const getRooms = async () => {
+      const response = await fetch(`/api/gameroom`, {
+        method: 'GET'
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error);
+      }
+      alert(data.message);
+      setRooms(data);
+      // console.log(data);
+    };
+    getRooms();
+  }, []);
 
   const [selectedGameType, setSelectedGameType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -92,30 +46,28 @@ export default function Page() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [avatar, setAvatar] = useState('');
-
   const userStore = useUserStore();
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      const response = await fetch(`/api/user?id=${userStore.userId}`, {
+        method: 'GET'
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setAvatar(data.avatar || '');
+      } else {
+        console.log(data.error);
+      }
+    };
     if (userStore.userId) {
       fetchUserData();
     }
   }, [userStore.userId]);
 
-  const fetchUserData = async () => {
-    const response = await fetch(`/api/user?id=${userStore.userId}`, {
-      method: 'GET'
-    });
-    const data = await response.json();
-    if (response.ok) {
-      setAvatar(data.avatar || '');
-    } else {
-      console.log(data.error);
-    }
-  };
-
   const filteredRooms = rooms
     .filter(
-      (room) => selectedGameType === 'all' || room.gametype === selectedGameType
+      (room) => selectedGameType === 'all' || room.type === selectedGameType
     )
     .filter((room) =>
       room.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -149,10 +101,8 @@ export default function Page() {
       <Container fluid className={styles.page}>
         <Row>
           <Col xs={12} md={1}></Col>
-
           <Col xs={12} md={3} className='p-4'>
             <span style={{ fontSize: '35px' }}>搜尋房間</span>
-
             <Search
               input={{
                 icon: 'search',

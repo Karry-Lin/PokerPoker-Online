@@ -3,7 +3,7 @@ import { Card, ListGroup, Button, ToggleButton } from 'react-bootstrap';
 import styles from './Page.module.css';
 import { useRouter } from 'next/navigation';
 
-function End_Page() {
+function End_Page({roomId}) {
   const router = useRouter();
   const sequence = ['1st', '2nd', '3rd', '4th'];
   const players = [
