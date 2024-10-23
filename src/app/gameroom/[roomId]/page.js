@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation'; 
-import End_Page from './status/end/End_page';
-import Playing_page from './status/playing/Playing_page';
-import Waiting_Page from './status/waiting/Waiting_page';
+import End_Page from './end/End_page';
+import Playing_page from './playing/Playing_page';
+import Waiting_Page from '../status/waiting/Waiting_page';
 
 const GameRoom = () => {
   const [roomData, setRoomData] = useState(null);

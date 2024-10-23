@@ -32,9 +32,7 @@ export default function Page() {
       if (!response.ok) {
         setError(data.error);
       }
-      alert(data.message);
       setRooms(data);
-      // console.log(data);
     };
     getRooms();
   }, []);
@@ -151,24 +149,26 @@ export default function Page() {
                   <Card.Text as='div' className={styles.room_text}>
                     <div style={{ margin: '1px' }}>
                       <span style={{ fontSize: '25px' }}>Game : </span>
-                      <span style={{ fontSize: '20px' }}>{room.gametype}</span>
+                      <span style={{ fontSize: '20px' }}>{room.type}</span>
                     </div>
                     <br />
                     <div style={{ margin: '1px' }}>
                       <span style={{ fontSize: '25px' }}>Players : </span>
                       <span style={{ fontSize: '20px' }}>
-                        {room.current_player}/{room.max_player}
+                        {Object.keys(room.players).length}/{room.maxPlayer}
                       </span>
                     </div>
 
                     <Button
                       style={{ float: 'right' }}
                       variant={
-                        room.current_player === room.max_player
+                        Object.keys(room.players).length === room.maxPlayer
                           ? 'secondary'
                           : 'primary'
                       }
-                      disabled={room.current_player === room.max_player}
+                      disabled={
+                        Object.keys(room.players).length === room.maxPlayer
+                      }
                       onClick={() => handleEnterRoom(room)}
                     >
                       Enter
