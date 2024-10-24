@@ -21,6 +21,10 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
   const [roomType, setRoomType] = useState('Chinese Poker');
 
   const handleSubmit = () => {
+    if (roomName.trim() === '') {
+      alert('房間名稱不能為空！'); 
+      return; 
+    }
     const currentTime = new Date().toLocaleString();
     createRoom(roomName, password, roomType, currentTime);
     handleClose();
@@ -103,18 +107,13 @@ const NavBar = ({ avatar, setAvatar }) => {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || 'Failed to create room');
       }
-
       const roomId = data.roomId;
-
       if (!roomId) {
         throw new Error('Room ID is missing in the response');
       }
-
-      // Redirect to the created room
       router.push(`/gameroom/${roomId}`);
     } catch (err) {
       setError(err.message);
