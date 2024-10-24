@@ -1,5 +1,5 @@
 'use client';
-import { Search, List } from 'semantic-ui-react'; // Correct import for Search
+import { Search, List } from 'semantic-ui-react'; 
 import 'semantic-ui-css/semantic.min.css';
 
 import {
@@ -21,6 +21,7 @@ import styles from './Page.module.css';
 import { useUserStore } from '@/app/stores/userStore.js';
 
 export default function Page() {
+  const router= useRouter()
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
@@ -32,9 +33,7 @@ export default function Page() {
       if (!response.ok) {
         setError(data.error);
       }
-      alert(data.message);
       setRooms(data);
-      // console.log(data);
     };
     getRooms();
   }, []);
@@ -73,20 +72,21 @@ export default function Page() {
       room.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const gameTypes = ['all', ...new Set(rooms.map((room) => room.gametype))];
+  const gameTypes = ['all', ...new Set(rooms.map((room) => room.type))];
 
   const handleEnterRoom = (room) => {
     if (room.password) {
       setSelectedRoom(room);
       setShowModal(true);
     } else {
-      alert(`Entering ${room.name}`);
+      alert("go")
+      router.push(`/gameroom/${room.id}`);
     }
   };
 
   const handlePasswordSubmit = () => {
     if (selectedRoom.password === passwordInput) {
-      alert(`Successfully entered ${selectedRoom.name}`);
+      router.push(`/gameroom/${selectedRoom.id}`);
       setShowModal(false);
       setPasswordInput('');
       setErrorMessage('');
@@ -122,7 +122,7 @@ export default function Page() {
               <List animated selection>
                 {gameTypes.map((type, index) => (
                   <List.Item
-                    style={{ width: '350px', height: '40px', fontSize: '20px' }} // Corrected syntax
+                    style={{ width: '350px', height: '40px', fontSize: '20px' }}
                     key={index}
                     onClick={() => setSelectedGameType(type)}
                     active={selectedGameType === type}
@@ -151,24 +151,26 @@ export default function Page() {
                   <Card.Text as='div' className={styles.room_text}>
                     <div style={{ margin: '1px' }}>
                       <span style={{ fontSize: '25px' }}>Game : </span>
-                      <span style={{ fontSize: '20px' }}>{room.gametype}</span>
+                      <span style={{ fontSize: '20px' }}>{room.type}</span>
                     </div>
                     <br />
                     <div style={{ margin: '1px' }}>
                       <span style={{ fontSize: '25px' }}>Players : </span>
                       <span style={{ fontSize: '20px' }}>
-                        {room.current_player}/{room.max_player}
+                        {Object.keys(room.players).length}/{room.maxPlayer}
                       </span>
                     </div>
 
                     <Button
                       style={{ float: 'right' }}
                       variant={
-                        room.current_player === room.max_player
+                        Object.keys(room.players).length === room.maxPlayer
                           ? 'secondary'
                           : 'primary'
                       }
-                      disabled={room.current_player === room.max_player}
+                      disabled={
+                        Object.keys(room.players).length === room.maxPlayer
+                      }
                       onClick={() => handleEnterRoom(room)}
                     >
                       Enter

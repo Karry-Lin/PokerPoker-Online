@@ -10,7 +10,7 @@ import {
   Spinner,
   Modal,
   Button,
-  Form,
+  Form
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'; // Use next/navigation for app directory routing
 import { useUserStore } from '@/app/stores/userStore.js';
@@ -21,6 +21,10 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
   const [roomType, setRoomType] = useState('Chinese Poker');
 
   const handleSubmit = () => {
+    if (roomName.trim() === '') {
+      alert('房間名稱不能為空！'); 
+      return; 
+    }
     const currentTime = new Date().toLocaleString();
     createRoom(roomName, password, roomType, currentTime);
     handleClose();
@@ -91,30 +95,26 @@ const NavBar = ({ avatar, setAvatar }) => {
       const response = await fetch(`/api/gameroom`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userId: userStore.userId, // Ensure userStore contains userId
+          userId: userStore.userId,
+          maxPlayer: 4,
           name,
           password,
           type,
-          time,
-        }),
+          time
+        })
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || 'Failed to create room');
       }
-
       const roomId = data.roomId;
-
       if (!roomId) {
         throw new Error('Room ID is missing in the response');
       }
-
-      // Redirect to the created room
       router.push(`/gameroom/${roomId}`);
     } catch (err) {
       setError(err.message);
@@ -160,13 +160,13 @@ const NavBar = ({ avatar, setAvatar }) => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
       <CreateRoomModal
         show={showModal}
         handleClose={() => setShowModal(false)}
         createRoom={createRoom}
       />
-      {error && <div className="error-message">{error}</div>} {/* Error message */}
+      {error && <div className='error-message'>{error}</div>}{' '}
+      {/* Error message */}
     </>
   );
 };
