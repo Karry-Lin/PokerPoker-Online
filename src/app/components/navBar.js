@@ -65,9 +65,9 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
               value={roomType}
               onChange={(e) => setRoomType(e.target.value)}
             >
-              <option value='Chinese Poker'>十三支</option>
-              <option value='Chinese Rummy'>撿紅點</option>
-              <option value='Big two'>大老二</option>
+              <option value='十三支'>十三支</option>
+              <option value='撿紅點'>撿紅點</option>
+              <option value='大老二'>大老二</option>
             </Form.Control>
           </Form.Group>
         </Form>
@@ -126,10 +126,10 @@ const NavBar = ({ avatar, setAvatar }) => {
     <>
       <Navbar bg='light' expand='lg' fixed='top'>
         <Container>
-          <Navbar.Brand href='/'>PokerPoker</Navbar.Brand>
+          <Navbar.Brand href='/' style={{ fontSize: '35px' }}>PokerPoker</Navbar.Brand>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
-            <Nav className='me-auto'>
+            <Nav className='me-auto' style={{ fontSize: '35px' }}>
               <Nav.Link href='/lobby'>Lobby</Nav.Link>
               <Nav.Link href='/about'>About</Nav.Link>
             </Nav>
@@ -139,7 +139,7 @@ const NavBar = ({ avatar, setAvatar }) => {
                   !avatar ? (
                     <Spinner animation='border'/>
                   ) : (
-                    <Image src={avatar} roundedCircle width={45} height={45}/>
+                    <Image src={avatar} roundedCircle width={60} height={60} />
                   )
                 }
                 id='user-dropdown'

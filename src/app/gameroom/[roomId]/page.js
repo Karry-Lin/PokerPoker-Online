@@ -1,26 +1,28 @@
-'use client'; // Mark this component as a Client Component
+"use client"; // Mark this component as a Client Component
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation'; 
-import End_Page from './end/End_page';
-import Playing_page from './playing/Playing_page';
-import Waiting_Page from './waiting/Waiting_page';
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+
+import { useUserStore } from '@/app/stores/userStore.js';
+
+import End_Page from "./end/End_page";
+import Playing_page from "./playing/Playing_page";
+import Waiting_Page from "./waiting/Waiting_page";
 
 const GameRoom = () => {
-  const { roomId } = useParams(); // Destructure to get roomId directly from params
+  const { roomId } = useParams();
   const [roomData, setRoomData] = useState(null);
   const [error, setError] = useState(null);
-  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState();
+  const [prop, setProp] = useState([]);
+  const userStore = useUserStore();
 
   useEffect(() => {
     if (roomId) {
-      console.log(roomId);
       const fetchRoomData = async () => {
         try {
-          // Correct the URL by using query parameter correctly
-          const response = await fetch(`/api/gameroom?id=${roomId}`); 
-          if (!response.ok) throw new Error('Failed to load room data');
-
+          const response = await fetch(`/api/gameroom?id=${roomId}`);
+          if (!response.ok) throw new Error("Failed to load room data");
           const data = await response.json();
           setRoomData(data);
         } catch (err) {
@@ -31,17 +33,41 @@ const GameRoom = () => {
     }
   }, [roomId]);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const response = await fetch(`/api/user?id=${userStore.userId}`, {
+        method: "GET",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setCurrentUser(data || "");
+      } else {
+        console.log(data.error);
+      }
+    };
+    if (userStore.userId) {
+      fetchUserData();
+    }
+  }, [userStore.userId]);
+
+  useEffect(() => {
+    if (roomData && currentUser) {
+      setProp({ roomData, currentUser });
+      console.log(prop);
+    }
+  }, [roomData, currentUser]);
+
   if (error) return <div>Error: {error}</div>;
   if (!roomData) return <p>Loading...</p>;
 
   return (
     <div>
-      {roomData.state === 'waiting' ? (
-        <Waiting_Page id={roomData.id} />
-      ) : roomData.state === 'playing' ? (
-        <Playing_page />
-      ) : roomData.state === 'end' ? (
-        <End_Page />
+      {roomData.state === "waiting" ? (
+        <Waiting_Page prop={prop} />
+      ) : roomData.state === "playing" ? (
+        <Playing_page prop={prop} />
+      ) : roomData.state === "end" ? (
+        <End_Page prop={prop} />
       ) : (
         <div>Unknown state</div>
       )}

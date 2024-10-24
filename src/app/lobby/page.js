@@ -38,7 +38,7 @@ export default function Page() {
     getRooms();
   }, []);
 
-  const [selectedGameType, setSelectedGameType] = useState('all');
+  const [selectedGameType, setSelectedGameType] = useState('全部');
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
@@ -66,20 +66,20 @@ export default function Page() {
 
   const filteredRooms = rooms
     .filter(
-      (room) => selectedGameType === 'all' || room.type === selectedGameType
+      (room) => selectedGameType === '全部' || room.type === selectedGameType
     )
     .filter((room) =>
       room.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const gameTypes = ['all', ...new Set(rooms.map((room) => room.type))];
+  const gameTypes = ['全部', ...new Set(rooms.map((room) => room.type))];
 
   const handleEnterRoom = (room) => {
     if (room.password) {
       setSelectedRoom(room);
       setShowModal(true);
     } else {
-      alert("go")
+      
       router.push(`/gameroom/${room.id}`);
     }
   };
@@ -97,8 +97,8 @@ export default function Page() {
 
   return (
     <>
-      <NavBar avatar={avatar} setAvatar={setAvatar} />
       <Container fluid className={styles.page}>
+      <NavBar avatar={avatar} setAvatar={setAvatar} />
         <Row>
           <Col xs={12} md={1}></Col>
           <Col xs={12} md={3} className='p-4'>
@@ -150,12 +150,12 @@ export default function Page() {
                 <Card.Body>
                   <Card.Text as='div' className={styles.room_text}>
                     <div style={{ margin: '1px' }}>
-                      <span style={{ fontSize: '25px' }}>Game : </span>
+                      <span style={{ fontSize: '25px' }}>遊戲 : </span>
                       <span style={{ fontSize: '20px' }}>{room.type}</span>
                     </div>
                     <br />
                     <div style={{ margin: '1px' }}>
-                      <span style={{ fontSize: '25px' }}>Players : </span>
+                      <span style={{ fontSize: '25px' }}>人數 : </span>
                       <span style={{ fontSize: '20px' }}>
                         {Object.keys(room.players).length}/{room.maxPlayer}
                       </span>
@@ -173,7 +173,7 @@ export default function Page() {
                       }
                       onClick={() => handleEnterRoom(room)}
                     >
-                      Enter
+                      {Object.keys(room.players).length === room.maxPlayer?'已滿':'進入'}
                     </Button>
                   </Card.Text>
                 </Card.Body>
