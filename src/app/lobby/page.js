@@ -71,7 +71,7 @@ export default function Page() {
       room.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const gameTypes = ['all', ...new Set(rooms.map((room) => room.gametype))];
+  const gameTypes = ['all', ...new Set(rooms.map((room) => room.type))];
 
   const handleEnterRoom = (room) => {
     if (room.password) {
@@ -120,7 +120,7 @@ export default function Page() {
               <List animated selection>
                 {gameTypes.map((type, index) => (
                   <List.Item
-                    style={{ width: '350px', height: '40px', fontSize: '20px' }} // Corrected syntax
+                    style={{ width: '350px', height: '40px', fontSize: '20px' }}
                     key={index}
                     onClick={() => setSelectedGameType(type)}
                     active={selectedGameType === type}

@@ -10,7 +10,7 @@ import {
   Spinner,
   Modal,
   Button,
-  Form,
+  Form
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'; // Use next/navigation for app directory routing
 import { useUserStore } from '@/app/stores/userStore.js';
@@ -90,15 +90,16 @@ const NavBar = ({ avatar, setAvatar }) => {
       const response = await fetch(`/api/gameroom`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userId: userStore.userId, // Ensure userStore contains userId
+          userId: userStore.userId,
+          maxPlayer: 4,
           name,
           password,
           type,
-          time,
-        }),
+          time
+        })
       });
 
       const data = await response.json();
@@ -158,13 +159,13 @@ const NavBar = ({ avatar, setAvatar }) => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
       <CreateRoomModal
         show={showModal}
         handleClose={() => setShowModal(false)}
         createRoom={createRoom}
       />
-      {error && <div className="error-message">{error}</div>} {/* Error message */}
+      {error && <div className='error-message'>{error}</div>}{' '}
+      {/* Error message */}
     </>
   );
 };
