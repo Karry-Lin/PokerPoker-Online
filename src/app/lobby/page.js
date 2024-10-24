@@ -97,8 +97,9 @@ export default function Page() {
 
   return (
     <>
-      <NavBar avatar={avatar} setAvatar={setAvatar} />
+      
       <Container fluid className={styles.page}>
+      <NavBar avatar={avatar} setAvatar={setAvatar} />
         <Row>
           <Col xs={12} md={1}></Col>
           <Col xs={12} md={3} className='p-4'>

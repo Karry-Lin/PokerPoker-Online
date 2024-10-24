@@ -125,10 +125,10 @@ const NavBar = ({ avatar, setAvatar }) => {
     <>
       <Navbar bg='light' expand='lg' fixed='top'>
         <Container>
-          <Navbar.Brand href='/'>PokerPoker</Navbar.Brand>
+          <Navbar.Brand href='/' style={{ fontSize: '35px' }}>PokerPoker</Navbar.Brand>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
-            <Nav className='me-auto'>
+            <Nav className='me-auto' style={{ fontSize: '35px' }}>
               <Nav.Link href='/lobby'>Lobby</Nav.Link>
             </Nav>
             <Nav>
@@ -137,7 +137,7 @@ const NavBar = ({ avatar, setAvatar }) => {
                   !avatar ? (
                     <Spinner animation='border' />
                   ) : (
-                    <Image src={avatar} roundedCircle width={45} height={45} />
+                    <Image src={avatar} roundedCircle width={60} height={60} />
                   )
                 }
                 id='user-dropdown'
