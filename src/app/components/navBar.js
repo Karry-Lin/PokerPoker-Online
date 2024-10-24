@@ -64,9 +64,9 @@ const CreateRoomModal = ({ show, handleClose, createRoom }) => {
               value={roomType}
               onChange={(e) => setRoomType(e.target.value)}
             >
-              <option value='Chinese Poker'>十三支</option>
-              <option value='Chinese Rummy'>撿紅點</option>
-              <option value='Big two'>大老二</option>
+              <option value='十三支'>十三支</option>
+              <option value='撿紅點'>撿紅點</option>
+              <option value='大老二'>大老二</option>
             </Form.Control>
           </Form.Group>
         </Form>
