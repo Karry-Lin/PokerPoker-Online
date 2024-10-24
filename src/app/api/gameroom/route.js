@@ -1,21 +1,12 @@
-import { database } from '@/utils/firebase.js';
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  where
-} from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
+import {database} from "@/utils/firebase.js";
+import {collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where} from 'firebase/firestore';
+import {v4 as uuidv4} from "uuid";
 
 export async function POST(request) {
-  const { userId, name, password, type, maxPlayer } = await request.json();
+  const {userId, name, password, type} = await request.json();
   const checkRoomnameExists = async (name) => {
     const roomCollection = collection(database, 'room');
-    const roomList = query(roomCollection, where('name', '==', name));
+    const roomList = query(roomCollection, where("name", "==", name));
     const querySnapshot = await getDocs(roomList);
     return !querySnapshot.empty;
   };
@@ -38,11 +29,10 @@ export async function POST(request) {
     type,
     players: {
       [userId]: {
-        place: '1',
-        handCards: []
-      }
+        place: "1",
+        handCards: [],
+      },
     },
-    maxPlayer,
     nowCards: [],
     state: 'waiting',
     time: new Date().toISOString()
