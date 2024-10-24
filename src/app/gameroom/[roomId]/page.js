@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation'; 
-import End_Page from './status/end/End_page';
-import Playing_page from './status/playing/Playing_page';
-import Waiting_Page from './status/waiting/Waiting_page';
+import End_Page from './end/End_page';
+import Playing_page from './playing/Playing_page';
+import Waiting_Page from './waiting/Waiting_page';
 
 const GameRoom = () => {
   const { roomId } = useParams(); // Destructure to get roomId directly from params
