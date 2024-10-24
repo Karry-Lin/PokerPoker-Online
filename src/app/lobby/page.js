@@ -1,5 +1,5 @@
 'use client';
-import { Search, List } from 'semantic-ui-react'; // Correct import for Search
+import { Search, List } from 'semantic-ui-react'; 
 import 'semantic-ui-css/semantic.min.css';
 
 import {
@@ -21,6 +21,7 @@ import styles from './Page.module.css';
 import { useUserStore } from '@/app/stores/userStore.js';
 
 export default function Page() {
+  const router= useRouter()
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
@@ -78,13 +79,14 @@ export default function Page() {
       setSelectedRoom(room);
       setShowModal(true);
     } else {
-      alert(`Entering ${room.name}`);
+      alert("go")
+      router.push(`/gameroom/${room.id}`);
     }
   };
 
   const handlePasswordSubmit = () => {
     if (selectedRoom.password === passwordInput) {
-      alert(`Successfully entered ${selectedRoom.name}`);
+      router.push(`/gameroom/${selectedRoom.id}`);
       setShowModal(false);
       setPasswordInput('');
       setErrorMessage('');

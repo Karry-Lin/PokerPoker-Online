@@ -1,21 +1,24 @@
 'use client'; // Mark this component as a Client Component
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation'; // Use this to get route params
-import End_Page from './end/End_page';
-import Playing_page from './playing/Playing_page';
-import Waiting_Page from './waiting/Waiting_page';
+import { useRouter, useParams } from 'next/navigation'; 
+import End_Page from './status/end/End_page';
+import Playing_page from './status/playing/Playing_page';
+import Waiting_Page from './status/waiting/Waiting_page';
 
 const GameRoom = () => {
-  const { id: roomId } = useParams(); // Destructure to get roomId directly from params
+  const { roomId } = useParams(); // Destructure to get roomId directly from params
   const [roomData, setRoomData] = useState(null);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (roomId) {
+      console.log(roomId);
       const fetchRoomData = async () => {
         try {
-          const response = await fetch(`/api/gameroom/${roomId}`); // Use a more standard route format
+          // Correct the URL by using query parameter correctly
+          const response = await fetch(`/api/gameroom?id=${roomId}`); 
           if (!response.ok) throw new Error('Failed to load room data');
 
           const data = await response.json();
