@@ -9,7 +9,6 @@ export default function BigTwo() {
         'https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1728983058758_%E9%99%B6%E6%9C%B1%E9%9A%B1%E5%9C%92.jfif?alt=media&token=1064e23d-0058-4b6d-bb0c-cb9785244f21',
       email: 'test002@gmail.com',
       money: 250,
-      password: 'test002',
       username: 'test002'
     },
     roomData: {
@@ -17,7 +16,6 @@ export default function BigTwo() {
       maxPlayer: 4,
       name: 'number6',
       nowCards: [],//mean the cards on the middle table
-      password: '',
       players: {
         'b8d36589-673c-48a4-8529-6d1062cdcddf': {
           handCards:[],
@@ -26,29 +24,24 @@ export default function BigTwo() {
         },
         'left_player_id': {
           handCards:[],
-          place:1,
+          place:2,
           score:null
         },
         'right_player_id': {
           handCards:[],
-          place:1,
+          place:3,
           score:null
         },
         'top_player_id': {
           handCards:[],
-          place:1,
+          place:4,
           score:null
         }
       },
       state: 'playing',
-      time: '2024-10-22T08:15:17.128Z',
-      type: 'Chinese Poker'
     }
   };
 
-  useEffect(() => {
-    console.log(prop);
-  });
   const [handCards, setHandCards] = useState([
     1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14
   ]);

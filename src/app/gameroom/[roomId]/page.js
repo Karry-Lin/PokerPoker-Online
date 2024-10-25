@@ -1,29 +1,78 @@
-'use client';
-import { useEffect } from 'react';
-import BigTwo from './BigTwo/big_two';
-import ChinesePoker from './Chinese Poker/chinese_poker';
-import ChineseRummy from './Chinese Rummy/chinese_rummy';
+"use client"; // Mark this component as a Client Component
 
-export default function PlayingPage({ prop }) {
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+
+import { useUserStore } from '@/app/stores/userStore.js';
+
+import End_Page from "./end/End_page";
+import Playing_page from "./playing/Playing_page";
+import Waiting_Page from "./waiting/Waiting_page";
+
+const GameRoom = () => {
+  const { roomId } = useParams();
+  const [roomData, setRoomData] = useState(null);
+  const [error, setError] = useState(null);
+  const [currentUser, setCurrentUser] = useState();
+  const [prop, setProp] = useState([]);
+  const userStore = useUserStore();
+
   useEffect(() => {
-    console.log(prop);
-  }, []); // Empty dependency array to run once on mount
+    if (roomId) {
+      const fetchRoomData = async () => {
+        try {
+          const response = await fetch(`/api/gameroom?id=${roomId}`);
+          if (!response.ok) throw new Error("Failed to load room data");
+          const data = await response.json();
+          setRoomData(data);
+        } catch (err) {
+          setError(err.message);
+        }
+      };
+      fetchRoomData();
+    }
+  }, [roomId]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const response = await fetch(`/api/user?id=${userStore.userId}`, {
+        method: "GET",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setCurrentUser(data || "");
+      } else {
+        console.log(data.error);
+      }
+    };
+    if (userStore.userId) {
+      fetchUserData();
+    }
+  }, [userStore.userId]);
+
+  useEffect(() => {
+    if (roomData && currentUser) {
+      setProp({ roomData, currentUser });
+      console.log(prop);
+    }
+  }, [roomData, currentUser]);
+
+  if (error) return <div>Error: {error}</div>;
+  if (!roomData) return <p>Loading...</p>;
 
   return (
     <div>
-      {prop && prop.roomData ? (
-        prop.roomData.type === 'Big Two' ? (
-          <BigTwo prop={prop} />
-        ) : prop.roomData.type === 'Chinese Poker' ? (
-          <ChinesePoker prop={prop} />
-        ) : prop.roomData.type === 'Chinese Rummy' ? (
-          <ChineseRummy prop={prop} />
-        ) : (
-          <div>Unknown state</div>
-        )
+      {roomData.state === "waiting" ? (
+        <Waiting_Page prop={prop} />
+      ) : roomData.state === "playing" ? (
+        <Playing_page prop={prop} />
+      ) : roomData.state === "end" ? (
+        <End_Page prop={prop} />
       ) : (
-        <div>Loading...</div>
+        <div>Unknown state</div>
       )}
     </div>
   );
-}
+};
+
+export default GameRoom;

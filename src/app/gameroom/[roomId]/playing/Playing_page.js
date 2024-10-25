@@ -5,9 +5,9 @@ import ChinesePoker from './Chinese Poker/ChinesePoker';
 import ChineseRummy from './Chinese Rummy/ChineseRummy';
 
 export default function PlayingPage({ prop }) {
-  useEffect(() => {
-    console.log(prop);
-  }, []); // Empty dependency array
+  // useEffect(() => {
+  //   console.log(prop);
+  // }, []); 
 
   return (
     <div>
