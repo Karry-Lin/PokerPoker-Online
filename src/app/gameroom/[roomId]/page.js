@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
-import { useUserStore } from '@/app/stores/userStore.js';
+import { useUserStore } from "@/app/stores/userStore.js";
 
 import End_Page from "./end/End_page";
 import Playing_page from "./playing/Playing_page";
@@ -53,6 +53,7 @@ const GameRoom = () => {
   useEffect(() => {
     if (roomData && currentUser) {
       setProp({ roomData, currentUser });
+      console.log("here");
       console.log(prop);
     }
   }, [roomData, currentUser]);
