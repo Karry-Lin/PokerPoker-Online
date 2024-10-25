@@ -14,7 +14,7 @@ export default function Page() {
             <h1 className="text-center mb-4 display-4">About</h1>
             <p className="text-center mb-5 fs-5 text-muted">
               This website is an online multiplayer card game that offers three games: "Chinese Poker," "Big Two," and
-              "Pick Up Red Dots." Players can create rooms and enjoy exciting gameplay with their pals, experiencing the
+              "Chinese Rummy." Players can create rooms and enjoy exciting gameplay with their pals, experiencing the
               joy of friendship and challenge. <br/>This website is built using the following technologies:
             </p>
 

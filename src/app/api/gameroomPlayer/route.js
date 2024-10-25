@@ -27,6 +27,7 @@ export async function PUT(request) {
     [`players.${userId}`]: {
       place: newPlace.toString(),
       handCards: [],
+        score: 0,
     }
   });
   return Response.json({message: '已加入房間'}, {status: 201});

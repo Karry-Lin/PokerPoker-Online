@@ -31,6 +31,7 @@ export async function POST(request) {
       [userId]: {
         place: "1",
         handCards: [],
+        score: 0,
       },
     },
     nowCards: [],
