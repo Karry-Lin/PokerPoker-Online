@@ -1,124 +1,74 @@
-'use client';
-import { useEffect, useState } from 'react';
-import styles from './Page.module.css';
+"use client"; // Mark this component as a Client Component
 
-export default function Playing_page() {
-  const prop = {
-    currentUser: {
-      avatar:
-        'https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1728983058758_%E9%99%B6%E6%9C%B1%E9%9A%B1%E5%9C%92.jfif?alt=media&token=1064e23d-0058-4b6d-bb0c-cb9785244f21',
-      email: 'test002@gmail.com',
-      money: 250,
-      password: 'test002',
-      username: 'test002'
-    },
-    roomData: {
-      id: '465513ea-24a4-463f-9cce-29dde88e6c0f',
-      maxPlayer: 4,
-      name: 'number6',
-      nowCards: [],//mean the cards on the middle table
-      password: '',
-      players: {
-        'b8d36589-673c-48a4-8529-6d1062cdcddf': {
-          handCards:[],
-          place:1,
-          score:null
-        },
-        'left_player_id': {
-          handCards:[],
-          place:1,
-          score:null
-        },
-        'right_player_id': {
-          handCards:[],
-          place:1,
-          score:null
-        },
-        'top_player_id': {
-          handCards:[],
-          place:1,
-          score:null
-        }
-      },
-      state: 'playing',
-      time: '2024-10-22T08:15:17.128Z',
-      type: 'Chinese Poker'
-    }
-  };
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+
+import { useUserStore } from '@/app/stores/userStore.js';
+
+const GameRoom = () => {
+  const { roomId } = useParams();
+  const [roomData, setRoomData] = useState(null);
+  const [error, setError] = useState(null);
+  const [currentUser, setCurrentUser] = useState();
+  const [prop, setProp] = useState([]);
+  const userStore = useUserStore();
 
   useEffect(() => {
-    console.log(prop);
-  });
-  const [handCards, setHandCards] = useState([
-    1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14
-  ]);
-  const [selectedCards, setSelectedCards] = useState([]);
+    if (roomId) {
+      const fetchRoomData = async () => {
+        try {
+          const response = await fetch(`/api/gameroom?id=${roomId}`);
+          if (!response.ok) throw new Error("Failed to load room data");
+          const data = await response.json();
+          setRoomData(data);
+        } catch (err) {
+          setError(err.message);
+        }
+      };
+      fetchRoomData();
+    }
+  }, [roomId]);
 
-  const OtherPlayersCardNumber = [8, 10, 13];
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const response = await fetch(`/api/user?id=${userStore.userId}`, {
+        method: "GET",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setCurrentUser(data || "");
+      } else {
+        console.log(data.error);
+      }
+    };
+    if (userStore.userId) {
+      fetchUserData();
+    }
+  }, [userStore.userId]);
 
-  // Toggle card selection on click
-  const handleCardClick = (card) => {
-    setSelectedCards((prevSelected) =>
-      prevSelected.includes(card)
-        ? prevSelected.filter((c) => c !== card)
-        : [...prevSelected, card]
-    );
-  };
+  useEffect(() => {
+    if (roomData && currentUser) {
+      setProp({ roomData, currentUser });
+      console.log(prop);
+    }
+  }, [roomData, currentUser]);
 
-  // Handle submit button click
-  const handleSubmit = () => {
-    setHandCards((prevHand) =>
-      prevHand.filter((card) => !selectedCards.includes(card))
-    );
-    setSelectedCards([]);
-  };
+  if (error) return <div>Error: {error}</div>;
+  if (!roomData) return <p>Loading...</p>;
 
   return (
-    <div className={styles.container}>
-      {/* Other players' cards */}
-      <div className={styles.topPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[0] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.leftPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[1] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.rightPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[2] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
-          </div>
-        ))}
-      </div>
-
-      {/* Player's hand cards */}
-      <div className={styles.cardRowWrapper}>
-        <div className={styles.handCards}>
-          {handCards.map((card, index) => (
-            <div
-              key={index}
-              className={`${styles.card} ${
-                selectedCards.includes(card) ? styles.selected : ''
-              }`}
-              onClick={() => handleCardClick(card)}
-            >
-              <img src={`/cards/${card}.png`} alt={`Card ${card}`} />
-            </div>
-          ))}
-        </div>
-        <button className={styles.submitButton} onClick={handleSubmit}>
-          Submit
-        </button>
-      </div>
+    <div>
+      {roomData.state === "waiting" ? (
+        <Waiting_Page prop={prop} />
+      ) : roomData.state === "playing" ? (
+        <Playing_page prop={prop} />
+      ) : roomData.state === "end" ? (
+        <End_Page prop={prop} />
+      ) : (
+        <div>Unknown state</div>
+      )}
     </div>
   );
-}
+};
+
+export default GameRoom;

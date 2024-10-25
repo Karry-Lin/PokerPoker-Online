@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import styles from './Page.module.css';
 
-export default function Playing_page() {
+export default function chinese_poker() {
   const [handCards, setHandCards] = useState([
     1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14,
   ]);
