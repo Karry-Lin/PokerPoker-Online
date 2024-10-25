@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import BigTwo from './BigTwo/BigTwo';
 import ChinesePoker from './Chinese Poker/ChinesePoker';
 import ChineseRummy from './Chinese Rummy/ChineseRummy';
-
+import Test from './test/Test';
 export default function PlayingPage({ prop }) {
   // useEffect(() => {
   //   console.log(prop);
@@ -18,7 +18,7 @@ export default function PlayingPage({ prop }) {
       ) : prop?.roomData?.type === 'Chinese Rummy' ? (
         <ChineseRummy prop={prop} />
       ) : prop?.roomData?.type === 'test' ? (
-        <ChineseRummy prop={prop} />
+        <Test prop={prop} />
       ): (
         <div>Unknown state</div>
       )}

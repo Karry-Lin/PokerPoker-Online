@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import styles from './Page.module.css';
 
-export default function BigTwo() {
+export default function Test() {
   const prop = {
     currentUser: {
       avatar:
