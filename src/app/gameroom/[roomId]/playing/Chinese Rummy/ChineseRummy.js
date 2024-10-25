@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import styles from './Page.module.css';
 
-export default function chinese_poker() {
+export default function ChineseRummy() {
   const [handCards, setHandCards] = useState([
     1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14,
   ]);
@@ -70,7 +70,7 @@ export default function chinese_poker() {
           ))}
         </div>
         <button className={styles.submitButton} onClick={handleSubmit}>
-          Submit
+          出牌
         </button>
       </div>
     </div>
