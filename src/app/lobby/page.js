@@ -1,5 +1,5 @@
 'use client';
-import { Search, List } from 'semantic-ui-react'; 
+import { Search, List } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 
 import {
@@ -21,7 +21,7 @@ import styles from './Page.module.css';
 import { useUserStore } from '@/app/stores/userStore.js';
 
 export default function Page() {
-  const router= useRouter()
+  const router = useRouter();
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
@@ -79,7 +79,6 @@ export default function Page() {
       setSelectedRoom(room);
       setShowModal(true);
     } else {
-      
       router.push(`/gameroom/${room.id}`);
     }
   };
@@ -98,7 +97,7 @@ export default function Page() {
   return (
     <>
       <Container fluid className={styles.page}>
-      <NavBar avatar={avatar} setAvatar={setAvatar} />
+        <NavBar avatar={avatar} setAvatar={setAvatar} />
         <Row>
           <Col xs={12} md={1}></Col>
           <Col xs={12} md={3} className='p-4'>
@@ -173,7 +172,9 @@ export default function Page() {
                       }
                       onClick={() => handleEnterRoom(room)}
                     >
-                      {Object.keys(room.players).length === room.maxPlayer?'已滿':'進入'}
+                      {Object.keys(room.players).length === room.maxPlayer
+                        ? '已滿'
+                        : '進入'}
                     </Button>
                   </Card.Text>
                 </Card.Body>

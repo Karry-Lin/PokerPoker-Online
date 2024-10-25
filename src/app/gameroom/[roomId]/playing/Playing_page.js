@@ -1,14 +1,60 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './Page.module.css';
 
 export default function Playing_page() {
+  const prop = {
+    currentUser: {
+      avatar:
+        'https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1728983058758_%E9%99%B6%E6%9C%B1%E9%9A%B1%E5%9C%92.jfif?alt=media&token=1064e23d-0058-4b6d-bb0c-cb9785244f21',
+      email: 'test002@gmail.com',
+      money: 250,
+      password: 'test002',
+      username: 'test002'
+    },
+    roomData: {
+      id: '465513ea-24a4-463f-9cce-29dde88e6c0f',
+      maxPlayer: 4,
+      name: 'number6',
+      nowCards: [],//mean the cards on the middle table
+      password: '',
+      players: {
+        'b8d36589-673c-48a4-8529-6d1062cdcddf': {
+          handCards:[],
+          place:1,
+          score:null
+        },
+        'left_player_id': {
+          handCards:[],
+          place:1,
+          score:null
+        },
+        'right_player_id': {
+          handCards:[],
+          place:1,
+          score:null
+        },
+        'top_player_id': {
+          handCards:[],
+          place:1,
+          score:null
+        }
+      },
+      state: 'playing',
+      time: '2024-10-22T08:15:17.128Z',
+      type: 'Chinese Poker'
+    }
+  };
+
+  useEffect(() => {
+    console.log(prop);
+  });
   const [handCards, setHandCards] = useState([
-    1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14,
+    1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14
   ]);
   const [selectedCards, setSelectedCards] = useState([]);
-  
-  const OtherPlayersCardNumber = [8, 10, 13]; // Cards count for top, left, right players
+
+  const OtherPlayersCardNumber = [8, 10, 13];
 
   // Toggle card selection on click
   const handleCardClick = (card) => {
@@ -33,7 +79,7 @@ export default function Playing_page() {
       <div className={styles.topPlayer}>
         {Array.from({ length: OtherPlayersCardNumber[0] }).map((_, index) => (
           <div key={index} className={styles.otherCard}>
-            <img src="/cards/0.jpg" alt="Other Player's Card" />
+            <img src='/cards/0.jpg' alt="Other Player's Card" />
           </div>
         ))}
       </div>
@@ -41,7 +87,7 @@ export default function Playing_page() {
       <div className={styles.leftPlayer}>
         {Array.from({ length: OtherPlayersCardNumber[1] }).map((_, index) => (
           <div key={index} className={styles.otherCard}>
-            <img src="/cards/0.jpg" alt="Other Player's Card" />
+            <img src='/cards/0.jpg' alt="Other Player's Card" />
           </div>
         ))}
       </div>
@@ -49,7 +95,7 @@ export default function Playing_page() {
       <div className={styles.rightPlayer}>
         {Array.from({ length: OtherPlayersCardNumber[2] }).map((_, index) => (
           <div key={index} className={styles.otherCard}>
-            <img src="/cards/0.jpg" alt="Other Player's Card" />
+            <img src='/cards/0.jpg' alt="Other Player's Card" />
           </div>
         ))}
       </div>
