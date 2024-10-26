@@ -29,11 +29,12 @@ export async function POST(request) {
         type,
         players: {
             [userId]: {
-                place: "1",
+                place: 1,
                 handCards: [],
                 score: 0,
             },
         },
+        turn: 0,
         nowCards: [],
         state: 'waiting',
         time: new Date().toISOString()

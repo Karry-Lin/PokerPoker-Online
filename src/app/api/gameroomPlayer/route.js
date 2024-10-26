@@ -25,7 +25,7 @@ export async function PUT(request) {
   }
   await updateDoc(roomDocRef, {
     [`players.${userId}`]: {
-      place: newPlace.toString(),
+      place: newPlace,
       handCards: [],
         score: 0,
     }
