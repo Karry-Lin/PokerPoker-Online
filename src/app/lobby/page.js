@@ -19,6 +19,8 @@ import { HiLockClosed, HiLockOpen } from "react-icons/hi2";
 import NavBar from "../components/navBar";
 import styles from "./Page.module.css";
 import { useUserStore } from "@/app/stores/userStore.js";
+import { database } from "@/utils/firebase.js";
+import {collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where} from 'firebase/firestore';
 
 export default function Page() {
   const router = useRouter();
@@ -45,7 +47,7 @@ export default function Page() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [currentUser, setCurrentUser] = useState("");
+  const [uid, setUid] = useState("");
   const userStore = useUserStore();
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function Page() {
       const data = await response.json();
       if (response.ok) {
         setAvatar(data.avatar || "");
-        setCurrentUser(userStore.userId) || "";
+        setUid(userStore.userId) || "";
       } else {
         console.log(data.error);
       }
@@ -76,64 +78,47 @@ export default function Page() {
 
   const gameTypes = ["全部", ...new Set(rooms.map((room) => room.type))];
   const joinRoom = async (roomId, userId) => {
+    const roomRef = doc(database, `room/${roomId}`);
     try {
-      const response = await fetch(`/api/gameroom`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ roomId, userId }),
-      });
-      const data = await response.json();
+      const roomSnapshot = await getDoc(roomRef);
+      const roomData = roomSnapshot.data();
+      const playerCount = roomData?.players ? Object.keys(roomData.players).length : 0;
 
-      if (response.ok) {
-        console.log(data.message); // '已加入房間'
-        router.push(`/gameroom/${roomId}`); // Navigate to game room after joining
-      } else {
-        console.error("Failed to join the room:", data.error);
-      }
+      await setDoc(roomRef, {
+        ...roomData,
+        players: {
+          ...roomData.players,
+          [userId]: {
+            place: playerCount + 1,
+            handCards: [],
+            score: 0,
+          },
+        },
+      });
     } catch (error) {
       console.error("Error joining room:", error);
+      setErrorMessage("Could not join the room. Please try again.");
     }
+    router.push(`/gameroom/${roomId}`);
   };
-
-  // Leave room function
-  const leaveRoom = async (roomId, userId) => {
-    try {
-      const response = await fetch(`/api/gameroom`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ roomId, userId }),
-      });
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log(data.message); // '已離開房間'
-        router.push(`/`); // Navigate back to the home page after leaving
-      } else {
-        console.error("Failed to leave the room:", data.error);
-      }
-    } catch (error) {
-      console.error("Error leaving room:", error);
-    }
-  };
+ 
   const handleEnterRoom = (room) => {
     if (room.password) {
       setSelectedRoom(room);
       setShowModal(true);
     } else {
-      router.push(`/gameroom/${room.id}`);
+      joinRoom(room.id,uid)
+      
     }
   };
 
   const handlePasswordSubmit = () => {
     if (selectedRoom.password === passwordInput) {
-      router.push(`/gameroom/${selectedRoom.id}`);
       setShowModal(false);
       setPasswordInput("");
       setErrorMessage("");
+      joinRoom(selectedRoom.id,uid)
+      // router.push(`/gameroom/${selectedRoom.id}`);
     } else {
       setErrorMessage("Incorrect password. Please try again.");
     }
