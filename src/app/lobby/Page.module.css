@@ -2,7 +2,7 @@
   position: relative;
   min-height: 100vh;
   width: 100%;
-  z-index: 1;
+  /* z-index: 1; */
 }
 
 .page::before {
@@ -17,12 +17,12 @@
   background-repeat: no-repeat;
   background-attachment: fixed;
   opacity: 0.6; /* Set opacity for the background image */
-  z-index: -1; /* Place the background behind the content */
+  /* z-index: -1; */
 }
 
 .page > * {
   position: relative;
-  z-index: 1; /* Ensure content appears above the background */
+  /* z-index: 1;  */
 }
 
 .room_header {
