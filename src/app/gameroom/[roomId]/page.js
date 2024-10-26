@@ -53,8 +53,8 @@ const GameRoom = () => {
   useEffect(() => {
     if (roomData && currentUser) {
       setProp({ roomData, currentUser });
-      console.log("here");
-      console.log(prop);
+      // console.log("here");
+      // console.log(prop);
     }
   }, [roomData, currentUser]);
 

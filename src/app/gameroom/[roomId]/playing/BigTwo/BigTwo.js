@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import styles from './Page.module.css';
+import shuffleCards from './conponents/shuffleCards';
+import {database} from "@/utils/firebase.js";
 
-export default function Test() {
+export default function BigTwo() {
   const prop = {
     currentUser: {
+      id: 'b8d36589-673c-48a4-8529-6d1062cdcddf',
       avatar:
         'https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1728983058758_%E9%99%B6%E6%9C%B1%E9%9A%B1%E5%9C%92.jfif?alt=media&token=1064e23d-0058-4b6d-bb0c-cb9785244f21',
       email: 'test002@gmail.com',
@@ -15,32 +18,41 @@ export default function Test() {
       id: '465513ea-24a4-463f-9cce-29dde88e6c0f',
       maxPlayer: 4,
       name: 'number6',
-      nowCards: [],//mean the cards on the middle table
+      nowCards: [], //mean the cards on the middle table
       players: {
         'b8d36589-673c-48a4-8529-6d1062cdcddf': {
-          handCards:[],
-          place:1,
-          score:null
+          handCards: [],
+          place: 1,
+          score: null
         },
-        'left_player_id': {
-          handCards:[],
-          place:2,
-          score:null
+        left_player_id: {
+          handCards: [],
+          place: 2,
+          score: null
         },
-        'right_player_id': {
-          handCards:[],
-          place:3,
-          score:null
+        right_player_id: {
+          handCards: [],
+          place: 3,
+          score: null
         },
-        'top_player_id': {
-          handCards:[],
-          place:4,
-          score:null
+        top_player_id: {
+          handCards: [],
+          place: 4,
+          score: null
         }
       },
-      state: 'playing',
+      state: 'playing'
     }
   };
+  const { roomId } = useParams();
+  
+  
+  const [deck, setDeck] = useState([]);
+  useEffect(() => {
+    const shuffledDeck = shuffleCards();
+    setDeck(shuffledDeck);
+    console.log(shuffledDeck);
+  }, []);
 
   const [handCards, setHandCards] = useState([
     1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14
