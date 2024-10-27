@@ -2,9 +2,16 @@
 import { Card, ListGroup, ToggleButton } from "react-bootstrap";
 import styles from "./Page.module.css";
 import { useRouter } from "next/navigation";
+import { useState,useEffect } from "react";
+import shuffleCards from "../playing/BigTwo/conponents/shuffleCards";
 
-function Waiting_Page({ prop }) {
+export default function Waiting_Page({ prop }) {
   const router = useRouter();
+  const [deck, setDeck] = useState([]);
+  useEffect(() => {
+    const shuffledDeck = shuffleCards();
+    setDeck(shuffledDeck);
+  }, []);
   const sequence = ["1st", "2nd", "3rd", "4th"];
   const players = [
     { name: "p1", state: "Ready", place: 1 },
@@ -49,7 +56,4 @@ function Waiting_Page({ prop }) {
       </div>
     </div>
   );
-  
 }
-
-export default Waiting_Page;

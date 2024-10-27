@@ -47,12 +47,7 @@ export default function BigTwo() {
   const { roomId } = useParams();
   
   
-  const [deck, setDeck] = useState([]);
-  useEffect(() => {
-    const shuffledDeck = shuffleCards();
-    setDeck(shuffledDeck);
-    console.log(shuffledDeck);
-  }, []);
+  
 
   const [handCards, setHandCards] = useState([
     1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14
