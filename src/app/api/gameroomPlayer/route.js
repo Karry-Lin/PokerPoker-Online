@@ -18,6 +18,9 @@ export async function PUT(request) {
   const roomDocSnap = await getDoc(roomDocRef);
   const roomData = roomDocSnap.data();
   const players = roomData.players || {};
+  const docRef = doc(database, `user/${userId}`);
+  const docSnap = await getDoc(docRef);
+  const data = docSnap.data();
   const existingPlaces = Object.values(players).map(player => parseInt(player.place));
   let newPlace = 1;
   while (existingPlaces.includes(newPlace)) {
@@ -25,9 +28,13 @@ export async function PUT(request) {
   }
   await updateDoc(roomDocRef, {
     [`players.${userId}`]: {
+      username: data.username,
+      avatar: data.avatar,
+      money: data.money,
       place: newPlace,
       handCards: [],
-        score: 0,
+      score: 0,
+      ready: false,
     }
   });
   return Response.json({message: '已加入房間'}, {status: 201});

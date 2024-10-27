@@ -20,6 +20,9 @@ export async function POST(request) {
     if (password && password.length < 6) {
         return Response.json({error: '密碼長度不可小於6'}, {status: 400});
     }
+    const docRef = doc(database, `user/${userId}`);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
     const roomId = uuidv4();
     const roomRef = doc(database, `room/${roomId}`);
     await setDoc(roomRef, {
@@ -29,9 +32,13 @@ export async function POST(request) {
         type,
         players: {
             [userId]: {
+                username: data.username,
+                avatar: data.avatar,
+                money: data.money,
                 place: 1,
                 handCards: [],
                 score: 0,
+                ready: false,
             },
         },
         turn: 0,
