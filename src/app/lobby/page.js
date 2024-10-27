@@ -92,6 +92,8 @@ export default function Page() {
             place: playerCount + 1,
             handCards: [],
             score: 0,
+            avatar:avatar,
+            ready :false
           },
         },
       });

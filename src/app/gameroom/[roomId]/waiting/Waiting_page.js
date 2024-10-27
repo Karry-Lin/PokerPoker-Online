@@ -2,28 +2,63 @@
 import { Card, ListGroup, ToggleButton } from "react-bootstrap";
 import styles from "./Page.module.css";
 import { useRouter } from "next/navigation";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import shuffleCards from "../playing/BigTwo/conponents/shuffleCards";
 
 export default function Waiting_Page({ prop }) {
   const router = useRouter();
   const [deck, setDeck] = useState([]);
+  const [players, setPlayers] = useState([]);
+  
+  // Shuffle the deck on component load
   useEffect(() => {
     const shuffledDeck = shuffleCards();
     setDeck(shuffledDeck);
   }, []);
-  const sequence = ["1st", "2nd", "3rd", "4th"];
-  const players = [
-    { name: "p1", state: "Ready", place: 1 },
-    { name: "p2", state: "unReady", place: 2 },
-    { name: "p3", state: "Ready", place: 3 },
-    { name: "p4", state: "unReady", place: 4 },
-  ];
 
-  function submit_Ready() {}
+  // Initialize players, ensuring there are always four players, filling with default players if necessary
+  useEffect(() => {
+    const defaultPlayers = [
+      { id: "default1", name: "Waiting...", state: "unReady", place: 1, score: 0, handCards: [] },
+      { id: "default2", name: "Waiting...", state: "unReady", place: 2, score: 0, handCards: [] },
+      { id: "default3", name: "Waiting...", state: "unReady", place: 3, score: 0, handCards: [] },
+      { id: "default4", name: "Waiting...", state: "unReady", place: 4, score: 0, handCards: [] },
+    ];
+    
+    // Merge prop players with default players
+    const mergedPlayers = [...prop.players, ...defaultPlayers].slice(0, 4);
+    setPlayers(mergedPlayers);
+  }, [prop.players]);
+
+  // Check if all four players are ready
+  const areAllPlayersReady = players.every(player => player.state === "Ready");
+
+  // Submit functions for handling button clicks
+  function submit_Ready() {
+    console.log("Ready button clicked");
+    // Implement your ready-up logic here
+  }
+
   function submit_Lobby() {
+    const leaveRoom = async (roomId, userId) => {
+      const roomRef = doc(database, `room/${roomId}`);
+      try {
+        const roomSnapshot = await getDoc(roomRef);
+        const roomData = roomSnapshot.data();
+  
+        if (roomData?.players && roomData.players[userId]) {
+          const updatedPlayers = { ...roomData.players };
+          delete updatedPlayers[userId];
+          await setDoc(roomRef, { ...roomData, players: updatedPlayers });
+        }
+      } catch (error) {
+        console.error("Error leaving room:", error);
+        setErrorMessage("Could not leave the room. Please try again.");
+      }
+    };
     router.push("/lobby");
   }
+
   return (
     <div className={styles.body}>
       <div className={styles.card_container}>
@@ -36,16 +71,17 @@ export default function Waiting_Page({ prop }) {
             />
             <Card.Body className={styles.card_body}>
               <Card.Title className={styles.card_title}>
-                {sequence[index]} Place
+                {index + 1} Place
               </Card.Title>
             </Card.Body>
             <ListGroup>
               <ListGroup.Item>Name: {player.name}</ListGroup.Item>
-              <ListGroup.Item>state: {player.state}</ListGroup.Item>
+              <ListGroup.Item>State: {player.state}</ListGroup.Item>
             </ListGroup>
           </Card>
         ))}
       </div>
+
       <div className={styles.button_container}>
         <ToggleButton onClick={() => submit_Ready()} className={styles.button}>
           Ready
@@ -54,6 +90,12 @@ export default function Waiting_Page({ prop }) {
           Back To Lobby
         </ToggleButton>
       </div>
+
+      {areAllPlayersReady && (
+        <div className={styles.ready_message}>
+          All players are ready! Starting the game...
+        </div>
+      )}
     </div>
   );
 }
