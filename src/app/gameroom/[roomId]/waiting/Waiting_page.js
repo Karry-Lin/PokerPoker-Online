@@ -16,22 +16,22 @@ export default function Waiting_Page({ prop }) {
     setDeck(shuffledDeck);
   }, []);
 
-  // Initialize players, ensuring there are always four players, filling with default players if necessary
   useEffect(() => {
     const defaultPlayers = [
-      { id: "default1", name: "Waiting...", state: "unReady", place: 1, score: 0, handCards: [] },
-      { id: "default2", name: "Waiting...", state: "unReady", place: 2, score: 0, handCards: [] },
-      { id: "default3", name: "Waiting...", state: "unReady", place: 3, score: 0, handCards: [] },
-      { id: "default4", name: "Waiting...", state: "unReady", place: 4, score: 0, handCards: [] },
+      { id: "default1", name: "Waiting...", ready: false, place: 1, score: 0, handCards: [] },
+      { id: "default2", name: "Waiting...", ready: false, place: 2, score: 0, handCards: [] },
+      { id: "default3", name: "Waiting...", ready: false, place: 3, score: 0, handCards: [] },
+      { id: "default4", name: "Waiting...", ready: false, place: 4, score: 0, handCards: [] },
     ];
     
     // Merge prop players with default players
     const mergedPlayers = [...prop.players, ...defaultPlayers].slice(0, 4);
     setPlayers(mergedPlayers);
+    console.log(prop)
   }, [prop.players]);
 
   // Check if all four players are ready
-  const areAllPlayersReady = players.every(player => player.state === "Ready");
+  const areAllPlayersReady = players.every(player => player.ready === true);
 
   // Submit functions for handling button clicks
   function submit_Ready() {
@@ -76,7 +76,7 @@ export default function Waiting_Page({ prop }) {
             </Card.Body>
             <ListGroup>
               <ListGroup.Item>Name: {player.name}</ListGroup.Item>
-              <ListGroup.Item>State: {player.state}</ListGroup.Item>
+              <ListGroup.Item>State: {player.ready?"ready":"unready"}</ListGroup.Item>
             </ListGroup>
           </Card>
         ))}
