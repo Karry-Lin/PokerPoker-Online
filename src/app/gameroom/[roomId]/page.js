@@ -55,6 +55,7 @@ const GameRoom = () => {
         players: playersArray,
         type: roomData.type || ''
       });
+      // console.log(prop);
     }
   }, [roomData, userStore.userId]);
 

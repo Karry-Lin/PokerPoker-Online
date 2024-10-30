@@ -1,9 +1,9 @@
-"use client";
-import { Card, ListGroup, ToggleButton } from "react-bootstrap";
-import styles from "./Page.module.css";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import shuffleCards from "../playing/BigTwo/conponents/shuffleCards";
+'use client';
+import { Card, ListGroup, ToggleButton } from 'react-bootstrap';
+import styles from './Page.module.css';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import shuffleCards from '../playing/BigTwo/conponents/shuffleCards';
 import { database } from '@/utils/firebase.js';
 import {
   collection,
@@ -20,13 +20,45 @@ export default function Waiting_Page({ prop }) {
   const router = useRouter();
   const [deck, setDeck] = useState([]);
   const [players, setPlayers] = useState([]);
-  
+
   // Default players array
   const defaultPlayers = [
-    { id: "default1", name: "Waiting...", ready: false, place: 1, score: 0, handCards: [] },
-    { id: "default2", name: "Waiting...", ready: false, place: 2, score: 0, handCards: [] },
-    { id: "default3", name: "Waiting...", ready: false, place: 3, score: 0, handCards: [] },
-    { id: "default4", name: "Waiting...", ready: false, place: 4, score: 0, handCards: [] },
+    {
+      id: 'default1',
+      avatar:'/avator_test.jpg',
+      username: 'Waiting...',
+      ready: false,
+      place: 1,
+      score: 0,
+      handCards: []
+    },
+    {
+      id: 'default2',
+      avatar:'/avator_test.jpg',
+      username: 'Waiting...',
+      ready: false,
+      place: 2,
+      score: 0,
+      handCards: []
+    },
+    {
+      id: 'default3',
+      avatar:'/avator_test.jpg',
+      username: 'Waiting...',
+      ready: false,
+      place: 3,
+      score: 0,
+      handCards: []
+    },
+    {
+      id: 'default4',
+      avatar:'/avator_test.jpg',
+      username: 'Waiting...',
+      ready: false,
+      place: 4,
+      score: 0,
+      handCards: []
+    }
   ];
 
   useEffect(() => {
@@ -35,7 +67,7 @@ export default function Waiting_Page({ prop }) {
   }, []);
 
   useEffect(() => {
-    // Only proceed if prop exists and has a players array
+    // Only proceed if prop'avator_test.jpg' exists and has a players array
     if (prop && Array.isArray(prop.players)) {
       // Merge prop players with default players
       const mergedPlayers = [...prop.players, ...defaultPlayers].slice(0, 4);
@@ -46,13 +78,14 @@ export default function Waiting_Page({ prop }) {
       setPlayers(defaultPlayers);
       console.log('Using default players');
     }
-  }, [prop?.players]); // Only depend on prop.players, with optional chaining
+    console.log(players);
+  }, [prop?.players]);
 
   // Check if all four players are ready
-  const areAllPlayersReady = players.every(player => player.ready === true);
+  const areAllPlayersReady = players.every((player) => player.ready === true);
 
   function submit_Ready() {
-    console.log("Ready button clicked");
+    console.log('Ready button clicked');
     // Implement your ready-up logic here
   }
 
@@ -69,9 +102,9 @@ export default function Waiting_Page({ prop }) {
           await setDoc(roomRef, { ...roomData, players: updatedPlayers });
         }
       }
-      router.push("/lobby");
+      router.push('/lobby');
     } catch (error) {
-      console.error("Error leaving room:", error);
+      console.error('Error leaving room:', error);
       // Handle error appropriately
     }
   }
@@ -82,8 +115,8 @@ export default function Waiting_Page({ prop }) {
         {players.map((player, index) => (
           <Card key={index} className={styles.card}>
             <Card.Img
-              variant="top"
-              src="avator_test.jpg"
+              variant='top'
+              src={`${player.avatar}`}
               className={styles.avator}
             />
             <Card.Body className={styles.card_body}>
@@ -92,8 +125,10 @@ export default function Waiting_Page({ prop }) {
               </Card.Title>
             </Card.Body>
             <ListGroup>
-              <ListGroup.Item>Name: {player.name}</ListGroup.Item>
-              <ListGroup.Item>State: {player.ready ? "ready" : "unready"}</ListGroup.Item>
+              <ListGroup.Item>Name: {player.username}</ListGroup.Item>
+              <ListGroup.Item>
+                State: {player.ready ? 'ready' : 'unready'}
+              </ListGroup.Item>
             </ListGroup>
           </Card>
         ))}
