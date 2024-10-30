@@ -1,4 +1,4 @@
-'use client'; // Mark this component as a Client Component
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -12,7 +12,13 @@ const GameRoom = () => {
   const { roomId } = useParams();
   const [roomData, setRoomData] = useState(null);
   const [error, setError] = useState(null);
-  const [prop, setProp] = useState(null);
+  const [prop, setProp] = useState({
+    uid: '',
+    roomId: '',
+    nowCards: [],
+    players: [],
+    type: ''
+  });
   const userStore = useUserStore();
 
   useEffect(() => {
@@ -34,23 +40,21 @@ const GameRoom = () => {
 
   useEffect(() => {
     if (roomData && userStore.userId) {
-      // Convert players object to an array of player data 
       const playersArray = roomData.players
         ? Object.keys(roomData.players).map((key) => ({
-        id: key,
-        ...roomData.players[key],
-        score: 0
-      })):[];
-      const updatedProp = {
+            id: key,
+            ...roomData.players[key],
+            score: 0
+          }))
+        : [];
+
+      setProp({
         uid: userStore.userId,
         roomId: roomData.id,
         nowCards: [],
         players: playersArray,
-        type: roomData.type
-      };
-
-      setProp(updatedProp);
-      console.log('Prop:', updatedProp);
+        type: roomData.type || ''
+      });
     }
   }, [roomData, userStore.userId]);
 

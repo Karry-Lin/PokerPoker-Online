@@ -1,7 +1,6 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { Search, List } from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
-
 import {
   Form,
   Card,
@@ -12,9 +11,7 @@ import {
   Modal,
   Alert
 } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
 import { HiLockClosed, HiLockOpen } from 'react-icons/hi2';
 import NavBar from '../components/navBar';
 import styles from './Page.module.css';
@@ -34,21 +31,6 @@ import {
 export default function Page() {
   const router = useRouter();
   const [rooms, setRooms] = useState([]);
-
-  useEffect(() => {
-    const getRooms = async () => {
-      const response = await fetch(`/api/gameroom`, {
-        method: 'GET'
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error);
-      }
-      setRooms(data);
-    };
-    getRooms();
-  }, []);
-
   const [selectedGameType, setSelectedGameType] = useState('全部');
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -58,6 +40,37 @@ export default function Page() {
   const [avatar, setAvatar] = useState('');
   const [uid, setUid] = useState('');
   const userStore = useUserStore();
+
+  useEffect(() => {
+    const loadSemanticUICSS = () => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href =
+        'https://cdn.jsdelivr.net/npm/semantic-ui-css@2.4.1/semantic.min.css';
+      link.id = 'semantic-ui-css';
+      document.head.appendChild(link);
+    };
+
+    loadSemanticUICSS();
+
+    // Clean up Semantic UI CSS when the component unmounts
+    return () => {
+      const link = document.getElementById('semantic-ui-css');
+      if (link) {
+        document.head.removeChild(link);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const getRooms = async () => {
+      const response = await fetch(`/api/gameroom`, { method: 'GET' });
+      const data = await response.json();
+      if (!response.ok) setErrorMessage(data.error);
+      setRooms(data);
+    };
+    getRooms();
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -86,6 +99,7 @@ export default function Page() {
     );
 
   const gameTypes = ['全部', ...new Set(rooms.map((room) => room.type))];
+
   const joinRoom = async (roomId, userId) => {
     const roomRef = doc(database, `room/${roomId}`);
     try {
@@ -130,16 +144,17 @@ export default function Page() {
       setPasswordInput('');
       setErrorMessage('');
       joinRoom(selectedRoom.id, uid);
-      // router.push(`/gameroom/${selectedRoom.id}`);
     } else {
       setErrorMessage('Incorrect password. Please try again.');
     }
   };
 
   return (
-    // <div>
-      <div className={styles.page}>
-      <NavBar avatar={avatar} setAvatar={setAvatar} />
+    <div className={styles.page}>
+      <div>
+        <NavBar avatar={avatar} setAvatar={setAvatar} />
+      </div>
+
       <Row>
         <Col xs={12} md={1}></Col>
         <Col xs={12} md={3} className='p-4'>

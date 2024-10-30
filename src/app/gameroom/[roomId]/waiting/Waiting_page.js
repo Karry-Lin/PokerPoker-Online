@@ -4,59 +4,76 @@ import styles from "./Page.module.css";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import shuffleCards from "../playing/BigTwo/conponents/shuffleCards";
+import { database } from '@/utils/firebase.js';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  where
+} from 'firebase/firestore';
 
 export default function Waiting_Page({ prop }) {
   const router = useRouter();
   const [deck, setDeck] = useState([]);
   const [players, setPlayers] = useState([]);
   
-  // Shuffle the deck on component load
+  // Default players array
+  const defaultPlayers = [
+    { id: "default1", name: "Waiting...", ready: false, place: 1, score: 0, handCards: [] },
+    { id: "default2", name: "Waiting...", ready: false, place: 2, score: 0, handCards: [] },
+    { id: "default3", name: "Waiting...", ready: false, place: 3, score: 0, handCards: [] },
+    { id: "default4", name: "Waiting...", ready: false, place: 4, score: 0, handCards: [] },
+  ];
+
   useEffect(() => {
     const shuffledDeck = shuffleCards();
     setDeck(shuffledDeck);
   }, []);
 
   useEffect(() => {
-    const defaultPlayers = [
-      { id: "default1", name: "Waiting...", ready: false, place: 1, score: 0, handCards: [] },
-      { id: "default2", name: "Waiting...", ready: false, place: 2, score: 0, handCards: [] },
-      { id: "default3", name: "Waiting...", ready: false, place: 3, score: 0, handCards: [] },
-      { id: "default4", name: "Waiting...", ready: false, place: 4, score: 0, handCards: [] },
-    ];
-    
-    // Merge prop players with default players
-    const mergedPlayers = [...prop.players, ...defaultPlayers].slice(0, 4);
-    setPlayers(mergedPlayers);
-    console.log(prop)
-  }, [prop.players]);
+    // Only proceed if prop exists and has a players array
+    if (prop && Array.isArray(prop.players)) {
+      // Merge prop players with default players
+      const mergedPlayers = [...prop.players, ...defaultPlayers].slice(0, 4);
+      setPlayers(mergedPlayers);
+      console.log('Updated players:', mergedPlayers);
+    } else {
+      // If no prop players, use default players
+      setPlayers(defaultPlayers);
+      console.log('Using default players');
+    }
+  }, [prop?.players]); // Only depend on prop.players, with optional chaining
 
   // Check if all four players are ready
   const areAllPlayersReady = players.every(player => player.ready === true);
 
-  // Submit functions for handling button clicks
   function submit_Ready() {
     console.log("Ready button clicked");
     // Implement your ready-up logic here
   }
 
-  function submit_Lobby() {
-    const leaveRoom = async (roomId, userId) => {
-      const roomRef = doc(database, `room/${roomId}`);
-      try {
+  async function submit_Lobby() {
+    try {
+      if (prop?.roomId && prop?.uid) {
+        const roomRef = doc(database, `room/${prop.roomId}`);
         const roomSnapshot = await getDoc(roomRef);
         const roomData = roomSnapshot.data();
-  
-        if (roomData?.players && roomData.players[userId]) {
+
+        if (roomData?.players && roomData.players[prop.uid]) {
           const updatedPlayers = { ...roomData.players };
-          delete updatedPlayers[userId];
+          delete updatedPlayers[prop.uid];
           await setDoc(roomRef, { ...roomData, players: updatedPlayers });
         }
-      } catch (error) {
-        console.error("Error leaving room:", error);
-        setErrorMessage("Could not leave the room. Please try again.");
       }
-    };
-    router.push("/lobby");
+      router.push("/lobby");
+    } catch (error) {
+      console.error("Error leaving room:", error);
+      // Handle error appropriately
+    }
   }
 
   return (
@@ -76,17 +93,17 @@ export default function Waiting_Page({ prop }) {
             </Card.Body>
             <ListGroup>
               <ListGroup.Item>Name: {player.name}</ListGroup.Item>
-              <ListGroup.Item>State: {player.ready?"ready":"unready"}</ListGroup.Item>
+              <ListGroup.Item>State: {player.ready ? "ready" : "unready"}</ListGroup.Item>
             </ListGroup>
           </Card>
         ))}
       </div>
 
       <div className={styles.button_container}>
-        <ToggleButton onClick={() => submit_Ready()} className={styles.button}>
+        <ToggleButton onClick={submit_Ready} className={styles.button}>
           Ready
         </ToggleButton>
-        <ToggleButton onClick={() => submit_Lobby()} className={styles.button}>
+        <ToggleButton onClick={submit_Lobby} className={styles.button}>
           Back To Lobby
         </ToggleButton>
       </div>

@@ -12,13 +12,13 @@ import {
   Button,
   Form
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation'; // Use next/navigation for app directory routing
+import { useRouter } from 'next/navigation'; 
 import { useUserStore } from '@/app/stores/userStore.js';
 
 const CreateRoomModal = ({ show, handleClose, createRoom }) => {
   const [roomName, setRoomName] = useState('');
   const [password, setPassword] = useState('');
-  const [roomType, setRoomType] = useState('Chinese Poker');
+  const [roomType, setRoomType] = useState('十三支');
 
   const handleSubmit = () => {
     if (roomName.trim() === '') {
