@@ -1,52 +1,33 @@
-.page {
-  /* position: relative; */
-  /* min-height: 100vh; */
-  width: 100%;
-  /* z-index: 1; */
-}
+/* Page.module.css */
 
-/* .page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  opacity: 0.6;
-  z-index: -1;
-} */
+.page {
+  width: 100%;
+}
 
 .page > * {
   position: relative;
-  /* z-index: 1;  */
 }
 
-.room_header {
-  font-size: 35px;
+.roomHeader {
+  font-size: 2.2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
 }
-.room_text {
-  font-size: 20px;
-  margin: 5px;
+
+.roomText {
+  font-size: 1.25rem;
+  margin: 0.3rem;
 }
 
 .card {
-  width: 500px;
-  height: 190px;
-  /* background-color: rgba(255, 255, 255, 0.9); */
-  /* border: none; */
+  width: 31rem;
+  min-height: 12rem;
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin: 20px;
-  flex-wrap: nowrap;
+  margin: 1.25rem;
 }
 
 .card:hover {
@@ -54,8 +35,36 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.float-right {
-  float: right;
-  /* float: inline-end; */
-  position: fixed;
+/* Style for the search bar */
+.searchBar {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 10px 15px;
+  font-size: 16px;
+  transition: all 0.3s ease;
 }
+
+.searchBar:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.gameTypeList .item {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f8f9fa; /* Default background color */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.gameTypeList .item:hover {
+  background-color: #e2e6ea; /* Gray on hover */
+}
+
+.gameTypeList .item.is-active {
+  background-color: #9ea4aa;
+  color: #fff;
+}
+
+
