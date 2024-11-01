@@ -1,149 +1,130 @@
 'use client';
-import { Card, ListGroup, ToggleButton } from 'react-bootstrap';
-import styles from './Page.module.css';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import shuffleCards from '../playing/BigTwo/conponents/shuffleCards';
+import { useRouter } from 'next/navigation';
+import { Card, ListGroup, ToggleButton } from 'react-bootstrap';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { database } from '@/utils/firebase.js';
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  where
-} from 'firebase/firestore';
+import shuffleCards from '../playing/BigTwo/conponents/shuffleCards';
+import styles from './Page.module.css';
 
-export default function Waiting_Page({ prop }) {
+// Default player template
+const DEFAULT_PLAYER = {
+  avatar: '/avator_test.jpg',
+  username: 'Waiting...',
+  ready: false,
+  score: 0,
+  handCards: []
+};
+
+// Create array of 4 default players
+const DEFAULT_PLAYERS = Array.from({ length: 4 }, (_, index) => ({
+  ...DEFAULT_PLAYER,
+  id: `default${index + 1}`,
+  place: index + 1
+}));
+
+export default function WaitingPage({ prop }) {
   const router = useRouter();
+  const [players, setPlayers] = useState(DEFAULT_PLAYERS);
   const [deck, setDeck] = useState([]);
-  const [players, setPlayers] = useState([]);
 
-  // Default players array
-  const defaultPlayers = [
-    {
-      id: 'default1',
-      avatar: '/avator_test.jpg',
-      username: 'Waiting...',
-      ready: false,
-      place: 1,
-      score: 0,
-      handCards: []
-    },
-    {
-      id: 'default2',
-      avatar: '/avator_test.jpg',
-      username: 'Waiting...',
-      ready: false,
-      place: 2,
-      score: 0,
-      handCards: []
-    },
-    {
-      id: 'default3',
-      avatar: '/avator_test.jpg',
-      username: 'Waiting...',
-      ready: false,
-      place: 3,
-      score: 0,
-      handCards: []
-    },
-    {
-      id: 'default4',
-      avatar: '/avator_test.jpg',
-      username: 'Waiting...',
-      ready: false,
-      place: 4,
-      score: 0,
-      handCards: []
-    }
-  ];
-
+  // Initialize deck and players
   useEffect(() => {
-    const shuffledDeck = shuffleCards();
-    setDeck(shuffledDeck);
-  }, []);
+    setDeck(shuffleCards());
 
-  useEffect(() => {
-    if (prop && Array.isArray(prop.players)) {
-      const mergedPlayers = [...prop.players, ...defaultPlayers].slice(0, 4);
+    if (prop?.players) {
+      const mergedPlayers = [...prop.players, ...DEFAULT_PLAYERS].slice(0, 4);
       setPlayers(mergedPlayers);
-    } else {
-      setPlayers(defaultPlayers);
-      // console.log('Using default players');
     }
-    console.log(players);
   }, [prop?.players]);
 
-  const areAllPlayersReady = players.every((player) => player.ready === true);
+  // Check if all players are ready and update room state
+  useEffect(() => {
+    const checkAndUpdateGameState = async () => {
+      const areAllPlayersReady = players.every((player) => player.ready);
 
-  async function submit_Ready() {
+      if (areAllPlayersReady && prop?.roomId) {
+        try {
+          const roomRef = doc(database, `room/${prop.roomId}`);
+          const roomSnapshot = await getDoc(roomRef);
+          const roomData = roomSnapshot.data();
+          await setDoc(roomRef, { ...roomData, state: 'playing' });
+        } catch (error) {
+          console.error('Error updating game state:', error);
+        }
+      }
+    };
+
+    checkAndUpdateGameState();
+  }, [players, prop?.roomId]);
+
+  // Handle ready status toggle
+  const handleReadyToggle = async () => {
+    if (!prop?.roomId || !prop?.uid) return;
+
     try {
-      if (prop?.roomId && prop?.uid) {
-        const roomRef = doc(database, `room/${prop.roomId}`);
-        const roomSnapshot = await getDoc(roomRef);
-        const roomData = roomSnapshot.data();
+      const roomRef = doc(database, `room/${prop.roomId}`);
+      const roomSnapshot = await getDoc(roomRef);
+      const roomData = roomSnapshot.data();
 
-        if (roomData?.players && roomData.players[prop.uid]) {
-          // Toggle the user's "ready" status
-          const isReady = !roomData.players[prop.uid].ready;
-          const updatedPlayers = {
-            ...roomData.players,
-            [prop.uid]: {
-              ...roomData.players[prop.uid],
-              ready: isReady
-            }
-          };
-
-          // Update database
-          await setDoc(roomRef, { ...roomData, players: updatedPlayers });
-
-          // Update local state
-          setPlayers((prevPlayers) =>
-            prevPlayers.map((player) =>
-              player.id === prop.uid ? { ...player, ready: isReady } : player
-            )
-          );
-          const readyButton = document.querySelector(`.${styles.button}`);
-          if (readyButton) {
-            readyButton.classList.toggle(styles.ready, isReady);
+      if (roomData?.players?.[prop.uid]) {
+        const isReady = !roomData.players[prop.uid].ready;
+        const updatedPlayers = {
+          ...roomData.players,
+          [prop.uid]: {
+            ...roomData.players[prop.uid],
+            ready: isReady
           }
+        };
+
+        await setDoc(roomRef, { ...roomData, players: updatedPlayers });
+
+        setPlayers((prevPlayers) =>
+          prevPlayers.map((player) =>
+            player.id === prop.uid ? { ...player, ready: isReady } : player
+          )
+        );
+
+        // Update button style
+        const readyButton = document.querySelector(`.${styles.button}`);
+        if (readyButton) {
+          readyButton.classList.toggle(styles.ready, isReady);
         }
       }
     } catch (error) {
       console.error('Error updating ready status:', error);
     }
-  }
+  };
 
-  async function submit_Lobby() {
+  // Handle returning to lobby
+  const handleReturnToLobby = async () => {
+    if (!prop?.roomId || !prop?.uid) return;
+
     try {
-      if (prop?.roomId && prop?.uid) {
-        const roomRef = doc(database, `room/${prop.roomId}`);
-        const roomSnapshot = await getDoc(roomRef);
-        const roomData = roomSnapshot.data();
+      const roomRef = doc(database, `room/${prop.roomId}`);
+      const roomSnapshot = await getDoc(roomRef);
+      const roomData = roomSnapshot.data();
 
-        if (roomData?.players && roomData.players[prop.uid]) {
-          const updatedPlayers = { ...roomData.players };
-          delete updatedPlayers[prop.uid];
-          await setDoc(roomRef, { ...roomData, players: updatedPlayers });
-        }
+      if (roomData?.players?.[prop.uid]) {
+        const updatedPlayers = { ...roomData.players };
+        delete updatedPlayers[prop.uid];
+        await setDoc(roomRef, { ...roomData, players: updatedPlayers });
       }
+
       router.push('/lobby');
     } catch (error) {
       console.error('Error leaving room:', error);
     }
-  }
+  };
 
   return (
     <div className={styles.body}>
       <div className={styles.card_container}>
         {players.map((player, index) => (
-          <Card key={index} className={styles.card}>
+          <Card key={player.id} className={styles.card}>
             <Card.Img
               variant='top'
-              src={`${player.avatar}`}
+              src={player.avatar}
               className={styles.avator}
             />
             <Card.Body className={styles.card_body}>
@@ -162,19 +143,13 @@ export default function Waiting_Page({ prop }) {
       </div>
 
       <div className={styles.button_container}>
-        <ToggleButton onClick={submit_Ready} className={styles.button}>
+        <ToggleButton onClick={handleReadyToggle} className={styles.button}>
           Ready
         </ToggleButton>
-        <ToggleButton onClick={submit_Lobby} className={styles.button}>
+        <ToggleButton onClick={handleReturnToLobby} className={styles.button}>
           Back To Lobby
         </ToggleButton>
       </div>
-
-      {areAllPlayersReady && (
-        <div className={styles.ready_message}>
-          All players are ready! Starting the game...
-        </div>
-      )}
     </div>
   );
 }
