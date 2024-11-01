@@ -79,15 +79,15 @@ export default function Page() {
               <Col md={4} className="mb-4">
                 <Card className={`shadow-sm border-0 h-100 ${styles.hoverCard}`}>
                   <Card.Body>
-                    <a href="https://www.freepik.com" target="_blank" rel="noopener noreferrer">
-                      <img src="/freepik_icon.png" alt="freepik_icon" width={50} height={50}/>
+                    <a href="https://aws.amazon.com/tw/ec2/?nc2=h_ql_prod_fs_ec2" target="_blank" rel="noopener noreferrer">
+                      <img src="/awsEC2_icon.png" alt="awsEC2_icon" width={50} height={50}/>
                     </a>
-                    <Card.Title className="mt-3 fs-4">Freepik</Card.Title>
+                    <Card.Title className="mt-3 fs-4">AWS EC2</Card.Title>
                   </Card.Body>
                 </Card>
               </Col>
             </Row>
-            <div className="text-center mt-5">
+            <div className={`text-center mt-5 ${styles.link}`}>
               <h5>
                 Authors:{" "}
                 <a href="https://github.com/Karry-Lin" target="_blank" rel="noopener noreferrer" className="me-1">
@@ -98,6 +98,7 @@ export default function Page() {
                   Howard
                 </a>
               </h5>
+              <h5>圖片來源：<a href="https://www.freepik.com" target="_blank" rel="noopener noreferrer">Freepik</a></h5>
             </div>
 
           </Col>
