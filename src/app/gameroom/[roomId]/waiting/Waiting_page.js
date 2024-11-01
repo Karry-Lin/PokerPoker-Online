@@ -67,26 +67,21 @@ export default function Waiting_Page({ prop }) {
   }, []);
 
   useEffect(() => {
-    // Only proceed if prop'avator_test.jpg' exists and has a players array
     if (prop && Array.isArray(prop.players)) {
-      // Merge prop players with default players
       const mergedPlayers = [...prop.players, ...defaultPlayers].slice(0, 4);
       setPlayers(mergedPlayers);
-      console.log('Updated players:', mergedPlayers);
     } else {
-      // If no prop players, use default players
       setPlayers(defaultPlayers);
-      console.log('Using default players');
+      // console.log('Using default players');
     }
     console.log(players);
   }, [prop?.players]);
 
-  // Check if all four players are ready
   const areAllPlayersReady = players.every((player) => player.ready === true);
 
   function submit_Ready() {
     console.log('Ready button clicked');
-    // Implement your ready-up logic here
+    // finish here
   }
 
   async function submit_Lobby() {
@@ -105,7 +100,6 @@ export default function Waiting_Page({ prop }) {
       router.push('/lobby');
     } catch (error) {
       console.error('Error leaving room:', error);
-      // Handle error appropriately
     }
   }
 
