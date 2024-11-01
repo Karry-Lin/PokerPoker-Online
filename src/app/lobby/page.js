@@ -25,7 +25,8 @@ export default function GameRoomPage() {
   });
   const [userData, setUserData] = useState({
     avatar: '',
-    uid: ''
+    uid: '',
+    username: ''
   });
 
   // Fetch rooms data
@@ -48,7 +49,8 @@ export default function GameRoomPage() {
       if (response.ok) {
         setUserData({
           avatar: data.avatar || '',
-          uid: userStore.userId
+          uid: userStore.userId,
+          username: data.username
         });
       }
     };
@@ -83,7 +85,8 @@ export default function GameRoomPage() {
             handCards: [],
             score: 0,
             avatar: userData.avatar,
-            ready: false
+            ready: false,
+            username: userData.username
           }
         }
       });

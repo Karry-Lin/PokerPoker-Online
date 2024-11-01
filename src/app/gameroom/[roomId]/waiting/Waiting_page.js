@@ -25,7 +25,7 @@ export default function Waiting_Page({ prop }) {
   const defaultPlayers = [
     {
       id: 'default1',
-      avatar:'/avator_test.jpg',
+      avatar: '/avator_test.jpg',
       username: 'Waiting...',
       ready: false,
       place: 1,
@@ -34,7 +34,7 @@ export default function Waiting_Page({ prop }) {
     },
     {
       id: 'default2',
-      avatar:'/avator_test.jpg',
+      avatar: '/avator_test.jpg',
       username: 'Waiting...',
       ready: false,
       place: 2,
@@ -43,7 +43,7 @@ export default function Waiting_Page({ prop }) {
     },
     {
       id: 'default3',
-      avatar:'/avator_test.jpg',
+      avatar: '/avator_test.jpg',
       username: 'Waiting...',
       ready: false,
       place: 3,
@@ -52,7 +52,7 @@ export default function Waiting_Page({ prop }) {
     },
     {
       id: 'default4',
-      avatar:'/avator_test.jpg',
+      avatar: '/avator_test.jpg',
       username: 'Waiting...',
       ready: false,
       place: 4,
@@ -79,9 +79,42 @@ export default function Waiting_Page({ prop }) {
 
   const areAllPlayersReady = players.every((player) => player.ready === true);
 
-  function submit_Ready() {
-    console.log('Ready button clicked');
-    // finish here
+  async function submit_Ready() {
+    try {
+      if (prop?.roomId && prop?.uid) {
+        const roomRef = doc(database, `room/${prop.roomId}`);
+        const roomSnapshot = await getDoc(roomRef);
+        const roomData = roomSnapshot.data();
+
+        if (roomData?.players && roomData.players[prop.uid]) {
+          // Toggle the user's "ready" status
+          const isReady = !roomData.players[prop.uid].ready;
+          const updatedPlayers = {
+            ...roomData.players,
+            [prop.uid]: {
+              ...roomData.players[prop.uid],
+              ready: isReady
+            }
+          };
+
+          // Update database
+          await setDoc(roomRef, { ...roomData, players: updatedPlayers });
+
+          // Update local state
+          setPlayers((prevPlayers) =>
+            prevPlayers.map((player) =>
+              player.id === prop.uid ? { ...player, ready: isReady } : player
+            )
+          );
+          const readyButton = document.querySelector(`.${styles.button}`);
+          if (readyButton) {
+            readyButton.classList.toggle(styles.ready, isReady);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error updating ready status:', error);
+    }
   }
 
   async function submit_Lobby() {
