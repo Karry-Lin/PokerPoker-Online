@@ -18,14 +18,11 @@ export default function BigTwo({ prop }) {
   const [handCards, setHandCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
 
-  // Update middle cards when props change
   useEffect(() => {
     if (nowCards) {
       setMiddleCards(nowCards);
     }
   }, [nowCards]);
-
-  // Update hand cards when player data changes
   useEffect(() => {
     if (players && uid) {
       const currentPlayer = players.find((player) => player.id === uid);
@@ -42,7 +39,9 @@ export default function BigTwo({ prop }) {
         : [...prevSelected, card]
     );
   };
-
+  const handlePass = async () =>{
+    
+  }
   const handleSubmit = async () => {
     if (!compare(selectedCards, middleCards)) {
       console.log('Invalid card combination');
@@ -71,7 +70,6 @@ export default function BigTwo({ prop }) {
       setSelectedCards([]);
     } catch (error) {
       console.error('Error updating game state:', error);
-      // TODO: Add user feedback for errors
     }
   };
 
@@ -122,6 +120,13 @@ export default function BigTwo({ prop }) {
           disabled={selectedCards.length === 0}
         >
           Submit
+        </button>
+        <button
+          className={styles.submitButton}
+          onClick={handlePass}
+          disabled={selectedCards.length === 0}
+        >
+          pass
         </button>
       </div>
     </div>
