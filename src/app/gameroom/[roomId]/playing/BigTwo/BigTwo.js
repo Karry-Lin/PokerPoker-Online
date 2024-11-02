@@ -1,20 +1,40 @@
 'use client';
+
 import { useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import styles from './Page.module.css';
-import shuffleCards from './conponents/shuffleCards';
 import { database } from '@/utils/firebase.js';
+import compare from './components/compare';
+
+const PLAYER_CARD_COUNTS = {
+  top: 8,
+  left: 10,
+  right: 13
+};
 
 export default function BigTwo({ prop }) {
-  const roomId = prop.id;
-  const [middleCard, setMiddleCards] = useState([3, 4, 5, 6, 7]);
-  const [handCards, setHandCards] = useState([
-    1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14
-  ]);
+  const { roomId, nowCards, players, uid } = prop;
+  const [middleCards, setMiddleCards] = useState([]);
+  const [handCards, setHandCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
 
-  const OtherPlayersCardNumber = [8, 10, 13];
+  // Update middle cards when props change
+  useEffect(() => {
+    if (nowCards) {
+      setMiddleCards(nowCards);
+    }
+  }, [nowCards]);
 
-  // Toggle card selection on click
+  // Update hand cards when player data changes
+  useEffect(() => {
+    if (players && uid) {
+      const currentPlayer = players.find((player) => player.id === uid);
+      if (currentPlayer) {
+        setHandCards(currentPlayer.handCards || []);
+      }
+    }
+  }, [players, uid]);
+
   const handleCardClick = (card) => {
     setSelectedCards((prevSelected) =>
       prevSelected.includes(card)
@@ -23,43 +43,59 @@ export default function BigTwo({ prop }) {
     );
   };
 
-  // Handle submit button click
-  const handleSubmit = () => {
-    setHandCards((prevHand) =>
-      prevHand.filter((card) => !selectedCards.includes(card))
-    );
-    setSelectedCards([]);
+  const handleSubmit = async () => {
+    if (!compare(selectedCards, middleCards)) {
+      console.log('Invalid card combination');
+      return;
+    }
+    try {
+      const roomRef = doc(database, `room/${roomId}`);
+      const roomSnapshot = await getDoc(roomRef);
+
+      const roomData = roomSnapshot.data();
+
+      if (!roomData.players || roomData.players.uid === -1) {
+        throw new Error('Invalid player data');
+      }
+
+      const updatedHandCards = handCards.filter(
+        (card) => !selectedCards.includes(card)
+      );
+
+      await updateDoc(roomRef, {
+        [`players.${uid}.handCards`]: updatedHandCards,
+        nowCards: selectedCards
+      });
+
+      setHandCards(updatedHandCards);
+      setSelectedCards([]);
+    } catch (error) {
+      console.error('Error updating game state:', error);
+      // TODO: Add user feedback for errors
+    }
   };
+
+  const renderOtherPlayerCards = (position, count) => (
+    <div className={styles[`${position}Player`]}>
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={`${position}-${index}`} className={styles.otherCard}>
+          <img src='/cards/0.jpg' alt="Other Player's Card" />
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className={styles.container}>
       {/* Other players' cards */}
-      <div className={styles.topPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[0] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
-          </div>
-        ))}
-      </div>
+      {renderOtherPlayerCards('top', PLAYER_CARD_COUNTS.top)}
+      {renderOtherPlayerCards('left', PLAYER_CARD_COUNTS.left)}
+      {renderOtherPlayerCards('right', PLAYER_CARD_COUNTS.right)}
 
-      <div className={styles.leftPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[1] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.rightPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[2] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
-          </div>
-        ))}
-      </div>
+      {/* Middle cards */}
       <div className={styles.middleCards}>
-        {middleCard.map((card, index) => (
-          <div key={index} className={styles.middleCard}>
+        {middleCards?.map((card, index) => (
+          <div key={`middle-${index}`} className={styles.middleCard}>
             <img src={`/cards/${card}.png`} alt={`Card ${card}`} />
           </div>
         ))}
@@ -70,7 +106,7 @@ export default function BigTwo({ prop }) {
         <div className={styles.handCards}>
           {handCards.map((card, index) => (
             <div
-              key={index}
+              key={`hand-${index}`}
               className={`${styles.card} ${
                 selectedCards.includes(card) ? styles.selected : ''
               }`}
@@ -80,58 +116,14 @@ export default function BigTwo({ prop }) {
             </div>
           ))}
         </div>
-        <button className={styles.submitButton} onClick={handleSubmit}>
+        <button
+          className={styles.submitButton}
+          onClick={handleSubmit}
+          disabled={selectedCards.length === 0}
+        >
           Submit
         </button>
       </div>
     </div>
   );
 }
-//prop data as follow
-// const prop = {
-//   id: "a45fe9ce-0004-4fec-8149-54c7761938ed", this is room id
-//   nowCards: [3,4,5,6,7], place it as middle card
-//   players: [
-//     {
-//       id: "6e9e6917-ec83-4b12-b2e9-fd7ecb840f73",
-//       avatar: "https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1728916380593_Circle-103x103-download.png?alt=media&token=ad24e688-20a1-4774-874f-f4fe54b6d3a5",
-//       handCards: [],
-//       place: 4,
-//       ready: true,
-//       score: 0,
-//       username: "test001"
-//     },
-//     {
-//       id: "726a7cbe-0d00-42ac-a27a-4714a299cd06",
-//       avatar: "https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1729918669117_%E6%A6%AE%E6%B0%91%E4%B9%8B%E5%AE%B6.png?alt=media&token=77f88b92-560e-4379-8cd8-937da21f2813",
-//       handCards: [],
-//       place: 2,
-//       ready: true,
-//       score: 0,
-//       username: "test003"
-//     },
-//     {
-//       id: "b8d36589-673c-48a4-8529-6d1062cdcddf",
-//       avatar: "https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1728983058758_%E9%99%B6%E6%9C%B1%E9%9A%B1%E5%9C%92.jfif?alt=media&token=1064e23d-0058-4b6d-bb0c-cb9785244f21",
-//       handCards: [],
-//       place: 3,
-//       ready: true,
-//       score: 0,
-//       username: "test002"
-//     },
-//     {
-//       id: "f3f7b67c-6772-4890-9cd6-8d7af4fbcbb1",
-//       avatar: "https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1729918737075_pika.png?alt=media&token=a20de5bd-1339-47bc-a376-afda0e246515",
-//       handCards: [],
-//       money: 0,
-//       place: 1,
-//       ready: true,
-//       score: 0,
-//       username: "test004"
-//     }
-//   ],
-//   state: "playing",
-//   time: "2024-11-01T05:44:45.834Z",
-//   turn: 0,
-//   type: "大老二"
-// };

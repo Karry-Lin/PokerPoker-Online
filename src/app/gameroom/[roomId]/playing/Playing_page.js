@@ -6,7 +6,7 @@ import ChineseRummy from './Chinese Rummy/ChineseRummy';
 import Test from './test/Test';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { database } from '@/utils/firebase.js';
-import shuffleCards from './BigTwo/conponents/shuffleCards';
+import shuffleCards from './BigTwo/components/shuffleCards';
 
 export default function PlayingPage({ prop }) {
   useEffect(() => {
@@ -14,9 +14,8 @@ export default function PlayingPage({ prop }) {
       // console.log('prop:', prop);
       const shuffle = async () => {
         if (!prop.isShuffled) {
-          // Get shuffled deck
-          const deck = shuffleCards();
           try {
+            const deck = shuffleCards();
             const roomRef = doc(database, `room/${prop.roomId}`);
             const roomSnapshot = await getDoc(roomRef);
             const roomData = roomSnapshot.data();

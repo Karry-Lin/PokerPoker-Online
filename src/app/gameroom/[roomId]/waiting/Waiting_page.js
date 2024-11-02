@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Card, ListGroup, ToggleButton } from 'react-bootstrap';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { database } from '@/utils/firebase.js';
-import shuffleCards from '../playing/BigTwo/conponents/shuffleCards';
+import shuffleCards from '../playing/BigTwo/components/shuffleCards';
 import styles from './Page.module.css';
 
 // Default player template
