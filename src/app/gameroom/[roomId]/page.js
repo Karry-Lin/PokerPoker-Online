@@ -51,13 +51,13 @@ const GameRoom = () => {
       setProp({
         uid: userStore.userId,
         roomId: roomData.id,
-        nowCards: [],
+        nowCards: [], 
         players: playersArray,
         type: roomData.type || ''
       });
-      // console.log(prop);
+      // console.log(prop)
     }
-  }, [roomData, userStore.userId]);
+  }, [roomData, userStore.userId]); 
 
   if (error) return <div>Error: {error}</div>;
   if (!roomData) return <p>Loading...</p>;

@@ -6,35 +6,31 @@ import ChineseRummy from './Chinese Rummy/ChineseRummy';
 import Test from './test/Test';
 import shuffleCards from './BigTwo/conponents/shuffleCards';
 export default function PlayingPage({ prop }) {
-  const [deck, setDeck] = useState([]);
-  const [roomData,setRoomData] = useState(prop);
+  // useEffect(() => {
+  //   console.log('porp:',prop)
+  // }, [prop]);
   useEffect(() => {
-    const shuffledDeck = shuffleCards();
-    setDeck(shuffledDeck);
-    // console.log(shuffledDeck);
-  }, []);
-  useEffect(() => {
-    if(prop?.roomData?.type === '大老二'){
+    if(prop?.type == '大老二'){
       
-    }else if(prop?.roomData?.type === '十三支'){
+    }else if(prop?.type == '十三支'){
       
-    }else if(prop?.roomData?.type === '撿紅點'){
-      
+    }else if(prop?.type == '撿紅點'){
+    
     }
   }, []); 
 
   return (
     <div>
-      {prop?.roomData?.type === '大老二' ? (
+      {prop?.type == '大老二' ? (
         <BigTwo prop={prop} />
-      ) : prop?.roomData?.type === '十三支' ? (
+      ) : prop?.type == '十三支' ? (
         <ChinesePoker prop={prop} />
-      ) : prop?.roomData?.type === '撿紅點' ? (
+      ) : prop?.type == '撿紅點' ? (
         <ChineseRummy prop={prop} />
-      ) : prop?.roomData?.type === 'test' ? (
+      ) : prop?.type == 'test' ? (
         <Test prop={prop} />
       ): (
-        <div>Unknown state</div>
+        <div>die in playing room</div>
       )}
     </div>
   );
