@@ -26,11 +26,9 @@ const DEFAULT_PLAYERS = Array.from({ length: 4 }, (_, index) => ({
 export default function WaitingPage({ prop }) {
   const router = useRouter();
   const [players, setPlayers] = useState(DEFAULT_PLAYERS);
-  const [deck, setDeck] = useState([]);
 
   // Initialize deck and players
   useEffect(() => {
-    setDeck(shuffleCards());
 
     if (prop?.players) {
       const mergedPlayers = [...prop.players, ...DEFAULT_PLAYERS].slice(0, 4);
