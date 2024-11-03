@@ -10,6 +10,7 @@ import shuffleCards from './BigTwo/components/shuffleCards';
 
 export default function PlayingPage({ prop }) {
   const { roomRef, roomData } = prop;
+
   useEffect(() => {
     if (prop?.type == '大老二') {
       const shuffle = async () => {
@@ -18,24 +19,38 @@ export default function PlayingPage({ prop }) {
             const deck = shuffleCards();
             const { players } = roomData;
             const playerIds = Object.keys(players);
-            // console.log('check1',playerIds)
-            // Create updated players object with distributed cards
             const updatedPlayers = {};
+            
+            // Find who has card 41 (3♦) while distributing cards
+            let startingPlayerId = null;
+            
             playerIds.forEach((playerId, index) => {
               const startIdx = index * 13;
               const endIdx = startIdx + 13;
+              const playerCards = deck.slice(startIdx, endIdx);
+              
+              // Check if this player has card 41 (3♦)
+              if (playerCards.includes(41)) {
+                startingPlayerId = playerId;
+              }
+              
               updatedPlayers[playerId] = {
                 ...players[playerId],
-                handCards: deck.slice(startIdx, endIdx)
+                handCards: playerCards
               };
             });
+
+            if (!startingPlayerId) {
+              console.error('Card 41 not found in deck');
+              return;
+            }
+
             await setDoc(roomRef, {
               ...roomData,
               players: updatedPlayers,
-              isShuffled: true
+              isShuffled: true,
+              turn: startingPlayerId // Set turn to the player with card 41
             });
-            // console.log('prop:', prop);
-            // console.log('finish shuffle');
           } catch (error) {
             console.error('Error updating game state:', error);
           }
@@ -43,12 +58,18 @@ export default function PlayingPage({ prop }) {
       };
       shuffle();
     } else if (prop?.type == '十三支') {
+      // Chinese Poker initialization logic
     } else if (prop?.type == '撿紅點') {
+      // Chinese Rummy initialization logic
     }
   }, [prop]);
 
+  if (!prop?.type) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div>
+    <div className="w-full h-full">
       {prop?.type == '大老二' ? (
         <BigTwo prop={prop} />
       ) : prop?.type == '十三支' ? (
@@ -58,7 +79,7 @@ export default function PlayingPage({ prop }) {
       ) : prop?.type == 'test' ? (
         <Test prop={prop} />
       ) : (
-        <div>die in playing room</div>
+        <div>Error: Invalid game type</div>
       )}
     </div>
   );

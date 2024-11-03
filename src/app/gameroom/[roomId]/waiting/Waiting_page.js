@@ -12,7 +12,8 @@ const DEFAULT_PLAYER = {
   username: 'Waiting...',
   ready: false,
   score: 0,
-  handCards: []
+  handCards: [],
+  place: 999 // High default place for sorting
 };
 
 // Create array of 4 default players
@@ -27,10 +28,29 @@ export default function WaitingPage({ prop }) {
   const [players, setPlayers] = useState(DEFAULT_PLAYERS);
   const { roomData, roomRef } = prop;
 
-  // Initialize deck and players
+  // Initialize deck and players with sorting
   useEffect(() => {
     if (prop?.players) {
-      const mergedPlayers = [...prop.players, ...DEFAULT_PLAYERS].slice(0, 4);
+      // Convert Firebase players object to array and merge with defaults
+      const firebasePlayers = Object.entries(prop.players).map(([id, playerData]) => ({
+        ...playerData,
+        id
+      }));
+      
+      // Merge and sort players
+      const mergedPlayers = [...firebasePlayers, ...DEFAULT_PLAYERS]
+        .slice(0, 4)
+        .sort((a, b) => {
+          // Sort by place if both players have valid places
+          if (a.place && b.place) {
+            return a.place - b.place;
+          }
+          // Put players with undefined places at the end
+          if (!a.place) return 1;
+          if (!b.place) return -1;
+          return 0;
+        });
+
       setPlayers(mergedPlayers);
     }
   }, [prop?.players]);
@@ -53,8 +73,6 @@ export default function WaitingPage({ prop }) {
 
   // Handle ready status toggle
   const handleReadyToggle = async () => {
-    if (!prop?.roomId || !prop?.uid) return;
-
     try {
       if (roomData?.players?.[prop.uid]) {
         const isReady = !roomData.players[prop.uid].ready;
@@ -100,16 +118,16 @@ export default function WaitingPage({ prop }) {
   return (
     <div className={styles.body}>
       <div className={styles.card_container}>
-        {players.map((player, index) => (
+        {players.map((player) => (
           <Card key={player.id} className={styles.card}>
             <Card.Img
-              variant='top'
+              variant="top"
               src={player.avatar}
               className={styles.avator}
             />
             <Card.Body className={styles.card_body}>
               <Card.Title className={styles.card_title}>
-                {index + 1} Place
+                {player.place} Place
               </Card.Title>
             </Card.Body>
             <ListGroup>

@@ -12,13 +12,7 @@ const GameRoom = () => {
   const { roomId } = useParams();
   const [roomData, setRoomData] = useState(null);
   const [error, setError] = useState(null);
-  const [prop, setProp] = useState({
-    uid: '',
-    roomId: '',
-    nowCards: [],
-    players: [],
-    type: ''
-  });
+  const [prop, setProp] = useState({});
   const userStore = useUserStore();
 
   useEffect(() => {
@@ -33,22 +27,20 @@ const GameRoom = () => {
           setError('Room not found');
           return;
         }
+
         const data = {
           id: snapshot.id,
-          ...snapshot.data()
+          ...snapshot.data(),
         };
         setRoomData(data);
-        // console.log('Room Data:', data);
 
         // Update prop if userStore.userId is available
-        if (userStore.userId) {
-          const playersArray = data.players
-            ? Object.keys(data.players).map((key) => ({
-                id: key,
-                ...data.players[key],
-                score: 0
-              }))
-            : [];
+        if (userStore.userId && data.players && data.players[userStore.userId]) {
+          const playersArray = Object.keys(data.players).map((key) => ({
+            id: key,
+            ...data.players[key],
+            score: 0,
+          }));
 
           setProp({
             uid: userStore.userId,
@@ -57,11 +49,13 @@ const GameRoom = () => {
             nowCards: data.nowCards || [],
             players: playersArray,
             type: data.type || '',
-            userplace:data.players[userStore.userId].place,
-            turn:data.turn,
-            roomRef:roomRef,
-            roomData:roomData
+            userplace: data.players[userStore.userId]?.place || null,
+            turn: data.turn,
+            roomRef,         
+            roomData: data,  
           });
+        } else if (!userStore.userId) {
+          setError('User not logged in');
         }
       },
       (err) => {
@@ -70,7 +64,6 @@ const GameRoom = () => {
       }
     );
 
-    // Cleanup subscription on unmount
     return () => {
       unsubscribe();
     };
