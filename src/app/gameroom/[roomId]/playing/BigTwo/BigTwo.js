@@ -8,7 +8,7 @@ import compare from './components/compare';
 
 export default function BigTwo({ prop }) {
   console.log(prop);
-  const { roomId, nowCards, players, uid, userplace, turn } = prop;
+  const { roomRef, roomData, nowCards, players, uid, userplace, turn } = prop;
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
@@ -51,22 +51,16 @@ export default function BigTwo({ prop }) {
   };
 
   const handlePass = async () => {
-    const roomRef = doc(database, `room/${roomId}`);
     await updateDoc(roomRef, {
       turn: (turn % 4) + 1
     });
   };
-
   const handleSubmit = async () => {
     if (!compare(selectedCards, middleCards)) {
       console.log('Invalid card combination');
       return;
     }
     try {
-      const roomRef = doc(database, `room/${roomId}`);
-      const roomSnapshot = await getDoc(roomRef);
-      const roomData = roomSnapshot.data();
-
       if (!roomData.players || roomData.players.uid === -1) {
         throw new Error('Invalid player data');
       }
@@ -83,6 +77,14 @@ export default function BigTwo({ prop }) {
 
       setHandCards(updatedHandCards);
       setSelectedCards([]);
+      if (updatedHandCards.length === 0) {
+        console.log(`Player ${uid} has won the game!`);
+        // Additional logic for handling the win, e.g., ending the game or showing a message
+        await updateDoc(roomRef, {
+          state: 'end'
+          // winner: uid
+        });
+      }
     } catch (error) {
       console.error('Error updating game state:', error);
     }

@@ -33,13 +33,12 @@ const GameRoom = () => {
           setError('Room not found');
           return;
         }
-
         const data = {
           id: snapshot.id,
           ...snapshot.data()
         };
         setRoomData(data);
-        console.log('Room Data:', data);
+        // console.log('Room Data:', data);
 
         // Update prop if userStore.userId is available
         if (userStore.userId) {
@@ -59,7 +58,9 @@ const GameRoom = () => {
             players: playersArray,
             type: data.type || '',
             userplace:data.players[userStore.userId].place,
-            turn:data.turn
+            turn:data.turn,
+            roomRef:roomRef,
+            roomData:roomData
           });
         }
       },

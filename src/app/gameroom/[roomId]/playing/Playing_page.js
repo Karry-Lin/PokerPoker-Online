@@ -9,19 +9,14 @@ import { database } from '@/utils/firebase.js';
 import shuffleCards from './BigTwo/components/shuffleCards';
 
 export default function PlayingPage({ prop }) {
+  const { roomRef, roomData } = prop;
   useEffect(() => {
     if (prop?.type == '大老二') {
-      // console.log('prop:', prop);
       const shuffle = async () => {
         if (!prop.isShuffled) {
           try {
             const deck = shuffleCards();
-            const roomRef = doc(database, `room/${prop.roomId}`);
-            const roomSnapshot = await getDoc(roomRef);
-            const roomData = roomSnapshot.data();
-            // console.log('check1', roomData);
             const { players } = roomData;
-            // Convert players object to array easier distribution
             const playerIds = Object.keys(players);
             // console.log('check1',playerIds)
             // Create updated players object with distributed cards

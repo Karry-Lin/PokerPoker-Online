@@ -7,7 +7,6 @@ import { database } from '@/utils/firebase.js';
 import shuffleCards from '../playing/BigTwo/components/shuffleCards';
 import styles from './Page.module.css';
 
-// Default player template
 const DEFAULT_PLAYER = {
   avatar: '/avator_test.jpg',
   username: 'Waiting...',
@@ -26,10 +25,10 @@ const DEFAULT_PLAYERS = Array.from({ length: 4 }, (_, index) => ({
 export default function WaitingPage({ prop }) {
   const router = useRouter();
   const [players, setPlayers] = useState(DEFAULT_PLAYERS);
+  const { roomData, roomRef } = prop;
 
   // Initialize deck and players
   useEffect(() => {
-
     if (prop?.players) {
       const mergedPlayers = [...prop.players, ...DEFAULT_PLAYERS].slice(0, 4);
       setPlayers(mergedPlayers);
@@ -40,12 +39,8 @@ export default function WaitingPage({ prop }) {
   useEffect(() => {
     const checkAndUpdateGameState = async () => {
       const areAllPlayersReady = players.every((player) => player.ready);
-
       if (areAllPlayersReady && prop?.roomId) {
         try {
-          const roomRef = doc(database, `room/${prop.roomId}`);
-          const roomSnapshot = await getDoc(roomRef);
-          const roomData = roomSnapshot.data();
           await setDoc(roomRef, { ...roomData, state: 'playing' });
         } catch (error) {
           console.error('Error updating game state:', error);
@@ -61,10 +56,6 @@ export default function WaitingPage({ prop }) {
     if (!prop?.roomId || !prop?.uid) return;
 
     try {
-      const roomRef = doc(database, `room/${prop.roomId}`);
-      const roomSnapshot = await getDoc(roomRef);
-      const roomData = roomSnapshot.data();
-
       if (roomData?.players?.[prop.uid]) {
         const isReady = !roomData.players[prop.uid].ready;
         const updatedPlayers = {
@@ -74,15 +65,12 @@ export default function WaitingPage({ prop }) {
             ready: isReady
           }
         };
-
         await setDoc(roomRef, { ...roomData, players: updatedPlayers });
-
         setPlayers((prevPlayers) =>
           prevPlayers.map((player) =>
             player.id === prop.uid ? { ...player, ready: isReady } : player
           )
         );
-
         // Update button style
         const readyButton = document.querySelector(`.${styles.button}`);
         if (readyButton) {
@@ -97,18 +85,12 @@ export default function WaitingPage({ prop }) {
   // Handle returning to lobby
   const handleReturnToLobby = async () => {
     if (!prop?.roomId || !prop?.uid) return;
-
     try {
-      const roomRef = doc(database, `room/${prop.roomId}`);
-      const roomSnapshot = await getDoc(roomRef);
-      const roomData = roomSnapshot.data();
-
       if (roomData?.players?.[prop.uid]) {
         const updatedPlayers = { ...roomData.players };
         delete updatedPlayers[prop.uid];
         await setDoc(roomRef, { ...roomData, players: updatedPlayers });
       }
-
       router.push('/lobby');
     } catch (error) {
       console.error('Error leaving room:', error);
