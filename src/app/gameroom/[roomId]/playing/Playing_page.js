@@ -23,7 +23,7 @@ export default function PlayingPage({ prop }) {
             const { players } = roomData;
             // Convert players object to array easier distribution
             const playerIds = Object.keys(players);
-
+            // console.log('check1',playerIds)
             // Create updated players object with distributed cards
             const updatedPlayers = {};
             playerIds.forEach((playerId, index) => {

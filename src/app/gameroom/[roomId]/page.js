@@ -57,7 +57,9 @@ const GameRoom = () => {
             isShuffled: data.isShuffled,
             nowCards: data.nowCards || [],
             players: playersArray,
-            type: data.type || ''
+            type: data.type || '',
+            userplace:data.players[userStore.userId].place,
+            turn:data.turn
           });
         }
       },
