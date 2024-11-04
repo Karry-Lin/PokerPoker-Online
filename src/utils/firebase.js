@@ -1,6 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import {initializeApp} from "firebase/app";
+import {getStorage} from "firebase/storage";
+import {initializeFirestore} from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -12,8 +12,7 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
 const firebase = initializeApp(firebaseConfig);
-const database = getFirestore(firebase);
-database.settings({experimentalAutoDetectLongPolling: true});
+const database = initializeFirestore(firebase, {experimentalForceLongPolling: true})
 const storage = getStorage(firebase);
 
-export { firebase, database, storage};
+export {firebase, database, storage};
