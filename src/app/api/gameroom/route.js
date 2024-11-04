@@ -41,6 +41,8 @@ export async function POST(request) {
                 ready: false,
             },
         },
+        isShuffled: false,
+        startTurn: -1,
         turn: 0,
         nowCards: [],
         state: 'waiting',
