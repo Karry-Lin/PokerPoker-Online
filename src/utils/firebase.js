@@ -13,6 +13,7 @@ const firebaseConfig = {
 };
 const firebase = initializeApp(firebaseConfig);
 const database = getFirestore(firebase);
+database.settings({experimentalAutoDetectLongPolling: true});
 const storage = getStorage(firebase);
 
 export { firebase, database, storage};
