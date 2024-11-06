@@ -44,6 +44,7 @@ const GameRoom = () => {
 
           setProp({
             uid: userStore.userId,
+            // currentPlayer:playersArray[uid],
             roomId: data.id,
             isShuffled: data.isShuffled,
             nowCards: data.nowCards || [],
@@ -54,6 +55,7 @@ const GameRoom = () => {
             roomRef,         
             roomData: data,  
           });
+          // console.log(prop.currentPlayer)
         } else if (!userStore.userId) {
           setError('User not logged in');
         }
