@@ -1,6 +1,6 @@
 import {initializeApp} from "firebase/app";
 import {getStorage} from "firebase/storage";
-import {initializeFirestore} from 'firebase/firestore'
+import {getFirestore} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -12,7 +12,7 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
 const firebase = initializeApp(firebaseConfig);
-const database = initializeFirestore(firebase, {experimentalForceLongPolling: true})
+const database = getFirestore(firebase, process.env.NEXT_PUBLIC_PROJECT_ID);
 const storage = getStorage(firebase);
 
 export {firebase, database, storage};
