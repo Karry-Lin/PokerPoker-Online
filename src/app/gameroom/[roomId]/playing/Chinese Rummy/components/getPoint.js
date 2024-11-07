@@ -1,63 +1,46 @@
-// Helper function to get card rank
-function getRank(card) {
-  const rank = ((card - 1) % 13) + 1;
-  return rank;
-}
-
-// Helper function to get card suit priority (Spades > Hearts > Diamonds > Clubs)
-function getSuitPriority(card) {
-  if (card <= 13) return 4; // Spades
-  if (card <= 26) return 3; // Hearts
-  if (card <= 39) return 2; // Diamonds
-  return 1; // Clubs
-}
-
-// Main comparison function
 export default function getPoint(cards1, cards2) {
-  // Check if the cards form a valid pair
-  const rank1 = getRank(cards1);
-  const rank2 = getRank(cards2);
-  const suit1 = getSuitPriority(cards1);
-  const suit2 = getSuitPriority(cards2);
+  //card1,card2 will be two cards ranging from 1 to 52
+  //1 to 13 is spade
+  //14 to 26 is heart
+  //27 to 39 is diamond
+  //40 to 52 is club
+  
+  // Get the suit and number for each card
+  const getCardDetails = (card) => {
+    const number = ((card - 1) % 13) + 1;
+    const suit = Math.floor((card - 1) / 13); // 0:spade, 1:heart, 2:diamond, 3:club
+    return { number, suit };
+  };
 
-  // Check for the specific pairing rules
-  if (
-    (rank1 === 1 && rank2 === 9) ||
-    (rank1 === 2 && rank2 === 8) ||
-    (rank1 === 3 && rank2 === 7) ||
-    (rank1 === 4 && rank2 === 6) ||
-    (rank1 === 5 && rank2 === 5) ||
-    (rank1 === 10 && rank2 === 10) ||
-    (rank1 === 11 && rank2 === 11) ||
-    (rank1 === 12 && rank2 === 12) ||
-    (rank1 === 13 && rank2 === 13)
-  ) {
-    // Calculate the points
-    let points = 0;
-    if (suit1 === 4 || suit2 === 4) {
-      // Spades Ace
-      points = 30;
-    } else if (suit1 === 1 || suit2 === 1) {
-      // Clubs Ace
-      points = 40;
-    } else if (suit1 === 3 || suit2 === 3 || suit1 === 2 || suit2 === 2) {
-      // Hearts Ace or Diamonds Ace
-      points = 20;
-    } else if (rank1 >= 2 && rank1 <= 8) {
-      // Red 2 through 8
-      points = rank1;
-    } else {
-      // Red 9 through K
-      points = 10;
+  const card1 = getCardDetails(cards1);
+  const card2 = getCardDetails(cards2);
+
+  // Check if it's a valid pair
+  const isPair = (n1, n2) => {
+    if (n1 === n2) {
+      return [10, 11, 12, 13].includes(n1); // pairs of 10,11,12,13
     }
+    return (n1 === 1 && n2 === 9) || (n1 === 9 && n2 === 1) ||
+           (n1 === 2 && n2 === 8) || (n1 === 8 && n2 === 2) ||
+           (n1 === 3 && n2 === 7) || (n1 === 7 && n2 === 3) ||
+           (n1 === 4 && n2 === 6) || (n1 === 6 && n2 === 4) ||
+           (n1 === 5 && n2 === 5);
+  };
 
-    // Check for the "Double Red Five" bonus
-    if (rank1 === 5 && rank2 === 5) {
-      points += 10; // Additional 10 points for all other players
-    }
-
-    return points;
+  // If not a pair, return -1
+  if (!isPair(card1.number, card2.number)) {
+    return -1;
   }
 
-  return -1; // Invalid pair
+  // Calculate points (only for hearts and diamonds)
+  const getPoints = (card) => {
+    // Only count points for hearts (1) and diamonds (2)
+    if (card.suit !== 1 && card.suit !== 2) {
+      return 0;
+    }
+    // For cards 11, 12, 13, return 10 points
+    return card.number > 10 ? 10 : card.number;
+  };
+
+  return getPoints(card1) + getPoints(card2);
 }

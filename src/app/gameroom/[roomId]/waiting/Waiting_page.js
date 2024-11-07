@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Card, ListGroup, ToggleButton } from 'react-bootstrap';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { database } from '@/utils/firebase.js';
-import shuffleCards from '../playing/BigTwo/components/shuffleCards';
+import shuffleCards from '../playing/BigTwo/components/BigTwoShuffleCards';
 import styles from './Page.module.css';
 
 const DEFAULT_PLAYER = {
@@ -52,6 +52,7 @@ export default function WaitingPage({ prop }) {
         });
 
       setPlayers(mergedPlayers);
+      console.log(mergedPlayers)
     }
   }, [prop?.players]);
 

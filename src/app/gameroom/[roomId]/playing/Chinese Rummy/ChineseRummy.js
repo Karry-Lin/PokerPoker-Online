@@ -6,16 +6,7 @@ import styles from "./Page.module.css";
 import getPoint from "./components/getPoint";
 
 export default function ChineseRummy({ prop }) {
-  const {
-    roomRef,
-    roomData,
-    nowCards,
-    players,
-    uid,
-    userplace,
-    turn,
-    currentPlayer,
-  } = prop;
+  const { roomRef, roomData, nowCards, players, uid, userplace, turn } = prop;
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
@@ -41,17 +32,32 @@ export default function ChineseRummy({ prop }) {
   }, [nowCards, players, userplace]);
 
   useEffect(() => {
-    setHandCards(currentPlayer.handCards || []);
+    if (players && uid) {
+      const currentPlayer = players.find((player) => player.id === uid);
+      if (currentPlayer) {
+        setHandCards(currentPlayer.handCards || []);
+      }
+    }
   }, [players, uid]);
 
   const handleCardClick = (card) => {
-    setSelectedCards((prevSelected) =>
-      prevSelected.includes(card)
-        ? prevSelected.filter((c) => c !== card)
-        : [...prevSelected, card]
-    );
+    const isSelected = selectedCards.includes(card);
+    if (isSelected) {
+      setSelectedCards(selectedCards.filter((c) => c !== card));
+    } else {
+      if (selectedCards.length === 0) {
+        setSelectedCards([card]);
+      } else if (selectedCards.length === 1) {
+        const firstSelectedCard = selectedCards[0];
+        const isFirstCardFromHand = handCards.includes(firstSelectedCard);
+        const isClickedCardFromHand = handCards.includes(card);
+        if ((isFirstCardFromHand && !isClickedCardFromHand) || (!isFirstCardFromHand && isClickedCardFromHand)) {
+          setSelectedCards([...selectedCards, card]);
+        }
+      }
+    }
   };
-
+  
   const handlePass = async () => {
     await updateDoc(roomRef, {
       turn: (turn % 4) + 1,
@@ -61,14 +67,16 @@ export default function ChineseRummy({ prop }) {
   const handleSubmit = async () => {
     if (selectedCards.length === 2) {
       const [card1, card2] = selectedCards;
+      console.log(card1,card2)
       const point = getPoint(card1, card2);
+      console.log('point:',point)
       if (point !== -1) {
         const updatedHandCards = handCards.filter(
           (card) => !selectedCards.includes(card)
         );
         await updateDoc(roomRef, {
           [`players.${uid}.handCards`]: updatedHandCards,
-          [`players.${uid}.score`]: currentPlayer.score + point,
+          [`players.${uid}.score`]: players.uid.score + point,
           nowCards: nowCards.filter((card) => !selectedCards.includes(card)),
           turn: (turn % 4) + 1,
         });
@@ -97,7 +105,13 @@ export default function ChineseRummy({ prop }) {
       {/* Middle cards */}
       <div className={styles.middleCards}>
         {middleCards?.map((card, index) => (
-          <div key={`middle-${index}`} className={styles.middleCard}>
+          <div
+            key={`middle-${index}`}
+            className={`${styles.card} ${
+              selectedCards.includes(card) ? styles.selected : ""
+            }`}
+            onClick={() => handleCardClick(card)}
+          >
             <img src={`/cards/${card}.png`} alt={`Card ${card}`} />
           </div>
         ))}
