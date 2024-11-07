@@ -73,7 +73,9 @@ export default function PlayingPage({ prop }) {
               ...roomData,
               players: updatedPlayers,
               isShuffled: true,
-              turn: 1
+              turn:1,
+              nowCards:deck.slice(24, 28),
+              deck:deck.slice(28, 52)
             });
           } catch (error) {
             console.error("Error updating game state:", error);
@@ -81,7 +83,7 @@ export default function PlayingPage({ prop }) {
         }
       };
       shuffle();
-    } else if (prop?.type == "撿紅點") {
+    } else if (prop?.type == "十三支") {
       // Chinese Rummy initialization logic
     }
   }, [prop]);

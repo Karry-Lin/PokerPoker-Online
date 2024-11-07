@@ -51,13 +51,16 @@ export default function ChineseRummy({ prop }) {
         const firstSelectedCard = selectedCards[0];
         const isFirstCardFromHand = handCards.includes(firstSelectedCard);
         const isClickedCardFromHand = handCards.includes(card);
-        if ((isFirstCardFromHand && !isClickedCardFromHand) || (!isFirstCardFromHand && isClickedCardFromHand)) {
+        if (
+          (isFirstCardFromHand && !isClickedCardFromHand) ||
+          (!isFirstCardFromHand && isClickedCardFromHand)
+        ) {
           setSelectedCards([...selectedCards, card]);
         }
       }
     }
   };
-  
+
   const handlePass = async () => {
     await updateDoc(roomRef, {
       turn: (turn % 4) + 1,
@@ -67,16 +70,18 @@ export default function ChineseRummy({ prop }) {
   const handleSubmit = async () => {
     if (selectedCards.length === 2) {
       const [card1, card2] = selectedCards;
-      console.log(card1,card2)
+      console.log(card1, card2);
       const point = getPoint(card1, card2);
-      console.log('point:',point)
+      console.log("point:", point);
       if (point !== -1) {
         const updatedHandCards = handCards.filter(
           (card) => !selectedCards.includes(card)
         );
+        const currentPlayer = players.find((player) => player.id === uid);
+        
         await updateDoc(roomRef, {
           [`players.${uid}.handCards`]: updatedHandCards,
-          [`players.${uid}.score`]: players.uid.score + point,
+          [`players.${uid}.score`]: currentPlayer.score + point,
           nowCards: nowCards.filter((card) => !selectedCards.includes(card)),
           turn: (turn % 4) + 1,
         });
