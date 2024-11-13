@@ -1,116 +1,217 @@
 'use client';
-import { useEffect, useState } from 'react';
-import styles from './Page.module.css';
 
-export default function Test() {
-  const prop = {
-    currentUser: {
-      avatar:
-        'https://firebasestorage.googleapis.com/v0/b/pokerpoker-online.appspot.com/o/userAvatar%2F1728983058758_%E9%99%B6%E6%9C%B1%E9%9A%B1%E5%9C%92.jfif?alt=media&token=1064e23d-0058-4b6d-bb0c-cb9785244f21',
-      email: 'test002@gmail.com',
-      money: 250,
-      username: 'test002'
-    },
-    roomData: {
-      id: '465513ea-24a4-463f-9cce-29dde88e6c0f',
-      maxPlayer: 4,
-      name: 'number6',
-      nowCards: [],//mean the cards on the middle table
-      players: {
-        'b8d36589-673c-48a4-8529-6d1062cdcddf': {
-          handCards:[],
-          place:1,
-          score:null
-        },
-        'left_player_id': {
-          handCards:[],
-          place:2,
-          score:null
-        },
-        'right_player_id': {
-          handCards:[],
-          place:3,
-          score:null
-        },
-        'top_player_id': {
-          handCards:[],
-          place:4,
-          score:null
-        }
-      },
-      state: 'playing',
+import { useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import styles from './Page.module.css';
+import getPoint from './components/getPoint';
+
+export default function test({ prop }) {
+  const { roomRef, roomData, nowCards, players, uid, userplace, turn, deck } = prop;
+  const [middleCards, setMiddleCards] = useState([]);
+  const [handCards, setHandCards] = useState([]);
+  const [selectedHandCard, setSelectedHandCard] = useState(null);
+  const [selectedMiddleCard, setSelectedMiddleCard] = useState(null);
+  const [flipCard, setFlipCard] = useState(null);
+
+  const [playerCardCounts, setPlayerCardCounts] = useState({
+    top: 13,
+    left: 13,
+    right: 13
+  });
+
+  useEffect(() => {
+    setMiddleCards(nowCards);
+    if (players && players.length === 4) {
+      const topPlayer = players[(userplace + 1) % 4];
+      const leftPlayer = players[(userplace + 2) % 4];
+      const rightPlayer = players[(userplace + 3) % 4];
+
+      setPlayerCardCounts({
+        top: topPlayer.handCards.length,
+        left: leftPlayer.handCards.length,
+        right: rightPlayer.handCards.length
+      });
+    }
+  }, [nowCards, players, userplace]);
+
+  useEffect(() => {
+    if (players && uid) {
+      const currentPlayer = players.find((player) => player.id === uid);
+      if (currentPlayer) {
+        setHandCards(currentPlayer.handCards || []);
+      }
+    }
+  }, [players, uid]);
+
+  const handleMiddleCardClick = (card) => {
+    setSelectedMiddleCard(card);
+  };
+
+  const handleHandCardClick = (card) => {
+    setSelectedHandCard(card);
+  };
+
+  const handleThrowHandCard = async (card) => {
+    try {
+      // Remove the thrown card from player's hand
+      const updatedHandCards = handCards.filter(c => c !== selectedHandCard);
+      // Add the thrown card to middle cards
+      const updatedMiddleCards = [...middleCards, selectedHandCard];
+      
+      await updateDoc(roomRef, {
+        nowCards: updatedMiddleCards,
+        [`players.${uid}.handCards`]: updatedHandCards,
+        // Remove top card from deck and update deck
+        deck: deck.slice(1)
+      });
+
+      setFlipCard(deck[0]);
+      setSelectedHandCard(null);
+    } catch (error) {
+      console.error('Error throwing hand card:', error);
     }
   };
 
-  const [handCards, setHandCards] = useState([
-    1, 2, 21, 31, 20, 40, 12, 26, 25, 27, 13, 14
-  ]);
-  const [selectedCards, setSelectedCards] = useState([]);
+  const handleThrowFlipCard = async () => {
+    try {
+      // Add flip card to middle cards
+      const updatedMiddleCards = [...middleCards, flipCard];
+      
+      await updateDoc(roomRef, {
+        nowCards: updatedMiddleCards,
+        turn: (turn + 1) % 4,
+        // Remove top card from deck
+        deck: deck.slice(1)
+      });
 
-  const OtherPlayersCardNumber = [8, 10, 13];
-
-  // Toggle card selection on click
-  const handleCardClick = (card) => {
-    setSelectedCards((prevSelected) =>
-      prevSelected.includes(card)
-        ? prevSelected.filter((c) => c !== card)
-        : [...prevSelected, card]
-    );
+      setFlipCard(null);
+    } catch (error) {
+      console.error('Error throwing flip card:', error);
+    }
   };
 
-  // Handle submit button click
-  const handleSubmit = () => {
-    setHandCards((prevHand) =>
-      prevHand.filter((card) => !selectedCards.includes(card))
-    );
-    setSelectedCards([]);
+  const handleSubmitFlipCard = async () => {
+    try {
+      if (!roomData.players || roomData.players.uid === -1) {
+        throw new Error('Invalid player data');
+      }
+
+      const point = getPoint(flipCard, selectedMiddleCard);
+      if (point !== -1) {
+        // Remove matched cards from middle cards
+        const updatedMiddleCards = middleCards.filter(card => !selectedMiddleCard.includes(card));
+        
+        // Update player's score and game state
+        await updateDoc(roomRef, {
+          nowCards: updatedMiddleCards,
+          turn: (turn + 1) % 4,
+          [`players.${uid}.score`]: roomData.players[uid].score + point,
+          deck: deck.slice(1)
+        });
+
+        setSelectedMiddleCard(null);
+        setFlipCard(null);
+      }
+    } catch (error) {
+      console.error('Error submitting flip card:', error);
+    }
   };
+
+  const handleSubmit = async () => {
+    try {
+      if (!roomData.players || roomData.players.uid === -1) {
+        throw new Error('Invalid player data');
+      }
+
+      const point = getPoint(selectedHandCard, selectedMiddleCard);
+      if (point !== -1) {
+        // Remove matched cards from middle cards and hand
+        const updatedMiddleCards = middleCards.filter(card => !selectedMiddleCard.includes(card));
+        const updatedHandCards = handCards.filter(card => card !== selectedHandCard);
+        
+        await updateDoc(roomRef, {
+          [`players.${uid}.handCards`]: updatedHandCards,
+          [`players.${uid}.score`]: roomData.players[uid].score + point,
+          nowCards: updatedMiddleCards,
+          turn: (turn + 1) % 4
+        });
+
+        setSelectedMiddleCard(null);
+        setSelectedHandCard(null);
+      }
+    } catch (error) {
+      console.error('Error updating game state:', error);
+    }
+  };
+
+  const renderOtherPlayerCards = (position, count) => (
+    <div className={styles[`${position}Player`]}>
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={`${position}-${index}`} className={styles.otherCard}>
+          <img src='/cards/0.jpg' alt="Other Player's Card" />
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className={styles.container}>
-      {/* Other players' cards */}
-      <div className={styles.topPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[0] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
+      {renderOtherPlayerCards('top', playerCardCounts.top)}
+      {renderOtherPlayerCards('left', playerCardCounts.left)}
+      {renderOtherPlayerCards('right', playerCardCounts.right)}
+
+      <div className={styles.middleCards}>
+        {middleCards?.map((card, index) => (
+          <div
+            key={`middle-${index}`}
+            className={`${styles.card} ${
+              selectedMiddleCard?.includes(card) ? styles.selected : ''
+            }`}
+            onClick={() => handleMiddleCardClick(card)}
+          >
+            <img src={`/cards/${card}.png`} alt={`Card ${card}`} />
           </div>
         ))}
       </div>
 
-      <div className={styles.leftPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[1] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.rightPlayer}>
-        {Array.from({ length: OtherPlayersCardNumber[2] }).map((_, index) => (
-          <div key={index} className={styles.otherCard}>
-            <img src='/cards/0.jpg' alt="Other Player's Card" />
-          </div>
-        ))}
-      </div>
-
-      {/* Player's hand cards */}
       <div className={styles.cardRowWrapper}>
         <div className={styles.handCards}>
-          {handCards.map((card, index) => (
+          {handCards?.map((card, index) => (
             <div
-              key={index}
+              key={`hand-${index}`}
               className={`${styles.card} ${
-                selectedCards.includes(card) ? styles.selected : ''
+                selectedHandCard?.includes(card) ? styles.selected : ''
               }`}
-              onClick={() => handleCardClick(card)}
+              onClick={() => handleHandCardClick(card)}
             >
               <img src={`/cards/${card}.png`} alt={`Card ${card}`} />
             </div>
           ))}
         </div>
-        <button className={styles.submitButton} onClick={handleSubmit}>
-          Submit
-        </button>
+        {userplace === turn && (
+          <>
+            {selectedHandCard && selectedMiddleCard && (
+              <button className={styles.submitButton} onClick={handleSubmit}>
+                Submit
+              </button>
+            )}
+            {selectedHandCard && (
+              <button className={styles.submitButton} onClick={handleThrowHandCard}>
+                Throw
+              </button>
+            )}
+            {flipCard && selectedMiddleCard && (
+              <button className={styles.submitButton} onClick={handleSubmitFlipCard}>
+                Submit
+              </button>
+            )}
+            {flipCard && !selectedMiddleCard && (
+              <button className={styles.submitButton} onClick={handleThrowFlipCard}>
+                Throw
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

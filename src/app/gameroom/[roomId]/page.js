@@ -53,7 +53,8 @@ const GameRoom = () => {
             userplace: data.players[userStore.userId]?.place || null,
             turn: data.turn,
             roomRef,         
-            roomData: data,  
+            roomData: data, 
+            deck:data.deck 
           });
           // console.log(prop.currentPlayer)
         } else if (!userStore.userId) {
