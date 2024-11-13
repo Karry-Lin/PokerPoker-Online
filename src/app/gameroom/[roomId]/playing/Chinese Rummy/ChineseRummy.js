@@ -5,164 +5,247 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import styles from "./Page.module.css";
 import getPoint from "./components/getPoint";
 
-export default function ChineseRummy({ roomRef, roomData, nowCards, players, uid, userplace, turn }) {
-  // State management
+export default function ChineseRummy({ prop }) {
+  const { roomRef, roomData, nowCards, players, uid, userplace, turn, deck } =
+    prop;
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
   const [selectedMiddleCard, setSelectedMiddleCard] = useState(null);
+  const [flipCard, setFlipCard] = useState(null);
+
   const [playerCardCounts, setPlayerCardCounts] = useState({
-    top: 6,
-    left: 6,
-    right: 6,
+    top: 13,
+    left: 13,
+    right: 13,
   });
 
-  // Update middle cards and player card counts when data changes
   useEffect(() => {
-    if (!nowCards) return;
-    
+    setSelectedHandCard(null);
+    setSelectedMiddleCard(null);
+    setFlipCard(null);
+  }, [turn]);
+
+  useEffect(() => {
     setMiddleCards(nowCards);
-    
-    if (players?.length === 4) {
-      const playerPositions = {
-        top: (userplace + 1) % 4,
-        left: (userplace + 2) % 4,
-        right: (userplace + 3) % 4,
-      };
+    if (players && players.length === 4) {
+      const topPlayer = players[(userplace + 1) % 4];
+      const leftPlayer = players[(userplace + 2) % 4];
+      const rightPlayer = players[(userplace + 3) % 4];
 
-      const newCardCounts = Object.entries(playerPositions).reduce((acc, [position, playerIndex]) => {
-        const player = players[playerIndex];
-        acc[position] = player?.handCards?.length || 6;
-        return acc;
-      }, {});
-
-      setPlayerCardCounts(newCardCounts);
+      setPlayerCardCounts({
+        top: topPlayer.handCards?.length || 0,
+        left: leftPlayer.handCards?.length || 0,
+        right: rightPlayer.handCards?.length || 0,
+      });
     }
   }, [nowCards, players, userplace]);
 
-  // Update hand cards when player data changes
   useEffect(() => {
-    if (!players || !uid) return;
-    
-    const currentPlayer = players.find(player => player.id === uid);
-    setHandCards(currentPlayer?.handCards || []);
+    if (players && uid) {
+      const currentPlayer = players.find((player) => player.id === uid);
+      if (currentPlayer) {
+        setHandCards(currentPlayer.handCards || []);
+      }
+    }
   }, [players, uid]);
 
-  // Card selection handlers
-  const handleHandCardClick = (card) => {
-    setSelectedHandCard(selectedHandCard === card ? null : card);
-  };
-
   const handleMiddleCardClick = (card) => {
-    setSelectedMiddleCard(selectedMiddleCard === card ? null : card);
+    if (userplace !== turn) return;
+    if (flipCard) {
+      setSelectedMiddleCard(card);
+    } else if (selectedHandCard) {
+      setSelectedMiddleCard(card);
+    }
   };
 
-  // Game action handlers
-  const handlePass = async () => {
-    if (!roomRef) return;
-    
+  const handleHandCardClick = (card) => {
+    if (userplace !== turn || flipCard) return;
+    setSelectedHandCard(card);
+  };
+
+  const handleThrowHandCard = async () => {
     try {
+      if (userplace !== turn) return;
+      const updatedHandCards = handCards.filter((c) => c !== selectedHandCard);
+      const updatedMiddleCards = [...middleCards, selectedHandCard];
+
       await updateDoc(roomRef, {
-        turn: (turn % 4) + 1,
+        nowCards: updatedMiddleCards,
+        [`players.${uid}.handCards`]: updatedHandCards,
+        deck: deck.slice(1),
       });
+
+      setFlipCard(deck[0]);
+      setSelectedHandCard(null);
     } catch (error) {
-      console.error("Error passing turn:", error);
+      console.error("Error throwing hand card:", error);
+    }
+  };
+
+  const handleThrowFlipCard = async () => {
+    try {
+      if (userplace !== turn || !flipCard) return;
+      const updatedMiddleCards = [...middleCards, flipCard];
+
+      await updateDoc(roomRef, {
+        nowCards: updatedMiddleCards,
+        turn: (turn + 1) % 4,
+        deck: deck.slice(1),
+      });
+
+      setFlipCard(null);
+      setSelectedMiddleCard(null);
+    } catch (error) {
+      console.error("Error throwing flip card:", error);
+    }
+  };
+
+  const handleSubmitFlipCard = async () => {
+    try {
+      if (userplace !== turn || !flipCard || !selectedMiddleCard) return;
+      const point = getPoint(flipCard, selectedMiddleCard);
+      if (point !== -1) {
+        const updatedMiddleCards = middleCards.filter(
+          (card) => card !== selectedMiddleCard
+        );
+
+        await updateDoc(roomRef, {
+          nowCards: updatedMiddleCards,
+          turn: (turn + 1) % 4,
+          [`players.${uid}.score`]: (roomData.players[uid]?.score || 0) + point,
+          deck: deck.slice(1),
+        });
+
+        setSelectedMiddleCard(null);
+        setFlipCard(null);
+      } else {
+        alert("Please select valid cards");
+        setSelectedMiddleCard(null);
+      }
+    } catch (error) {
+      console.error("Error submitting flip card:", error);
     }
   };
 
   const handleSubmit = async () => {
-    if (!selectedMiddleCard || !selectedHandCard || !roomRef) return;
-    
     try {
-      const point = getPoint(selectedMiddleCard, selectedHandCard);
-      
-      if (point === -1) {
-        console.log("Invalid card combination");
+      if (userplace !== turn || !selectedHandCard || !selectedMiddleCard)
         return;
+      const point = getPoint(selectedHandCard, selectedMiddleCard);
+      if (point !== -1) {
+        const updatedMiddleCards = middleCards.filter(
+          (card) => card !== selectedMiddleCard
+        );
+        const updatedHandCards = handCards.filter(
+          (card) => card !== selectedHandCard
+        );
+
+        await updateDoc(roomRef, {
+          [`players.${uid}.handCards`]: updatedHandCards,
+          [`players.${uid}.score`]: (roomData.players[uid]?.score || 0) + point,
+          nowCards: updatedMiddleCards,
+        });
+
+        setSelectedMiddleCard(null);
+        setSelectedHandCard(null);
+      } else {
+        alert("Please select valid cards");
+        setSelectedMiddleCard(null);
+        setSelectedHandCard(null);
       }
-
-      const currentPlayer = players.find(player => player.id === uid);
-      if (!currentPlayer) return;
-
-      const updatedHandCards = handCards.filter(card => card !== selectedHandCard);
-      const updatedMiddleCards = middleCards.filter(card => card !== selectedMiddleCard);
-
-      await updateDoc(roomRef, {
-        [`players.${uid}.handCards`]: updatedHandCards,
-        [`players.${uid}.score`]: (currentPlayer.score || 0) + point,
-        nowCards: updatedMiddleCards,
-        turn: (turn % 4) + 1,
-      });
-
-      // Reset selections after successful submission
-      setSelectedHandCard(null);
-      setSelectedMiddleCard(null);
     } catch (error) {
-      console.error("Error submitting move:", error);
+      console.error("Error updating game state:", error);
     }
   };
 
-  // Render helper functions
   const renderOtherPlayerCards = (position, count) => (
     <div className={styles[`${position}Player`]}>
       {Array.from({ length: count }).map((_, index) => (
         <div key={`${position}-${index}`} className={styles.otherCard}>
-          <img src="/cards/0.jpg" alt="Card back" className={styles.cardImage} />
+          <img src="/cards/0.jpg" alt="Other Player's Card" />
         </div>
       ))}
     </div>
   );
 
-  const renderPlayerCard = (card, index, isHandCard) => (
-    <div
-      key={`${isHandCard ? 'hand' : 'middle'}-${index}`}
-      className={`${styles.card} ${
-        (isHandCard ? selectedHandCard : selectedMiddleCard) === card ? styles.selected : ''
-      }`}
-      onClick={() => isHandCard ? handleHandCardClick(card) : handleMiddleCardClick(card)}
-    >
-      <img 
-        src={`/cards/${card}.png`} 
-        alt={`Card ${card}`}
-        className={styles.cardImage}
-      />
-    </div>
-  );
-
   return (
     <div className={styles.container}>
-      {/* Other players' cards */}
-      {Object.entries(playerCardCounts).map(([position, count]) => 
-        renderOtherPlayerCards(position, count)
-      )}
+      {renderOtherPlayerCards("top", playerCardCounts.top)}
+      {renderOtherPlayerCards("left", playerCardCounts.left)}
+      {renderOtherPlayerCards("right", playerCardCounts.right)}
 
-      {/* Middle cards */}
       <div className={styles.middleCards}>
-        {middleCards?.map((card, index) => renderPlayerCard(card, index, false))}
+        {middleCards?.map((card, index) => (
+          <div
+            key={`middle-${index}`}
+            className={`${styles.card} ${
+              selectedMiddleCard === card ? styles.selected : ""
+            }`}
+            onClick={() => handleMiddleCardClick(card)}
+          >
+            <img src={`/cards/${card}.png`} alt={`Card ${card}`} />
+          </div>
+        ))}
       </div>
 
-      {/* Player's hand cards */}
       <div className={styles.cardRowWrapper}>
+        {flipCard && (
+          <div className={styles.handCards}>
+            <div className={styles.card}>
+              <img
+                src={`/cards/${flipCard}.png`}
+                alt={`Flip Card ${flipCard}`}
+              />
+            </div>
+          </div>
+        )}
+
         <div className={styles.handCards}>
-          {handCards.map((card, index) => renderPlayerCard(card, index, true))}
+          {handCards?.map((card, index) => (
+            <div
+              key={`hand-${index}`}
+              className={`${styles.card} ${
+                selectedHandCard === card ? styles.selected : ""
+              }`}
+              onClick={() => handleHandCardClick(card)}
+            >
+              <img src={`/cards/${card}.png`} alt={`Card ${card}`} />
+            </div>
+          ))}
         </div>
-        
+
         {userplace === turn && (
           <div className={styles.actionButtons}>
             {selectedHandCard && selectedMiddleCard && (
-              <button 
-                className={styles.submitButton} 
-                onClick={handleSubmit}
+              <button className={styles.submitButton} onClick={handleSubmit}>
+                Submit
+              </button>
+            )}
+            {selectedHandCard && !selectedMiddleCard && (
+              <button
+                className={styles.submitButton}
+                onClick={handleThrowHandCard}
+              >
+                Throw
+              </button>
+            )}
+            {flipCard && selectedMiddleCard && (
+              <button
+                className={styles.submitButton}
+                onClick={handleSubmitFlipCard}
               >
                 Submit
               </button>
             )}
-            <button 
-              className={styles.submitButton} 
-              onClick={handlePass}
-            >
-              Pass
-            </button>
+            {flipCard && !selectedMiddleCard && (
+              <button
+                className={styles.submitButton}
+                onClick={handleThrowFlipCard}
+              >
+                Throw
+              </button>
+            )}
           </div>
         )}
       </div>
