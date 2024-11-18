@@ -3,7 +3,7 @@ import {collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where} from 
 import {v4 as uuidv4} from "uuid";
 
 export async function POST(request) {
-    const {userId, name, password, type} = await request.json();
+    const {userId, name, password, type, maxPlayer} = await request.json();
     const checkRoomnameExists = async (name) => {
         const roomCollection = collection(database, 'room');
         const roomList = query(roomCollection, where("name", "==", name));
@@ -28,8 +28,14 @@ export async function POST(request) {
     await setDoc(roomRef, {
         id: roomId,
         name,
-        password,
         type,
+        state: 'waiting',
+        password,
+        maxPlayer,
+        nowCards: [],
+        turn: 0,
+        isShuffled: false,
+        startTurn: -1,
         players: {
             [userId]: {
                 username: data.username,
@@ -39,13 +45,9 @@ export async function POST(request) {
                 handCards: [],
                 score: 0,
                 ready: false,
+                isPassed: false,
             },
         },
-        isShuffled: false,
-        startTurn: -1,
-        turn: 0,
-        nowCards: [],
-        state: 'waiting',
         time: new Date().toISOString()
     });
     return Response.json({message: '創建成功', roomId}, {status: 201});

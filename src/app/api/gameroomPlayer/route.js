@@ -35,6 +35,7 @@ export async function PUT(request) {
       handCards: [],
       score: 0,
       ready: false,
+      isPassed: false,
     }
   });
   return Response.json({message: '已加入房間'}, {status: 201});
