@@ -6,6 +6,7 @@ import styles from "./Page.module.css";
 import getPoint from "./components/getPoint";
 
 export default function Test({ prop }) {
+  console.log(prop)
   const { roomRef, roomData, nowCards, players, uid, userplace, turn, deck } =
     prop;
   const [middleCards, setMiddleCards] = useState([]);
