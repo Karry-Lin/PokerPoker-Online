@@ -8,6 +8,7 @@ import styles from './Page.module.css';
 import { useUserStore } from '@/app/stores/userStore.js';
 import { database } from '@/utils/firebase.js';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { getDatabase } from "@/utils/firebaseForCilent.js";
 
 export default function GameRoomPage() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function GameRoomPage() {
 
   // Room joining logic
   const joinRoom = async (roomId) => {
-    const roomRef = doc(database, `room/${roomId}`);
+    const roomRef = doc(await getDatabase(), `room/${roomId}`);
     try {
       const snapshot = await getDoc(roomRef);
       const roomData = snapshot.data();

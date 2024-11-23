@@ -12,7 +12,5 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
 const firebase = initializeApp(firebaseConfig);
-const database = getFirestore(firebase, '(default)');
-const storage = getStorage(firebase);
-
-export {firebase, database, storage};
+export const database = getFirestore(firebase, '(default)');
+export const storage = getStorage(firebase);
