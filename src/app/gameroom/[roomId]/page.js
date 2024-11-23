@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useUserStore } from '@/app/stores/userStore.js';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { getDatabase } from '@/utils/firebase.js';
+import { database } from '@/utils/firebase.js';
 import End_Page from './end/End_page';
 import Playing_page from './playing/Playing_page';
 import Waiting_Page from './waiting/Waiting_page';
@@ -19,7 +19,7 @@ const GameRoom = () => {
     if (!roomId) return;
 
     // Set up real-time listener
-    const roomRef = doc(getDatabase(), 'room', roomId);
+    const roomRef = doc(database, 'room', roomId);
     const unsubscribe = onSnapshot(
       roomRef,
       (snapshot) => {
