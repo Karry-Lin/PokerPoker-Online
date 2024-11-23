@@ -14,4 +14,5 @@ EXPOSE 3000
 
 ENV PORT=3000
 
-CMD ["npm", "run", "build", "&&", "npm", "start"]
+#CMD ["npm", "start"]
+CMD npm run build && npm start
