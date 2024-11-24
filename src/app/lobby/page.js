@@ -6,9 +6,8 @@ import { HiLockClosed, HiLockOpen } from 'react-icons/hi2';
 import NavBar from '../components/navBar';
 import styles from './Page.module.css';
 import { useUserStore } from '@/app/stores/userStore.js';
-import { database } from '@/utils/firebase.js';
+import { getDatabase } from '@/utils/firebase.js';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { getDatabase } from "@/utils/firebaseForCilent.js";
 
 export default function GameRoomPage() {
   const router = useRouter();

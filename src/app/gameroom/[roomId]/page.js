@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useUserStore } from '@/app/stores/userStore.js';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { getDatabase } from '@/utils/firebaseForCilent.js';
 import End_Page from './end/End_page';
 import Playing_page from './playing/Playing_page';
 import Waiting_Page from './waiting/Waiting_page';
+import { getDatabase } from "@/utils/firebase.js";
 
 const GameRoom = () => {
   const { roomId } = useParams();

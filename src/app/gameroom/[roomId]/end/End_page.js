@@ -2,7 +2,7 @@
 import { Card, ListGroup, Button, ToggleButton } from "react-bootstrap";
 import styles from "./Page.module.css";
 import { useRouter } from "next/navigation";
-import { getDatabase } from "@/utils/firebaseForCilent.js";
+import { getDatabase } from "@/utils/firebase.js";
 
 function End_Page({ roomId }) {
   const router = useRouter();
