@@ -1,7 +1,7 @@
 //./conponents/shuffleCards
 'use client';
 
-export default function ChinesePoker() {
+export default function ChinesePokerShuffleCards() {
   // Initialize a sorted deck of cards (1 through 52)
   const cards = Array.from({ length: 52 }, (_, index) => index + 1);
 

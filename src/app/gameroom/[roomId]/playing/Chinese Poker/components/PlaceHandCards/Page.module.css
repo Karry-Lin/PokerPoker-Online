@@ -1,0 +1,131 @@
+.container {
+  position: relative;
+  height: 100vh;
+  background-image: url('/gameroom-playing-page.jpg');
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Card rows */
+.cardRow {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.cardRow.top {
+  /* margin-top: 10vh; */
+  margin-top: 10vh;
+  margin-bottom: -250px;
+}
+
+.cardRow.middle {
+  /* margin-top: 5vh; */
+  /* margin-top: -3vh; */
+  margin-bottom: -250px;
+}
+
+.cardRow.bottom {
+  /* margin-top: -1vh; */
+  
+}
+
+/* Overlapping effect */
+.cardRow .card {
+  margin-left: -60px;
+  position: relative;
+}
+
+.cardRow .card:first-child {
+  margin-left: 0;
+}
+
+/* Hand cards */
+.handCardsWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  /* bottom: 100px; */
+}
+
+.handCards {
+  display: flex;
+  justify-content: center;
+}
+
+.handCards .card {
+  margin-left: -60px;
+  cursor: pointer;
+}
+
+.handCards .card:first-child {
+  margin-left: 0;
+}
+
+.card.selected {
+  transform: translateY(-10px);
+  border: 2px solid gold;
+}
+
+.buttons {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-bottom: 100px;
+}
+.submitbutton{
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: -100px;
+}
+
+.button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.button:hover:enabled {
+  background-color: #0056b3;
+}
+
+/* Card styles */
+.card {
+  width: 120px;
+  height: 180px;
+  background-color: #eaeaea;
+  border: 2px solid black;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}

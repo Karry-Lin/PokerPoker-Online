@@ -65,7 +65,7 @@ const GameRoom = () => {
               turn: data.turn,
               roomRef,
               roomData: data,
-              isPassed: data.players[userStore.userId]?.isPassed
+              isPassed: data.players[userStore.userId]?.isPassed ||null
             });
           } else if (!userStore.userId) {
             setError('User not logged in');
