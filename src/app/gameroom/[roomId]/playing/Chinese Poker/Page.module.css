@@ -1,12 +1,12 @@
 .container {
   width: 100vw;
-  height: 100vh;
+  height: 120vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #1a472a;
+  background-image: url('/gameroom-playing-page.jpg');
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .gameBoard {
@@ -40,6 +40,7 @@
   gap: 20px;
   align-items: center;
   margin: 60px 0;
+  /* width: 1100px; */
 }
 
 .cardRow {
@@ -62,50 +63,58 @@
 }
 
 /* Hand Area */
-.handArea {
+.cardRowWrapper {
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 5px;
   padding: 20px;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  margin-top: auto;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.handCards {
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 /* Card Styles */
 .card {
-  width: 80px;
-  height: 120px;
-  position: relative;
-  transition: transform 0.2s ease;
+  width: 120px;
+  height: 180px;
+  background-color: #eaeaea;
+  border: 2px solid black;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+  transition: transform 0.2s;
+  position: relative;
+  margin-left: -60px;
+}
+
+.card:first-child {
+  margin-left: 0;
+}
+
+.card.selected {
+  border-color: gold;
+  transform: translateY(-20px);
 }
 
 .card img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  border-radius: 5px;
-}
-
-.card.selected {
-  transform: translateY(-20px);
-}
-
-.card:hover {
-  transform: translateY(-10px);
-}
-
-.card.selected:hover {
-  transform: translateY(-25px);
 }
 
 /* Button Styles */
-.putButton, .submitButton {
+.putButton,
+.submitButton {
   padding: 10px 20px;
   border-radius: 5px;
   border: none;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   font-weight: bold;
   cursor: pointer;
@@ -137,13 +146,16 @@
   position: relative;
 }
 
-.topBlock, .leftBlock, .rightBlock, .bottomBlock {
+.topBlock,
+.leftBlock,
+.rightBlock,
+.bottomBlock {
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  background-color: rgba(0, 0, 0, 0.2);
+  /* gap: 10px; */
+  /* background-color: rgba(0, 0, 0, 0.2); */
   padding: 15px;
   border-radius: 10px;
 }
@@ -177,7 +189,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 3px solid #4CAF50;
+  border: 3px solid #4caf50;
   object-fit: cover;
 }
 
@@ -185,21 +197,21 @@
 .cardRows {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: -5px;
 }
 
 .cardRow {
   display: flex;
-  gap: 2px;
+  /* gap: 2px; */
 }
 
 .cardRow img {
-  width: 40px;
-  height: 60px;
-  object-fit: contain;
+  width: 90px;
+  height: 135px;
+  /* object-fit: contain; */
 }
 
-/* Responsive Design */
+/* Responsive Design
 @media (max-width: 1200px) {
   .card {
     width: 60px;
@@ -232,7 +244,7 @@
   }
 }
 
-/* Animations */
+Animations
 @keyframes cardPlacement {
   0% {
     transform: translateY(-50px);
@@ -242,7 +254,7 @@
     transform: translateY(0);
     opacity: 1;
   }
-}
+} */
 
 .card-placed {
   animation: cardPlacement 0.3s ease forwards;
@@ -255,7 +267,7 @@
 }
 
 .highlighted {
-  box-shadow: 0 0 10px #4CAF50;
+  box-shadow: 0 0 10px #4caf50;
 }
 
 .error {
