@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useUserStore } from '@/app/stores/userStore.js';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { database } from '@/utils/firebase.js';
 import End_Page from './end/End_page';
 import Playing_page from './playing/Playing_page';
 import Waiting_Page from './waiting/Waiting_page';
+import { getDatabase } from "@/utils/firebase.js";
 
 const GameRoom = () => {
   const { roomId } = useParams();
@@ -18,58 +18,57 @@ const GameRoom = () => {
   useEffect(() => {
     if (!roomId) return;
 
-    // Set up real-time listener
-    const roomRef = doc(database, 'room', roomId);
-    const unsubscribe = onSnapshot(
-      roomRef,
-      (snapshot) => {
-        if (!snapshot.exists()) {
-          setError('Room not found');
-          return;
+    getDatabase().then((database) => {
+      // Set up real-time listener
+      const roomRef = doc(database, 'room', roomId);
+      const unsubscribe = onSnapshot(
+        roomRef,
+        (snapshot) => {
+          if (!snapshot.exists()) {
+            setError('Room not found');
+            return;
+          }
+
+          const data = {
+            id: snapshot.id,
+            ...snapshot.data(),
+          };
+          setRoomData(data);
+
+          // Update prop if userStore.userId is available
+          if (userStore.userId && data.players && data.players[userStore.userId]) {
+            const playersArray = Object.keys(data.players).map((key) => ({
+              id: key,
+              ...data.players[key],
+              score: 0,
+            }));
+
+            setProp({
+              uid: userStore.userId,
+              roomId: data.id,
+              isShuffled: data.isShuffled,
+              nowCards: data.nowCards || [],
+              players: playersArray,
+              type: data.type || '',
+              userplace: data.players[userStore.userId]?.place || null,
+              turn: data.turn,
+              roomRef,
+              roomData: data,
+            });
+          } else if (!userStore.userId) {
+            setError('User not logged in');
+          }
+        },
+        (err) => {
+          console.error('Error getting room updates:', err);
+          setError(err.message);
         }
+      );
 
-        const data = {
-          id: snapshot.id,
-          ...snapshot.data(),
-        };
-        setRoomData(data);
-
-        // Update prop if userStore.userId is available
-        if (userStore.userId && data.players && data.players[userStore.userId]) {
-          const playersArray = Object.keys(data.players).map((key) => ({
-            id: key,
-            ...data.players[key],
-            score: 0,
-          }));
-
-          setProp({
-            uid: userStore.userId,
-            // currentPlayer:playersArray[uid],
-            roomId: data.id,
-            isShuffled: data.isShuffled,
-            nowCards: data.nowCards || [],
-            players: playersArray,
-            type: data.type || '',
-            userplace: data.players[userStore.userId]?.place || null,
-            turn: data.turn,
-            roomRef,         
-            roomData: data, 
-            deck:data.deck 
-          });
-          // console.log(prop.currentPlayer)
-        } else if (!userStore.userId) {
-          setError('User not logged in');
-        }
-      },
-      (err) => {
-        console.error('Error getting room updates:', err);
-        setError(err.message);
-      }
-    );
-
-    return () => {
-      unsubscribe();
-    };
+      return () => {
+        unsubscribe();
+      };
+    });
   }, [roomId, userStore.userId]); // Include userStore.userId in dependencies
 
   if (error) return <div>Error: {error}</div>;

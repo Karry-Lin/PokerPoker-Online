@@ -2,6 +2,7 @@
 import { Card, ListGroup, Button, ToggleButton } from "react-bootstrap";
 import styles from "./Page.module.css";
 import { useRouter } from "next/navigation";
+import { getDatabase } from "@/utils/firebase.js";
 
 function End_Page({ roomId }) {
   const router = useRouter();
@@ -16,9 +17,9 @@ function End_Page({ roomId }) {
   function submit_Again() {
     router.push("/gameroom");
   }
-  function submit_Lobby() {
+  async function submit_Lobby() {
     const leaveRoom = async (roomId, userId) => {
-      const roomRef = doc(database, `room/${roomId}`);
+      const roomRef = doc(await getDatabase(), `room/${roomId}`);
       try {
         const roomSnapshot = await getDoc(roomRef);
         const roomData = roomSnapshot.data();
@@ -60,7 +61,7 @@ function End_Page({ roomId }) {
       <ToggleButton onClick={() => submit_Again()} className={styles.button}>
         Play Again
       </ToggleButton>
-      <ToggleButton onClick={() => submit_Lobby()} className={styles.button}>
+      <ToggleButton onClick={async () => await submit_Lobby()} className={styles.button}>
         Back To Lobby
       </ToggleButton>
     </div>

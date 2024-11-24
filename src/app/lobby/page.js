@@ -6,7 +6,7 @@ import { HiLockClosed, HiLockOpen } from 'react-icons/hi2';
 import NavBar from '../components/navBar';
 import styles from './Page.module.css';
 import { useUserStore } from '@/app/stores/userStore.js';
-import { database } from '@/utils/firebase.js';
+import { getDatabase } from '@/utils/firebase.js';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export default function GameRoomPage() {
@@ -68,7 +68,7 @@ export default function GameRoomPage() {
 
   // Room joining logic
   const joinRoom = async (roomId) => {
-    const roomRef = doc(database, `room/${roomId}`);
+    const roomRef = doc(await getDatabase(), `room/${roomId}`);
     try {
       const snapshot = await getDoc(roomRef);
       const roomData = snapshot.data();
