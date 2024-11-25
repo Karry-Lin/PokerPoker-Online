@@ -3,7 +3,7 @@ import { updateDoc, doc } from 'firebase/firestore';
 import styles from './Page.module.css';
 
 export default function PlaceHandCards({ prop }) {
-  const { roomRef, players, uid } = prop;
+  const { roomRef, players, uid, userplace } = prop;
 
   const [handCards, setHandCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
@@ -12,6 +12,53 @@ export default function PlaceHandCards({ prop }) {
     middle: [],
     bottom: []
   });
+  const [playerCardCounts, setPlayerCardCounts] = useState({
+    top: 13,
+    left: 13,
+    right: 13
+  });
+  const [timer, setTimer] = useState(60);
+
+  // Function to randomize card placement
+  const randomizeCardPlacement = () => {
+    const allCards = [
+      ...handCards,
+      ...rows.top,
+      ...rows.middle,
+      ...rows.bottom
+    ];
+    const shuffled = allCards.sort(() => Math.random() - 0.5);
+
+    setRows({
+      top: shuffled.slice(0, 3),
+      middle: shuffled.slice(3, 8),
+      bottom: shuffled.slice(8, 13)
+    });
+    setHandCards([]); // Clear hand cards after placing them
+  };
+  useEffect(() => {
+    if (timer > 0) {
+      const countdown = setInterval(() => setTimer((prev) => prev - 1), 1000);
+      return () => clearInterval(countdown); // Clear interval on component unmount
+    } else {
+      // Time's up! Randomize card placement
+      randomizeCardPlacement();
+    }
+  }, [timer]);
+
+  useEffect(() => {
+    if (players && players.length === 4) {
+      const topPlayer = players[(userplace + 1) % 4];
+      const leftPlayer = players[(userplace + 2) % 4];
+      const rightPlayer = players[(userplace + 3) % 4];
+
+      setPlayerCardCounts({
+        top: topPlayer.handCards.length,
+        left: leftPlayer.handCards.length,
+        right: rightPlayer.handCards.length
+      });
+    }
+  }, [prop]);
 
   useEffect(() => {
     if (players && uid) {
@@ -78,13 +125,26 @@ export default function PlaceHandCards({ prop }) {
       ))}
     </div>
   );
+  const renderOtherPlayerCards = (position, count) => (
+    <div className={styles[`${position}Player`]}>
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={`${position}-${index}`} className={styles.otherCard}>
+          <img src='/cards/0.jpg' alt="Other Player's Card" />
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className={styles.container}>
+      {renderOtherPlayerCards('top', playerCardCounts.top)}
+      {renderOtherPlayerCards('left', playerCardCounts.left)}
+      {renderOtherPlayerCards('right', playerCardCounts.right)}
       {/* Display rows */}
       {renderCardRow('top')}
       {renderCardRow('middle')}
       {renderCardRow('bottom')}
+      <div className={styles.timer}>Time left: {timer}s</div>
 
       {/* Hand cards */}
       <div className={styles.handCardsWrapper}>
@@ -132,8 +192,6 @@ export default function PlaceHandCards({ prop }) {
           </button>
         )}
       </div>
-
-      {/* Submit button */}
     </div>
   );
 }
