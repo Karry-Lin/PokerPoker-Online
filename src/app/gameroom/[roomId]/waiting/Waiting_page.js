@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, ListGroup, ToggleButton } from 'react-bootstrap';
+import { Card, ListGroup } from 'react-bootstrap';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { database } from '@/utils/firebase.js';
 import shuffleCards from '../playing/BigTwo/components/BigTwoShuffleCards';
@@ -144,12 +144,12 @@ export default function WaitingPage({ prop }) {
       </div>
 
       <div className={styles.button_container}>
-        <ToggleButton onClick={handleReadyToggle} className={styles.button}>
+        <button onClick={handleReadyToggle} className={styles.button}>
           {roomData.players[prop.uid].ready ? 'UnReady' : 'Ready'}
-        </ToggleButton>
-        <ToggleButton onClick={handleReturnToLobby} className={styles.button}>
+        </button>
+        <button onClick={handleReturnToLobby} className={styles.button}>
           Back To Lobby
-        </ToggleButton>
+        </button>
       </div>
     </div>
   );

@@ -44,7 +44,7 @@ export default function PlayingPage({ prop }) {
               ...roomData,
               players: updatedPlayers,
               isShuffled: true,
-              turn: startingPlayerId, // Set turn to the player with card 41
+              turn: players[startingPlayerId].place,
             });
           } catch (error) {
             console.error("Error updating game state:", error);

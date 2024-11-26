@@ -131,18 +131,24 @@ export default function BigTwo({ prop }) {
             </div>
           ))}
         </div>
-        {userplace === turn && (
-          <>
-            {selectedCards.length > 0 && (
-              <button className={styles.submitButton} onClick={handleSubmit}>
-                Submit
-              </button>
-            )}
-            <button className={styles.submitButton} onClick={handlePass}>
-              Pass
-            </button>
-          </>
-        )}
+        <button
+          className={`${styles.submitButton} ${
+            userplace !== turn ? styles.disabledButton : ''
+          }`}
+          onClick={userplace === turn ? handleSubmit : undefined}
+          disabled={userplace !== turn || selectedCards.length === 0}
+        >
+          Submit
+        </button>
+        <button
+          className={`${styles.submitButton} ${
+            userplace !== turn ? styles.disabledButton : ''
+          }`}
+          onClick={userplace === turn ? handlePass : undefined}
+          disabled={userplace !== turn}
+        >
+          Pass
+        </button>
       </div>
     </div>
   );

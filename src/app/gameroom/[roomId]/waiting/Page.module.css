@@ -14,9 +14,9 @@
 
 .card_container {
   display: flex;
-  flex-direction: row; 
+  flex-direction: row;
   gap: 20px;
-  flex-wrap: nowrap; 
+  flex-wrap: nowrap;
   overflow-x: auto;
 }
 
@@ -28,7 +28,7 @@
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  flex-shrink: 0; 
+  flex-shrink: 0;
   margin: 40px 20px;
 }
 
@@ -41,19 +41,27 @@
 }
 
 .button {
-  background-color:#47663B ;
-  border-color: #47663B;
-  transform: scale(2);
+  padding: 15px 25px;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #04aa6d;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
   margin-right: 200px;
   margin-left: 200px;
-  color: #E8ECD7;
 }
 
 .button:hover {
-  background-color:#47663B ;
-  border-color: #47663B;
-  transform: translateY(-2px);
-  transform: scale(2.2);
+  background-color: #3e8e41;
+}
+.button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
 }
 
 .avator {
@@ -91,10 +99,9 @@
   opacity: 0.4;
 }
 
-
 @media (max-width: 768px) {
   .body {
-    overflow-x: auto; 
+    overflow-x: auto;
   }
 
   .card {
