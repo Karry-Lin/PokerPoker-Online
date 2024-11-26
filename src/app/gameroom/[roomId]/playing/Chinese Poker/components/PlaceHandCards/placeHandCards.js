@@ -109,6 +109,12 @@ export default function PlaceHandCards({ prop }) {
     rows.middle.length === 5 &&
     rows.bottom.length === 5;
   const handleSubmit = async () => {
+    const updatedHandCards = [];
+    // updatedHandCards = {rows.top+middle+bottom}
+
+    await updateDoc(roomRef, {
+      [`players.${uid}.showCards`]: updatedHandCards,
+    });
     alert('commit sucessful');
   };
 
