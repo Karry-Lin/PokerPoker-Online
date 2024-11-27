@@ -56,10 +56,13 @@ export default function BigTwo({ prop }) {
     });
   };
   const handleSubmit = async () => {
-    if (!compare(selectedCards, middleCards)) {
-      console.log('Invalid card combination');
-      return;
+    if (prop.startTurn != userplace) {
+      if (!compare(selectedCards, middleCards)) {
+        console.log('Invalid card combination');
+        return;
+      }
     }
+
     try {
       if (!roomData.players || roomData.players.uid === -1) {
         throw new Error('Invalid player data');
@@ -72,6 +75,7 @@ export default function BigTwo({ prop }) {
       await updateDoc(roomRef, {
         [`players.${uid}.handCards`]: updatedHandCards,
         nowCards: selectedCards,
+        startTurn:userplace,
         turn: (turn % 4) + 1
       });
 

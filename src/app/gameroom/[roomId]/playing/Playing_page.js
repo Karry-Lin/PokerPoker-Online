@@ -30,7 +30,6 @@ export default function PlayingPage({ prop }) {
               const endIdx = startIdx + 13;
               const playerCards = deck.slice(startIdx, endIdx);
 
-              // Check if this player has card 41 (3♦)
               if (playerCards.includes(42)) {
                 startingPlayerId = playerId;
               }
