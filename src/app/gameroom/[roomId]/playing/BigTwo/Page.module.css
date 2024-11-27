@@ -167,18 +167,18 @@
   background-color: #04aa6d;
   border: none;
   border-radius: 15px;
-  box-shadow: 0 9px #999;
+  /* box-shadow: 0 9px #999; */
   margin-right: 20px;
   margin-left: 20px;
 }
 
 .submitButton:hover {
-  background-color: #3e8e41;
+  /* background-color: #3e8e41; */
 }
 .submitButton:active {
   background-color: #3e8e41;
-  box-shadow: 0 5px #666;
-  transform: translateY(4px);
+  /* box-shadow: 0 5px #666;
+  transform: translateY(4px); */
 }
 
 .disabledButton {

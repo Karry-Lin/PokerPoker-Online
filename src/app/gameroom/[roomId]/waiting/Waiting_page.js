@@ -130,11 +130,11 @@ export default function WaitingPage({ prop }) {
             />
             <Card.Body className={styles.card_body}>
               <Card.Title className={styles.card_title}>
-                {player.place} Place
+                {player.username}
               </Card.Title>
             </Card.Body>
             <ListGroup>
-              <ListGroup.Item>Name: {player.username}</ListGroup.Item>
+              <ListGroup.Item>Money: {player.money}</ListGroup.Item>
               <ListGroup.Item>
                 State: {player.ready ? 'ready' : 'unready'}
               </ListGroup.Item>
