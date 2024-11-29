@@ -1,0 +1,90 @@
+/* Game Board Layout */
+.gameBoard {
+  position: relative;
+  background-image: url('/gameroom-playing-page.jpg');
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Top Player */
+.topPlayer {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Bottom Player */
+.bottomPlayer {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Left Player */
+.leftPlayer {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+}
+
+/* Right Player */
+.rightPlayer {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+/* Player Block Styles */
+.playerBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.playerName {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Card Rows */
+.cardRow {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.middleRow {
+  margin-top: -80px; /* Overlap top row */
+}
+
+.bottomRow {
+  margin-top: -80px; /* Overlap middle row */
+}
+
+/* Card Styles */
+.card {
+  width: 90px;
+  height: 135px;
+  border-radius: 4px;
+  border: 1px solid #000;
+  z-index: 1; /* Ensure overlapping works */
+}

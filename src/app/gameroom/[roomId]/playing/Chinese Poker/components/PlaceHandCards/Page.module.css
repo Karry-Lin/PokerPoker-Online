@@ -1,0 +1,203 @@
+.container {
+  position: relative;
+  height: 100vh;
+  background-image: url('/gameroom-playing-page.jpg');
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Card rows */
+.cardRow {
+  display: flex;
+  justify-content: center;
+  position: absolute; /* Use absolute positioning to control placement */
+  width: 100%; /* Ensure rows span the width */
+}
+
+/* Specific positioning for each row */
+.cardRow.top {
+  top: 24%; /* Position row at 20% from the top of the container */
+}
+
+.cardRow.middle {
+  top: 34%; /* Position row at 40% from the top of the container */
+}
+
+.cardRow.bottom {
+  top: 44%; /* Position row at 60% from the top of the container */
+}
+
+/* Overlapping effect for cards */
+.cardRow .card {
+  margin-left: -60px; /* Overlapping margin */
+  position: relative;
+}
+
+.cardRow .card:first-child {
+  margin-left: 0; /* No margin for the first card in the row */
+}
+
+/* Player positions */
+.topPlayer,
+.leftPlayer,
+.rightPlayer {
+  position: absolute;
+  display: flex;
+}
+
+.topPlayer {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: row;
+}
+
+.leftPlayer,
+.rightPlayer {
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: 50px;
+  flex-direction: column;
+}
+
+.leftPlayer {
+  left: 50px;
+}
+
+.rightPlayer {
+  right: 50px;
+}
+
+/* Card styles */
+.otherCard {
+  width: 100px;
+  height: 150px;
+  background-color: #eaeaea;
+  border: 2px solid black;
+  border-radius: 8px;
+  position: relative;
+}
+
+.otherCard img {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+/* Positioning adjustments */
+.topPlayer .otherCard {
+  margin-left: -50px;
+}
+
+.leftPlayer .otherCard,
+.rightPlayer .otherCard {
+  margin-top: -100px;
+}
+
+.leftPlayer .otherCard {
+  transform: rotate(90deg);
+}
+
+.rightPlayer .otherCard {
+  transform: rotate(-90deg);
+}
+/* Hand cards */
+.handCardsWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute; /* Changed from relative */
+  bottom: 10px; /* Fix the wrapper at the bottom with spacing */
+}
+
+.handCards {
+  display: flex;
+  justify-content: center;
+}
+
+.handCards .card {
+  margin-left: -60px;
+  cursor: pointer;
+}
+
+.handCards .card:first-child {
+  margin-left: 0;
+}
+
+.card.selected {
+  transform: translateY(-10px);
+  border: 2px solid gold;
+}
+
+.buttons {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-bottom: 100px;
+}
+.submitbutton {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: -150px;
+}
+
+.button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.button:hover:enabled {
+  background-color: #0056b3;
+}
+
+/* Card styles */
+.card {
+  width: 120px;
+  height: 180px;
+  background-color: #eaeaea;
+  border: 2px solid black;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+.timer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 18px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}

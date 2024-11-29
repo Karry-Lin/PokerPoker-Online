@@ -1,7 +1,7 @@
 // Helper function to get card rank with Big Two rules (2 as highest rank)
 function getRank(card) {
   const rank = ((card - 1) % 13) + 1;
-  if(rank === 2)return 15;
+  if (rank === 2) return 15;
   return rank === 1 ? 14 : rank; // Treat Ace as 14 for Big Two ranking
 }
 
@@ -28,27 +28,26 @@ function getHandType(cards) {
   const counts = Object.values(rankCounts).sort((a, b) => b - a);
 
   if (isFlush && isStraight)
-    return { type: "straight_flush", value: Math.max(...ranks) };
+    return { type: 'straight_flush', value: Math.max(...ranks) };
   if (counts[0] === 4)
     return {
-      type: "four_of_a_kind",
-      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 4),
+      type: 'four_of_a_kind',
+      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 4)
     };
   if (counts[0] === 3 && counts[1] === 2)
     return {
-      type: "full_house",
-      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 3),
+      type: 'full_house',
+      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 3)
     };
-  if (isStraight) return { type: "straight", value: Math.max(...ranks) };
-  return { type: "high_card", value: Math.max(...ranks) };
+  if (isStraight) return { type: 'straight', value: Math.max(...ranks) };
+  return { type: 'high_card', value: Math.max(...ranks) };
 }
 
 // Main comparison function
 export default function compare(cards1, cards2) {
-  // Different number of cards, always return false
-  if (cards1.length !== cards2.length) return false;
+  if (cards1.length == 4 || cards1.length == 3) return false;
 
-  if (cards1.length === 1) {
+  if (cards1.length === 1 && cards2.length === 1) {
     // Single card comparison: by rank, then by suit
     const rank1 = getRank(cards1[0]);
     const rank2 = getRank(cards2[0]);
@@ -57,13 +56,13 @@ export default function compare(cards1, cards2) {
       : getSuitPriority(cards1[0]) > getSuitPriority(cards2[0]);
   }
 
-  if (cards1.length === 2) {
+  if (cards1.length === 2 && cards2.length === 2) {
     // Pair comparison: check for same rank in each pair
     if (
       getRank(cards1[0]) !== getRank(cards1[1]) ||
       getRank(cards2[0]) !== getRank(cards2[1])
     ) {
-      return false
+      return false;
     }
     const rank1 = getRank(cards1[0]);
     const rank2 = getRank(cards2[0]);
@@ -76,7 +75,7 @@ export default function compare(cards1, cards2) {
     );
   }
 
-  if (cards1.length === 5) {
+  if (cards1.length === 5 && cards2.length === 5) {
     // Five-card hand comparison
     const hand1 = getHandType(cards1);
     const hand2 = getHandType(cards2);
@@ -85,7 +84,7 @@ export default function compare(cards1, cards2) {
       straight: 1,
       full_house: 1,
       four_of_a_kind: 3,
-      straight_flush: 4,
+      straight_flush: 4
     };
 
     // Compare hand types by hierarchy
@@ -95,6 +94,30 @@ export default function compare(cards1, cards2) {
 
     // If hand types are the same, compare by highest value
     return hand1.value > hand2.value;
+  }
+  if (cards1.length == 5) {
+    const hand1 = getHandType(cards1);
+    if (hand1.type == 'straight_flush' || hand1.type == 'four_of_a_kind') {
+      return true;
+    }
+  }
+  if (cards2.length == 0) {
+    if (cards1.length == 1) {
+      return true;
+    } else if (cards1.length == 2) {
+      if (getRank(cards1[0]) !== getRank(cards1[1])) {
+        return false;
+      }
+      return true;
+    } else if (cards1.length == 5) {
+      const hand1 = getHandType(cards1);
+      if (hand1.type == 'high_card') {
+        return false;
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   return false; // Fallback case, should not occur if rules are adhered to

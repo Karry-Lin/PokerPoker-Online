@@ -1,10 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, ListGroup, ToggleButton } from 'react-bootstrap';
+import { Card, ListGroup } from 'react-bootstrap';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { database } from '@/utils/firebase.js';
-import shuffleCards from '../playing/BigTwo/components/shuffleCards';
+import shuffleCards from '../playing/BigTwo/components/BigTwoShuffleCards';
 import styles from './Page.module.css';
 
 const DEFAULT_PLAYER = {
@@ -32,11 +32,13 @@ export default function WaitingPage({ prop }) {
   useEffect(() => {
     if (prop?.players) {
       // Convert Firebase players object to array and merge with defaults
-      const firebasePlayers = Object.entries(prop.players).map(([id, playerData]) => ({
-        ...playerData,
-        id
-      }));
-      
+      const firebasePlayers = Object.entries(prop.players).map(
+        ([id, playerData]) => ({
+          ...playerData,
+          id
+        })
+      );
+
       // Merge and sort players
       const mergedPlayers = [...firebasePlayers, ...DEFAULT_PLAYERS]
         .slice(0, 4)
@@ -52,6 +54,7 @@ export default function WaitingPage({ prop }) {
         });
 
       setPlayers(mergedPlayers);
+      console.log(mergedPlayers);
     }
   }, [prop?.players]);
 
@@ -121,17 +124,17 @@ export default function WaitingPage({ prop }) {
         {players.map((player) => (
           <Card key={player.id} className={styles.card}>
             <Card.Img
-              variant="top"
+              variant='top'
               src={player.avatar}
               className={styles.avator}
             />
             <Card.Body className={styles.card_body}>
               <Card.Title className={styles.card_title}>
-                {player.place} Place
+                {player.username}
               </Card.Title>
             </Card.Body>
             <ListGroup>
-              <ListGroup.Item>Name: {player.username}</ListGroup.Item>
+              <ListGroup.Item>Money: {player.money}</ListGroup.Item>
               <ListGroup.Item>
                 State: {player.ready ? 'ready' : 'unready'}
               </ListGroup.Item>
@@ -141,12 +144,12 @@ export default function WaitingPage({ prop }) {
       </div>
 
       <div className={styles.button_container}>
-        <ToggleButton onClick={handleReadyToggle} className={styles.button}>
-          Ready
-        </ToggleButton>
-        <ToggleButton onClick={handleReturnToLobby} className={styles.button}>
+        <button onClick={handleReadyToggle} className={styles.button}>
+          {roomData?.players[prop.uid].ready ? 'UnReady' : 'Ready'}
+        </button>
+        <button onClick={handleReturnToLobby} className={styles.button}>
           Back To Lobby
-        </ToggleButton>
+        </button>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import End_Page from './end/End_page';
 import Playing_page from './playing/Playing_page';
 import Waiting_Page from './waiting/Waiting_page';
-import { getDatabase } from "@/utils/firebase.js";
+import { getDatabase } from '@/utils/firebase.js';
 
 const GameRoom = () => {
   const { roomId } = useParams();
@@ -31,16 +31,27 @@ const GameRoom = () => {
 
           const data = {
             id: snapshot.id,
-            ...snapshot.data(),
+            ...snapshot.data()
           };
           setRoomData(data);
-
+          if (
+            !(
+              userStore.userId &&
+              data.players &&
+              data.players[userStore.userId]
+            )
+          )
+            return <p>Loading...</p>;
           // Update prop if userStore.userId is available
-          if (userStore.userId && data.players && data.players[userStore.userId]) {
+          if (
+            userStore.userId &&
+            data.players &&
+            data.players[userStore.userId]
+          ) {
             const playersArray = Object.keys(data.players).map((key) => ({
               id: key,
               ...data.players[key],
-              score: 0,
+              score: 0
             }));
 
             setProp({
@@ -54,6 +65,8 @@ const GameRoom = () => {
               turn: data.turn,
               roomRef,
               roomData: data,
+              isPassed: data.players[userStore.userId]?.isPassed || null,
+              startTurn: data.startTurn
             });
           } else if (!userStore.userId) {
             setError('User not logged in');
