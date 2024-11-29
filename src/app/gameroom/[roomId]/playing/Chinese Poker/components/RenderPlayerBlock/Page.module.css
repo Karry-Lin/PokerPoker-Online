@@ -1,49 +1,90 @@
-.container {
-  background-image: url('/gameroom-playing-page.jpg');
-  display: grid;
-  grid-template-areas:
-    "top top top"
-    "left center right"
-    "bottom bottom bottom";
-  grid-template-rows: auto 1fr auto;
-  grid-template-columns: auto 1fr auto;
-  height: 100vh;
-  width: 100vw;
+/* Game Board Layout */
+.gameBoard {
   position: relative;
+  background-image: url('/gameroom-playing-page.jpg');
+  width: 100vw;
+  height: 100vh;
 }
 
+/* Top Player */
+.topPlayer {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Bottom Player */
+.bottomPlayer {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Left Player */
+.leftPlayer {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+}
+
+/* Right Player */
+.rightPlayer {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+/* Player Block Styles */
 .playerBlock {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  text-align: center;
 }
 
-.playerBlock .row {
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.playerName {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.cardContainer {
   display: flex;
-  gap: 5px;
+  flex-direction: column;
+  position: relative;
 }
 
+/* Card Rows */
+.cardRow {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.middleRow {
+  margin-top: -80px; /* Overlap top row */
+}
+
+.bottomRow {
+  margin-top: -80px; /* Overlap middle row */
+}
+
+/* Card Styles */
 .card {
-  width: 50px;
-  height: 70px;
-}
-
-.player0 {
-  grid-area: top;
-}
-
-.player1 {
-  grid-area: left;
-  justify-content: flex-end;
-}
-
-.player2 {
-  grid-area: right;
-  justify-content: flex-start;
-}
-
-.player3 {
-  grid-area: bottom;
+  width: 90px;
+  height: 135px;
+  border-radius: 4px;
+  border: 1px solid #000;
+  z-index: 1; /* Ensure overlapping works */
 }

@@ -145,7 +145,7 @@ export default function WaitingPage({ prop }) {
 
       <div className={styles.button_container}>
         <button onClick={handleReadyToggle} className={styles.button}>
-          {roomData.players[prop.uid].ready ? 'UnReady' : 'Ready'}
+          {roomData?.players[prop.uid].ready ? 'UnReady' : 'Ready'}
         </button>
         <button onClick={handleReturnToLobby} className={styles.button}>
           Back To Lobby

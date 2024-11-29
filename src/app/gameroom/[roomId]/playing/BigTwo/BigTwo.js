@@ -8,7 +8,16 @@ import compare from './components/compare';
 
 export default function BigTwo({ prop }) {
   console.log(prop);
-  const { roomRef, roomData, nowCards, players, uid, userplace, turn } = prop;
+  const {
+    roomRef,
+    roomData,
+    nowCards,
+    players,
+    uid,
+    userplace,
+    turn,
+    isPassed
+  } = prop;
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
@@ -21,9 +30,15 @@ export default function BigTwo({ prop }) {
   useEffect(() => {
     setMiddleCards(nowCards);
     if (players && players.length === 4) {
-      const topPlayer = players[(userplace + 1) % 4];
-      const leftPlayer = players[(userplace + 2) % 4];
-      const rightPlayer = players[(userplace + 3) % 4];
+      const topPlayer = players.find(
+        (player) => player.place == (userplace + 1) % 4
+      );
+      const leftPlayer = players.find(
+        (player) => player.place == (userplace + 2) % 4
+      );
+      const rightPlayer = players.find(
+        (player) => player.place == (userplace + 3) % 4
+      );
 
       setPlayerCardCounts({
         top: topPlayer.handCards.length,
@@ -41,6 +56,32 @@ export default function BigTwo({ prop }) {
       }
     }
   }, [players, uid]);
+  useEffect(() => {
+    const resetIsPassed = async () => {
+      const updatedPlayers = {};
+      players.forEach((player) => {
+        updatedPlayers[player.id] = { ...player, isPassed: false };
+      });
+
+      await updateDoc(roomRef, {
+        ...roomData,
+        players: updatedPlayers,
+        nowCards: []
+      });
+    };
+    const pass = async () => {
+      await updateDoc(roomRef, {
+        turn: (turn % 4) + 1
+      });
+    };
+    if (isPassed) {
+      pass();
+    }
+    // console.log('prop.startTurn', prop.startTurn);
+    if (prop.startTurn == turn) {
+      resetIsPassed();
+    }
+  }, [turn]);
 
   const handleCardClick = (card) => {
     setSelectedCards((prevSelected) =>
@@ -52,15 +93,14 @@ export default function BigTwo({ prop }) {
 
   const handlePass = async () => {
     await updateDoc(roomRef, {
-      turn: (turn % 4) + 1
+      turn: (turn % 4) + 1,
+      [`players.${uid}.isPassed`]: true
     });
   };
   const handleSubmit = async () => {
-    if (prop.startTurn != userplace) {
-      if (!compare(selectedCards, middleCards)) {
-        console.log('Invalid card combination');
-        return;
-      }
+    if (!compare(selectedCards, middleCards)) {
+      console.log('Invalid card combination');
+      return;
     }
 
     try {
@@ -75,7 +115,7 @@ export default function BigTwo({ prop }) {
       await updateDoc(roomRef, {
         [`players.${uid}.handCards`]: updatedHandCards,
         nowCards: selectedCards,
-        startTurn:userplace,
+        startTurn: userplace,
         turn: (turn % 4) + 1
       });
 
