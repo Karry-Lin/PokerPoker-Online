@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import BigTwo from "./BigTwo/BigTwo";
 import ChinesePoker from "./Chinese Poker/ChinesePoker";
 import ChineseRummy from "./Chinese Rummy/ChineseRummy";
-import Test from "./test/Test";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { database } from "@/utils/firebase.js";
 import BigTwoShuffleCards from "./BigTwo/components/BigTwoShuffleCards";
@@ -117,7 +116,7 @@ export default function PlayingPage({ prop }) {
   }, [prop]);
 
   if (!prop?.type) {
-    return <div>Loading...</div>;
+    return <div>Loading playing room...</div>;
   }
 
   return (
@@ -128,8 +127,6 @@ export default function PlayingPage({ prop }) {
         <ChinesePoker prop={prop} />
       ) : prop?.type == "撿紅點" ? (
         <ChineseRummy prop={prop} />
-      ) : prop?.type == "test" ? (
-        <Test prop={prop} />
       ) : (
         <div>Error: Invalid game type</div>
       )}
