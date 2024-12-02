@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import styles from './Page.module.css';
 import { database } from '@/utils/firebase.js';
 import compare from './components/compare';
-import count_point from './components/count_point';
 
 export default function BigTwo({ prop }) {
+  console.log(prop);
   const {
     roomRef,
     roomData,
@@ -18,8 +18,6 @@ export default function BigTwo({ prop }) {
     turn,
     isPassed
   } = prop;
-
-  // State hooks
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
@@ -29,47 +27,41 @@ export default function BigTwo({ prop }) {
     right: 13
   });
 
-  // Update middle cards and player card counts
   useEffect(() => {
     setMiddleCards(nowCards);
     if (players && players.length === 4) {
-      const getPlayerByRelativePlace = (offset) =>
-        players.find(
-          (player) => player.place === ((userplace + offset) % 4) + 1
-        );
-
-      const topPlayer = getPlayerByRelativePlace(2);
-      const leftPlayer = getPlayerByRelativePlace(1);
-      const rightPlayer = getPlayerByRelativePlace(3);
+      const topPlayer = players.find(
+        (player) => player.place == (userplace + 1) % 4
+      );
+      const leftPlayer = players.find(
+        (player) => player.place == (userplace + 2) % 4
+      );
+      const rightPlayer = players.find(
+        (player) => player.place == (userplace + 3) % 4
+      );
 
       setPlayerCardCounts({
-        top: topPlayer?.handCards.length ?? 13,
-        left: leftPlayer?.handCards.length ?? 13,
-        right: rightPlayer?.handCards.length ?? 13
+        top: topPlayer.handCards.length,
+        left: leftPlayer.handCards.length,
+        right: rightPlayer.handCards.length
       });
     }
   }, [nowCards, players, userplace]);
 
-  // Update hand cards for current player
   useEffect(() => {
     if (players && uid) {
       const currentPlayer = players.find((player) => player.id === uid);
-      setHandCards(currentPlayer?.handCards || []);
+      if (currentPlayer) {
+        setHandCards(currentPlayer.handCards || []);
+      }
     }
   }, [players, uid]);
-
-  // Handle turn and pass logic
   useEffect(() => {
     const resetIsPassed = async () => {
-      
-      const playerIds = Object.keys(players);
-        const updatedPlayers = {};
-        playerIds.forEach((playerId) => {
-          updatedPlayers[playerId] = {
-            ...players[playerId],
-            isPassed: false
-          };
-        });
+      const updatedPlayers = {};
+      players.forEach((player) => {
+        updatedPlayers[player.id] = { ...player, isPassed: false };
+      });
 
       await updateDoc(roomRef, {
         ...roomData,
@@ -77,39 +69,34 @@ export default function BigTwo({ prop }) {
         nowCards: []
       });
     };
-
     const pass = async () => {
       await updateDoc(roomRef, {
         turn: (turn % 4) + 1
       });
     };
-
     if (isPassed) {
       pass();
-      return;
     }
-
-    if (prop.startTurn === turn) {
+    // console.log('prop.startTurn', prop.startTurn);
+    if (prop.startTurn == turn) {
       resetIsPassed();
     }
-  }, [turn, isPassed, prop.startTurn, players, roomRef, roomData]);
+  }, [turn]);
 
-  // Card selection handler
   const handleCardClick = (card) => {
-    setSelectedCards((prev) =>
-      prev.includes(card) ? prev.filter((c) => c !== card) : [...prev, card]
+    setSelectedCards((prevSelected) =>
+      prevSelected.includes(card)
+        ? prevSelected.filter((c) => c !== card)
+        : [...prevSelected, card]
     );
   };
 
-  // Pass turn handler
   const handlePass = async () => {
     await updateDoc(roomRef, {
       turn: (turn % 4) + 1,
       [`players.${uid}.isPassed`]: true
     });
   };
-
-  // Submit cards handler
   const handleSubmit = async () => {
     if (!compare(selectedCards, middleCards)) {
       console.log('Invalid card combination');
@@ -134,19 +121,12 @@ export default function BigTwo({ prop }) {
 
       setHandCards(updatedHandCards);
       setSelectedCards([]);
-
       if (updatedHandCards.length === 0) {
-        const playerIds = Object.keys(players);
-        const updatedPlayers = {};
-        playerIds.forEach((playerId) => {
-          updatedPlayers[playerId] = {
-            ...players[playerId],
-            score: count_point(players[playerId].handCards)
-          };
-        });
+        console.log(`Player ${uid} has won the game!`);
+        // Additional logic for handling the win, e.g., ending the game or showing a message
         await updateDoc(roomRef, {
-          players: updatedPlayers,
           state: 'end'
+          // winner: uid
         });
       }
     } catch (error) {
@@ -154,7 +134,6 @@ export default function BigTwo({ prop }) {
     }
   };
 
-  // Render other players' card backs
   const renderOtherPlayerCards = (position, count) => (
     <div className={styles[`${position}Player`]}>
       {Array.from({ length: count }).map((_, index) => (
@@ -167,10 +146,12 @@ export default function BigTwo({ prop }) {
 
   return (
     <div className={styles.container}>
+      {/* Other players' cards */}
       {renderOtherPlayerCards('top', playerCardCounts.top)}
       {renderOtherPlayerCards('left', playerCardCounts.left)}
       {renderOtherPlayerCards('right', playerCardCounts.right)}
 
+      {/* Middle cards */}
       <div className={styles.middleCards}>
         {middleCards?.map((card, index) => (
           <div key={`middle-${index}`} className={styles.middleCard}>
@@ -179,6 +160,7 @@ export default function BigTwo({ prop }) {
         ))}
       </div>
 
+      {/* Player's hand cards */}
       <div className={styles.cardRowWrapper}>
         <div className={styles.handCards}>
           {handCards.map((card, index) => (
