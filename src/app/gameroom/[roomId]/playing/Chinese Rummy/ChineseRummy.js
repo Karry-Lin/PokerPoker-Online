@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import styles from "./Page.module.css";
-import getPoint from "./components/getPoint";
+import { useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import styles from './Page.module.css';
+import getPoint from './components/getPoint';
 
 export default function ChineseRummy({ prop }) {
   const { roomRef, roomData, nowCards, players, uid, userplace, turn, deck } =
@@ -17,7 +17,7 @@ export default function ChineseRummy({ prop }) {
   const [playerCardCounts, setPlayerCardCounts] = useState({
     top: 13,
     left: 13,
-    right: 13,
+    right: 13
   });
 
   useEffect(() => {
@@ -30,16 +30,18 @@ export default function ChineseRummy({ prop }) {
     setMiddleCards(nowCards);
     if (players?.length === 4) {
       const getRelativePlayer = (offset) =>
-        players.find((player) => player.place === ((userplace + offset) % 4) + 1);
-    
+        players.find(
+          (player) => player.place === ((userplace + offset) % 4) + 1
+        );
+
       const leftPlayer = getRelativePlayer(1);
       const topPlayer = getRelativePlayer(2);
       const rightPlayer = getRelativePlayer(3);
-    
+
       setPlayerCardCounts({
         top: topPlayer?.handCards.length || 0,
         left: leftPlayer?.handCards.length || 0,
-        right: rightPlayer?.handCards.length || 0,
+        right: rightPlayer?.handCards.length || 0
       });
     }
   }, [nowCards]);
@@ -76,13 +78,13 @@ export default function ChineseRummy({ prop }) {
       await updateDoc(roomRef, {
         nowCards: updatedMiddleCards,
         [`players.${uid}.handCards`]: updatedHandCards,
-        deck: deck.slice(1),
+        deck: deck.slice(1)
       });
 
       setFlipCard(deck[0]);
       setSelectedHandCard(null);
     } catch (error) {
-      console.error("Error throwing hand card:", error);
+      console.error('Error throwing hand card:', error);
     }
   };
 
@@ -93,14 +95,14 @@ export default function ChineseRummy({ prop }) {
 
       await updateDoc(roomRef, {
         nowCards: updatedMiddleCards,
-        turn: (turn + 1) % 4,
-        deck: deck.slice(1),
+        turn: (turn % 4) + 1,
+        deck: deck.slice(1)
       });
 
       setFlipCard(null);
       setSelectedMiddleCard(null);
     } catch (error) {
-      console.error("Error throwing flip card:", error);
+      console.error('Error throwing flip card:', error);
     }
   };
 
@@ -115,19 +117,19 @@ export default function ChineseRummy({ prop }) {
 
         await updateDoc(roomRef, {
           nowCards: updatedMiddleCards,
-          turn: (turn + 1) % 4,
+          turn: (turn % 4) + 1,
           [`players.${uid}.score`]: (roomData.players[uid]?.score || 0) + point,
-          deck: deck.slice(1),
+          deck: deck.slice(1)
         });
 
         setSelectedMiddleCard(null);
         setFlipCard(null);
       } else {
-        alert("Please select valid cards");
+        alert('Please select valid cards');
         setSelectedMiddleCard(null);
       }
     } catch (error) {
-      console.error("Error submitting flip card:", error);
+      console.error('Error submitting flip card:', error);
     }
   };
 
@@ -147,18 +149,20 @@ export default function ChineseRummy({ prop }) {
         await updateDoc(roomRef, {
           [`players.${uid}.handCards`]: updatedHandCards,
           [`players.${uid}.score`]: (roomData.players[uid]?.score || 0) + point,
-          nowCards: updatedMiddleCards,
+          deck: deck.slice(1),
+          nowCards: updatedMiddleCards
         });
 
         setSelectedMiddleCard(null);
         setSelectedHandCard(null);
+        setFlipCard(deck[0]);
       } else {
-        alert("Please select valid cards");
+        alert('Please select valid cards');
         setSelectedMiddleCard(null);
         setSelectedHandCard(null);
       }
     } catch (error) {
-      console.error("Error updating game state:", error);
+      console.error('Error updating game state:', error);
     }
   };
 
@@ -166,7 +170,7 @@ export default function ChineseRummy({ prop }) {
     <div className={styles[`${position}Player`]}>
       {Array.from({ length: count }).map((_, index) => (
         <div key={`${position}-${index}`} className={styles.otherCard}>
-          <img src="/cards/0.png" alt="Other Player's Card" />
+          <img src='/cards/0.png' alt="Other Player's Card" />
         </div>
       ))}
     </div>
@@ -174,16 +178,16 @@ export default function ChineseRummy({ prop }) {
 
   return (
     <div className={styles.container}>
-      {renderOtherPlayerCards("top", playerCardCounts.top)}
-      {renderOtherPlayerCards("left", playerCardCounts.left)}
-      {renderOtherPlayerCards("right", playerCardCounts.right)}
+      {renderOtherPlayerCards('top', playerCardCounts.top)}
+      {renderOtherPlayerCards('left', playerCardCounts.left)}
+      {renderOtherPlayerCards('right', playerCardCounts.right)}
 
       <div className={styles.middleCards}>
         {middleCards?.map((card, index) => (
           <div
             key={`middle-${index}`}
             className={`${styles.card} ${
-              selectedMiddleCard === card ? styles.selected : ""
+              selectedMiddleCard === card ? styles.selected : ''
             }`}
             onClick={() => handleMiddleCardClick(card)}
           >
@@ -209,7 +213,7 @@ export default function ChineseRummy({ prop }) {
             <div
               key={`hand-${index}`}
               className={`${styles.card} ${
-                selectedHandCard === card ? styles.selected : ""
+                selectedHandCard === card ? styles.selected : ''
               }`}
               onClick={() => handleHandCardClick(card)}
             >
@@ -218,11 +222,11 @@ export default function ChineseRummy({ prop }) {
           ))}
         </div>
 
-        {userplace === turn && (
+        {userplace === turn ? (
           <div className={styles.actionButtons}>
             {selectedHandCard && selectedMiddleCard && (
               <button className={styles.submitButton} onClick={handleSubmit}>
-                Submit
+                出牌
               </button>
             )}
             {selectedHandCard && !selectedMiddleCard && (
@@ -230,7 +234,7 @@ export default function ChineseRummy({ prop }) {
                 className={styles.submitButton}
                 onClick={handleThrowHandCard}
               >
-                Throw
+                丟牌
               </button>
             )}
             {flipCard && selectedMiddleCard && (
@@ -238,7 +242,7 @@ export default function ChineseRummy({ prop }) {
                 className={styles.submitButton}
                 onClick={handleSubmitFlipCard}
               >
-                Submit
+                出牌
               </button>
             )}
             {flipCard && !selectedMiddleCard && (
@@ -246,10 +250,15 @@ export default function ChineseRummy({ prop }) {
                 className={styles.submitButton}
                 onClick={handleThrowFlipCard}
               >
-                Throw
+                丟牌
               </button>
             )}
           </div>
+        ) : (
+          <>
+            <button className={styles.disabledButton}>出牌</button>
+            <button className={styles.disabledButton}>丟牌</button>
+          </>
         )}
       </div>
     </div>
