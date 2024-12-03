@@ -43,8 +43,7 @@ export default function BigTwo({ prop }) {
         right: rightPlayer?.handCards.length || 0,
       });
     }
-    
-  }, [nowCards, players, userplace]);
+  }, [nowCards]);
 
   useEffect(() => {
     if (players && uid) {

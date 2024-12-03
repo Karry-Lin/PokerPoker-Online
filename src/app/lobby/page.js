@@ -86,7 +86,8 @@ export default function GameRoomPage() {
             score: 0,
             avatar: userData.avatar,
             ready: false,
-            username: userData.username
+            username: userData.username,
+            money:userData.money
           }
         }
       });

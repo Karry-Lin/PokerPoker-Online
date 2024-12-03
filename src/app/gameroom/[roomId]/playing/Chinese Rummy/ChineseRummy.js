@@ -28,18 +28,21 @@ export default function ChineseRummy({ prop }) {
 
   useEffect(() => {
     setMiddleCards(nowCards);
-    if (players && players.length === 4) {
-      const topPlayer = players[(userplace + 1) % 4];
-      const leftPlayer = players[(userplace + 2) % 4];
-      const rightPlayer = players[(userplace + 3) % 4];
-
+    if (players?.length === 4) {
+      const getRelativePlayer = (offset) =>
+        players.find((player) => player.place === ((userplace + offset) % 4) + 1);
+    
+      const leftPlayer = getRelativePlayer(1);
+      const topPlayer = getRelativePlayer(2);
+      const rightPlayer = getRelativePlayer(3);
+    
       setPlayerCardCounts({
-        top: topPlayer.handCards?.length || 0,
-        left: leftPlayer.handCards?.length || 0,
-        right: rightPlayer.handCards?.length || 0,
+        top: topPlayer?.handCards.length || 0,
+        left: leftPlayer?.handCards.length || 0,
+        right: rightPlayer?.handCards.length || 0,
       });
     }
-  }, [nowCards, players, userplace]);
+  }, [nowCards]);
 
   useEffect(() => {
     if (players && uid) {

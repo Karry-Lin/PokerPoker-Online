@@ -11,5 +11,5 @@ export default function count_point(card) {
         }
     }
 
-    return n; // Return the final value of n
+    return -n; // Return the final value of n
 }
