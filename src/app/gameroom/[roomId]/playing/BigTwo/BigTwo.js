@@ -31,16 +31,18 @@ export default function BigTwo({ prop }) {
     setMiddleCards(nowCards);
     if (players?.length === 4) {
       const getRelativePlayer = (offset) =>
-        players.find((player) => player.place === ((userplace + offset) % 4) + 1);
-    
+        players.find(
+          (player) => player.place === ((userplace + offset) % 4) + 1
+        );
+
       const leftPlayer = getRelativePlayer(1);
       const topPlayer = getRelativePlayer(2);
       const rightPlayer = getRelativePlayer(3);
-    
+
       setPlayerCardCounts({
         top: topPlayer?.handCards.length || 0,
         left: leftPlayer?.handCards.length || 0,
-        right: rightPlayer?.handCards.length || 0,
+        right: rightPlayer?.handCards.length || 0
       });
     }
   }, [nowCards]);
@@ -71,7 +73,7 @@ export default function BigTwo({ prop }) {
         turn: (turn % 4) + 1
       });
     };
-    if (isPassed) {
+    if (isPassed && turn == userplace) {
       pass();
     }
     // console.log('prop.startTurn', prop.startTurn);

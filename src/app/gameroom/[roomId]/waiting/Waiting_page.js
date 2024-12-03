@@ -1,10 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, ListGroup } from 'react-bootstrap';
+import { Card, ListGroup, Modal } from 'react-bootstrap';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { database } from '@/utils/firebase.js';
-import shuffleCards from '../playing/BigTwo/components/BigTwoShuffleCards';
 import styles from './Page.module.css';
 
 const DEFAULT_PLAYER = {
@@ -13,6 +11,7 @@ const DEFAULT_PLAYER = {
   ready: false,
   score: 0,
   handCards: [],
+  money:0,
   place: 999 // High default place for sorting
 };
 
@@ -151,6 +150,9 @@ export default function WaitingPage({ prop }) {
           Back To Lobby
         </button>
       </div>
+      <Modal>
+        {/* to do here  */}
+      </Modal>
     </div>
   );
 }

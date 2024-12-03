@@ -26,7 +26,8 @@ export default function GameRoomPage() {
   const [userData, setUserData] = useState({
     avatar: '',
     uid: '',
-    username: ''
+    username: '',
+    money:null,
   });
 
   // Fetch rooms data
@@ -50,7 +51,8 @@ export default function GameRoomPage() {
         setUserData({
           avatar: data.avatar || '',
           uid: userStore.userId,
-          username: data.username
+          username: data.username,
+          money:data.money
         });
       }
     };
