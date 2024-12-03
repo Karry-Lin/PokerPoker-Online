@@ -29,23 +29,21 @@ export default function BigTwo({ prop }) {
 
   useEffect(() => {
     setMiddleCards(nowCards);
-    if (players && players.length === 4) {
-      const topPlayer = players.find(
-        (player) => player.place == (userplace + 1) % 4
-      );
-      const leftPlayer = players.find(
-        (player) => player.place == (userplace + 2) % 4
-      );
-      const rightPlayer = players.find(
-        (player) => player.place == (userplace + 3) % 4
-      );
-
+    if (players?.length === 4) {
+      const getRelativePlayer = (offset) =>
+        players.find((player) => player.place === ((userplace + offset) % 4) + 1);
+    
+      const leftPlayer = getRelativePlayer(1);
+      const topPlayer = getRelativePlayer(2);
+      const rightPlayer = getRelativePlayer(3);
+    
       setPlayerCardCounts({
-        top: topPlayer.handCards.length,
-        left: leftPlayer.handCards.length,
-        right: rightPlayer.handCards.length
+        top: topPlayer?.handCards.length || 0,
+        left: leftPlayer?.handCards.length || 0,
+        right: rightPlayer?.handCards.length || 0,
       });
     }
+    
   }, [nowCards, players, userplace]);
 
   useEffect(() => {
