@@ -8,6 +8,7 @@ import getPoint from './components/getPoint';
 export default function ChineseRummy({ prop }) {
   const { roomRef, roomData, nowCards, players, uid, userplace, turn, deck } =
     prop;
+
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
@@ -34,44 +35,35 @@ export default function ChineseRummy({ prop }) {
           (player) => player.place === ((userplace + offset) % 4) + 1
         );
 
-      const leftPlayer = getRelativePlayer(1);
-      const topPlayer = getRelativePlayer(2);
-      const rightPlayer = getRelativePlayer(3);
-
       setPlayerCardCounts({
-        top: topPlayer?.handCards.length || 0,
-        left: leftPlayer?.handCards.length || 0,
-        right: rightPlayer?.handCards.length || 0
+        top: getRelativePlayer(2)?.handCards.length || 0,
+        left: getRelativePlayer(1)?.handCards.length || 0,
+        right: getRelativePlayer(3)?.handCards.length || 0
       });
     }
-  }, [nowCards]);
+  }, [nowCards, players, userplace]);
 
   useEffect(() => {
     if (players && uid) {
       const currentPlayer = players.find((player) => player.id === uid);
-      if (currentPlayer) {
-        setHandCards(currentPlayer.handCards || []);
-      }
+      setHandCards(currentPlayer?.handCards || []);
     }
   }, [players, uid]);
 
   const handleMiddleCardClick = (card) => {
-    if (userplace !== turn) return;
-    if (flipCard) {
-      setSelectedMiddleCard(card);
-    } else if (selectedHandCard) {
+    if (userplace === turn) {
       setSelectedMiddleCard(card);
     }
   };
 
   const handleHandCardClick = (card) => {
-    if (userplace !== turn || flipCard) return;
-    setSelectedHandCard(card);
+    if (userplace === turn && !flipCard) {
+      setSelectedHandCard(card);
+    }
   };
 
   const handleThrowHandCard = async () => {
     try {
-      if (userplace !== turn) return;
       const updatedHandCards = handCards.filter((c) => c !== selectedHandCard);
       const updatedMiddleCards = [...middleCards, selectedHandCard];
 
@@ -90,7 +82,6 @@ export default function ChineseRummy({ prop }) {
 
   const handleThrowFlipCard = async () => {
     try {
-      if (userplace !== turn || !flipCard) return;
       const updatedMiddleCards = [...middleCards, flipCard];
 
       await updateDoc(roomRef, {
@@ -108,7 +99,6 @@ export default function ChineseRummy({ prop }) {
 
   const handleSubmitFlipCard = async () => {
     try {
-      if (userplace !== turn || !flipCard || !selectedMiddleCard) return;
       const point = getPoint(flipCard, selectedMiddleCard);
       if (point !== -1) {
         const updatedMiddleCards = middleCards.filter(
@@ -135,8 +125,6 @@ export default function ChineseRummy({ prop }) {
 
   const handleSubmit = async () => {
     try {
-      if (userplace !== turn || !selectedHandCard || !selectedMiddleCard)
-        return;
       const point = getPoint(selectedHandCard, selectedMiddleCard);
       if (point !== -1) {
         const updatedMiddleCards = middleCards.filter(
@@ -149,8 +137,8 @@ export default function ChineseRummy({ prop }) {
         await updateDoc(roomRef, {
           [`players.${uid}.handCards`]: updatedHandCards,
           [`players.${uid}.score`]: (roomData.players[uid]?.score || 0) + point,
-          deck: deck.slice(1),
-          nowCards: updatedMiddleCards
+          nowCards: updatedMiddleCards,
+          deck: deck.slice(1)
         });
 
         setSelectedMiddleCard(null);
@@ -163,6 +151,22 @@ export default function ChineseRummy({ prop }) {
       }
     } catch (error) {
       console.error('Error updating game state:', error);
+    }
+  };
+
+  const handlePlayCard = () => {
+    if (flipCard && selectedMiddleCard) {
+      handleSubmitFlipCard();
+    } else if (selectedHandCard && selectedMiddleCard) {
+      handleSubmit();
+    }
+  };
+
+  const handleDiscardCard = () => {
+    if (flipCard) {
+      handleThrowFlipCard();
+    } else if (selectedHandCard) {
+      handleThrowHandCard();
     }
   };
 
@@ -220,46 +224,30 @@ export default function ChineseRummy({ prop }) {
               <img src={`/cards/${card}.png`} alt={`Card ${card}`} />
             </div>
           ))}
-        </div>
 
-        {userplace === turn ? (
-          <div className={styles.actionButtons}>
-            {selectedHandCard && selectedMiddleCard && (
-              <button className={styles.submitButton} onClick={handleSubmit}>
-                出牌
-              </button>
-            )}
-            {selectedHandCard && !selectedMiddleCard && (
-              <button
-                className={styles.submitButton}
-                onClick={handleThrowHandCard}
-              >
-                丟牌
-              </button>
-            )}
-            {flipCard && selectedMiddleCard && (
-              <button
-                className={styles.submitButton}
-                onClick={handleSubmitFlipCard}
-              >
-                出牌
-              </button>
-            )}
-            {flipCard && !selectedMiddleCard && (
-              <button
-                className={styles.submitButton}
-                onClick={handleThrowFlipCard}
-              >
-                丟牌
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <button className={styles.disabledButton}>出牌</button>
-            <button className={styles.disabledButton}>丟牌</button>
-          </>
-        )}
+          <button
+            className={
+              (flipCard || selectedHandCard) && selectedMiddleCard
+                ? styles.submitButton
+                : styles.disabledButton
+            }
+            onClick={handlePlayCard}
+            disabled={userplace !== turn}
+          >
+            出牌
+          </button>
+          <button
+            className={
+              (flipCard || selectedHandCard) && !selectedMiddleCard
+                ? styles.submitButton
+                : styles.disabledButton
+            }
+            onClick={handleDiscardCard}
+            disabled={userplace !== turn}
+          >
+            丟牌
+          </button>
+        </div>
       </div>
     </div>
   );

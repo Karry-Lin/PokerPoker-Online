@@ -181,7 +181,7 @@ export default function BigTwo({ prop }) {
           onClick={userplace === turn ? handleSubmit : undefined}
           disabled={userplace !== turn || selectedCards.length === 0}
         >
-          Submit
+          出牌
         </button>
         <button
           className={`${styles.submitButton} ${
@@ -190,7 +190,7 @@ export default function BigTwo({ prop }) {
           onClick={userplace === turn ? handlePass : undefined}
           disabled={userplace !== turn}
         >
-          Pass
+          過牌
         </button>
       </div>
     </div>

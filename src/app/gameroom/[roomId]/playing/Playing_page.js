@@ -60,8 +60,8 @@ export default function PlayingPage({ prop }) {
             const playerIds = Object.keys(players);
             const updatedPlayers = {};
             playerIds.forEach((playerId, index) => {
-              const startIdx = index * 6;
-              const endIdx = startIdx + 6;
+              const startIdx = index * 4;
+              const endIdx = startIdx + 4;
               const playerCards = deck.slice(startIdx, endIdx);
               updatedPlayers[playerId] = {
                 ...players[playerId],
@@ -73,8 +73,8 @@ export default function PlayingPage({ prop }) {
               players: updatedPlayers,
               isShuffled: true,
               turn:1,
-              nowCards:deck.slice(24, 28),
-              deck:deck.slice(28, 52)
+              nowCards:deck.slice(16, 20),
+              deck:deck.slice(20, 52)
             });
           } catch (error) {
             console.error("Error updating game state:", error);
