@@ -30,7 +30,7 @@ export default function WaitingPage({ prop }) {
   // ShowResultModal Component
   const ShowResultModal = ({ show, handleClose }) => {
     // Sort players by score in descending order
-    const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+    const sortedPlayers = [...players].sort((a, b) => b.Score - a.Score);
   
     return (
       <Modal show={show} onHide={handleClose}>
@@ -47,7 +47,7 @@ export default function WaitingPage({ prop }) {
               />
               <div className={styles.playerInfo}>
                 <div className={styles.playerName}>{player.username}</div>
-                <div className={styles.playerScore}>Score: {player.score}</div>
+                <div className={styles.playerScore}>Score: {player.Score}</div>
               </div>
             </div>
           ))}
@@ -60,6 +60,7 @@ export default function WaitingPage({ prop }) {
       </Modal>
     );
   };
+  
   
   
 

@@ -1,5 +1,5 @@
 // Function to count points based on the cards
-export default function count_point(card) {
+export default function get_point(card) {
     let n = card.length; // Get the number of cards (length of array)
     
     // Check if any special card is included in the array

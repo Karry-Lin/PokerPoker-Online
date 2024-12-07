@@ -89,7 +89,8 @@ export default function GameRoomPage() {
             avatar: userData.avatar,
             ready: false,
             username: userData.username,
-            money:userData.money
+            money:userData.money,
+            showResult:false
           }
         }
       });
