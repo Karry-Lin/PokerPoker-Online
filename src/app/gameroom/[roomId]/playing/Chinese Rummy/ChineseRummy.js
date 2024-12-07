@@ -54,25 +54,25 @@ export default function ChineseRummy({ prop }) {
         top: {
           cardCount: updatePlayerState.top?.handCards.length || 0,
           avatar: updatePlayerState.top?.avatar || "/avatar_test.jpg",
-          score: updatePlayerState.top?.score || 0,
+          score: updatePlayerState.top?.Score || 0,
           name: updatePlayerState.top?.username || "player"
         },
         left: {
           cardCount: updatePlayerState.left?.handCards.length || 0,
           avatar: updatePlayerState.left?.avatar || "/avatar_test.jpg",
-          score: updatePlayerState.left?.score || 0,
+          score: updatePlayerState.left?.Score || 0,
           name: updatePlayerState.left?.username || "player"
         },
         right: {
           cardCount: updatePlayerState.right?.handCards.length || 0,
           avatar: updatePlayerState.right?.avatar || "/avatar_test.jpg",
-          score: updatePlayerState.right?.score || 0,
+          score: updatePlayerState.right?.Score || 0,
           name: updatePlayerState.right?.username || "player"
         },
         player: {
           cardCount: players.userplace?.handCards.length || 0,
           avatar: players.userplace?.avatar || "/avatar_test.jpg",
-          score: players.userplace?.score || 0,
+          score: players.userplace?.Score || 0,
           name: players.userplace?.username || "player"
         }
       });
@@ -205,38 +205,23 @@ export default function ChineseRummy({ prop }) {
       handleThrowHandCard();
     }
   };
-
-  // const renderOtherPlayer = (position) => {
-  //   const player = playerState[position];
-  //   return (
-  //     <div className={styles[`${position}Player`]}>
-  //       <img
-  //         src={player.avatar}
-  //         alt={`${position} Player Avatar`}
-  //         className={styles.avatar}
-  //       />
-  //       <div className={styles.playerName}>{player.name}</div>
-  //       <div className={styles.playerScore}>Score: {player.score}</div>
-  //       {Array.from({ length: player.cardCount }).map((_, index) => (
-  //         <div key={`${position}-${index}`} className={styles.otherCard}>
-  //           <img src="/cards/0.png" alt="Other Player's Card" />
-  //         </div>
-  //       ))}
-  //     </div>
-  //   );
-  // };
   const renderOtherPlayer = (position) => {
     const player = playerState[position];
+    const infoPositionClass = `${styles.playerInfoContainer} ${styles[position + "Info"]}`;
+    
     return (
       <div className={styles[`${position}Player`]}>
-        <div className={styles.playerInfoContainer}>
+        <div className={infoPositionClass}>
           <img
             src={player.avatar}
             alt={`${position} Player Avatar`}
             className={styles.avatar}
           />
-          <div className={styles.playerName}>{player.name}</div>
-          <div className={styles.playerScore}>Score: {player.score}</div>
+          <div className={styles.playerDetails}>
+            <div className={styles.playerName}>{player.name}</div>
+            <div className={styles.playerScore}>Score: {player.score}</div>
+            <div className={styles.playerCardsCount}>Cards: {player.cardCount}</div>
+          </div>
         </div>
         <div className={styles.otherCardsContainer}>
           {Array.from({ length: player.cardCount }).map((_, index) => (
@@ -248,6 +233,8 @@ export default function ChineseRummy({ prop }) {
       </div>
     );
   };
+  
+  
 
   return (
     <div className={styles.container}>
