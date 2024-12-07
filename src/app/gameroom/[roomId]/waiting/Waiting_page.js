@@ -1,48 +1,88 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, ListGroup, Modal } from 'react-bootstrap';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import styles from './Page.module.css';
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Card, ListGroup, Modal ,Button } from "react-bootstrap";
+import { doc, getDoc, setDoc,updateDoc } from "firebase/firestore";
+import styles from "./Page.module.css";
 
 const DEFAULT_PLAYER = {
-  avatar: '/avatar_test.jpg',
-  username: 'Waiting...',
+  avatar: "/avatar_test.jpg",
+  username: "Waiting...",
   ready: false,
   score: 0,
   handCards: [],
-  money:0,
-  place: 999 // High default place for sorting
+  money: 0,
+  place: 999, // High default place for sorting
 };
 
 // Create array of 4 default players
 const DEFAULT_PLAYERS = Array.from({ length: 4 }, (_, index) => ({
   ...DEFAULT_PLAYER,
   id: `default${index + 1}`,
-  place: index + 1
+  place: index + 1,
 }));
 
 export default function WaitingPage({ prop }) {
   const router = useRouter();
   const [players, setPlayers] = useState(DEFAULT_PLAYERS);
-  const { roomData, roomRef } = prop;
+  const { roomData, roomRef, showResult } = prop;
 
-  // Initialize deck and players with sorting
+  // ShowResultModal Component
+  const ShowResultModal = ({ show, handleClose }) => {
+    // Sort players by score in descending order
+    const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+  
+    return (
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Game Results</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {sortedPlayers.map((player) => (
+            <div key={player.id} className={styles.playerBlock}>
+              <img
+                src={player.avatar}
+                alt={`${player.username}'s avatar`}
+                className={styles.playerAvatar}
+              />
+              <div className={styles.playerInfo}>
+                <div className={styles.playerName}>{player.username}</div>
+                <div className={styles.playerScore}>Score: {player.score}</div>
+              </div>
+            </div>
+          ))}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  };
+  
+  
+
+  const CloseModal = async () => {
+    try {
+      await updateDoc(roomRef, {
+        [`players.${prop?.uid}.showResult`]: false,
+      });
+    } catch (error) {}
+  };
+
   useEffect(() => {
     if (prop?.players) {
-      // Convert Firebase players object to array and merge with defaults
       const firebasePlayers = Object.entries(prop.players).map(
         ([id, playerData]) => ({
           ...playerData,
-          id
+          id,
         })
       );
 
-      // Merge and sort players
       const mergedPlayers = [...firebasePlayers, ...DEFAULT_PLAYERS]
         .slice(0, 4)
         .sort((a, b) => {
-          // Sort by place if both players have valid places
           if (a.place && b.place) {
             return a.place - b.place;
           }
@@ -57,15 +97,14 @@ export default function WaitingPage({ prop }) {
     }
   }, [prop?.players]);
 
-  // Check if all players are ready and update room state
   useEffect(() => {
     const checkAndUpdateGameState = async () => {
       const areAllPlayersReady = players.every((player) => player.ready);
       if (areAllPlayersReady && prop?.roomId) {
         try {
-          await setDoc(roomRef, { ...roomData, state: 'playing' });
+          await setDoc(roomRef, { ...roomData, state: "playing" });
         } catch (error) {
-          console.error('Error updating game state:', error);
+          console.error("Error updating game state:", error);
         }
       }
     };
@@ -82,8 +121,8 @@ export default function WaitingPage({ prop }) {
           ...roomData.players,
           [prop.uid]: {
             ...roomData.players[prop.uid],
-            ready: isReady
-          }
+            ready: isReady,
+          },
         };
         await setDoc(roomRef, { ...roomData, players: updatedPlayers });
         setPlayers((prevPlayers) =>
@@ -98,7 +137,7 @@ export default function WaitingPage({ prop }) {
         }
       }
     } catch (error) {
-      console.error('Error updating ready status:', error);
+      console.error("Error updating ready status:", error);
     }
   };
 
@@ -111,9 +150,9 @@ export default function WaitingPage({ prop }) {
         delete updatedPlayers[prop.uid];
         await setDoc(roomRef, { ...roomData, players: updatedPlayers });
       }
-      router.push('/lobby');
+      router.push("/lobby");
     } catch (error) {
-      console.error('Error leaving room:', error);
+      console.error("Error leaving room:", error);
     }
   };
 
@@ -123,7 +162,7 @@ export default function WaitingPage({ prop }) {
         {players.map((player) => (
           <Card key={player.id} className={styles.card}>
             <Card.Img
-              variant='top'
+              variant="top"
               src={player.avatar}
               className={styles.avator}
             />
@@ -135,7 +174,7 @@ export default function WaitingPage({ prop }) {
             <ListGroup>
               <ListGroup.Item>Money: {player.money}</ListGroup.Item>
               <ListGroup.Item>
-                State: {player.ready ? 'ready' : 'unready'}
+                State: {player.ready ? "ready" : "unready"}
               </ListGroup.Item>
             </ListGroup>
           </Card>
@@ -144,15 +183,13 @@ export default function WaitingPage({ prop }) {
 
       <div className={styles.button_container}>
         <button onClick={handleReadyToggle} className={styles.button}>
-          {roomData?.players[prop.uid].ready ? 'UnReady' : 'Ready'}
+          {roomData?.players[prop.uid].ready ? "UnReady" : "Ready"}
         </button>
         <button onClick={handleReturnToLobby} className={styles.button}>
           Back To Lobby
         </button>
       </div>
-      <Modal>
-        {/* to do here  */}
-      </Modal>
+      <ShowResultModal show={showResult} handleClose={CloseModal} />
     </div>
   );
 }
