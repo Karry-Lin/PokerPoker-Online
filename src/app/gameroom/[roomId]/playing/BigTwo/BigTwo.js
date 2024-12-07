@@ -127,7 +127,7 @@ export default function BigTwo({ prop }) {
           updatedPlayers[player.id] = {
             ...player,
             ready: false,
-            Score: get_point(player.handCards),
+            score: get_point(player.handCards),
             showResult:true
           };
         });

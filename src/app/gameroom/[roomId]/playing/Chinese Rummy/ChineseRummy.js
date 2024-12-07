@@ -6,16 +6,8 @@ import styles from "./Page.module.css";
 import getPoint from "./components/getPoint";
 
 export default function ChineseRummy({ prop }) {
-  const { 
-    roomRef, 
-    roomData, 
-    nowCards, 
-    players, 
-    uid, 
-    userplace, 
-    turn, 
-    deck 
-  } = prop;
+  const { roomRef, roomData, nowCards, players, uid, userplace, turn, deck } =
+    prop;
 
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
@@ -24,10 +16,30 @@ export default function ChineseRummy({ prop }) {
   const [flipCard, setFlipCard] = useState(null);
 
   const [playerState, setPlayerState] = useState({
-    top: { cardCount: 13, avatar: "/avatar_test.jpg", score: 0, name: "player" },
-    left: { cardCount: 13, avatar: "/avatar_test.jpg", score: 0, name: "player" },
-    right: { cardCount: 13, avatar: "/avatar_test.jpg", score: 0, name: "player" },
-    player: { cardCount: 13, avatar: "/avatar_test.jpg", score: 0, name: "player" }
+    top: {
+      cardCount: 13,
+      avatar: "/avatar_test.jpg",
+      score: 0,
+      name: "player",
+    },
+    left: {
+      cardCount: 13,
+      avatar: "/avatar_test.jpg",
+      score: 0,
+      name: "player",
+    },
+    right: {
+      cardCount: 13,
+      avatar: "/avatar_test.jpg",
+      score: 0,
+      name: "player",
+    },
+    player: {
+      cardCount: 13,
+      avatar: "/avatar_test.jpg",
+      score: 0,
+      name: "player",
+    },
   });
 
   useEffect(() => {
@@ -38,43 +50,49 @@ export default function ChineseRummy({ prop }) {
 
   useEffect(() => {
     setMiddleCards(nowCards);
-    
+
     if (players?.length === 4) {
-      const getRelativePlayer = (offset) => 
-        players.find(player => player.place === ((userplace + offset) % 4) + 1);
+      const getRelativePlayer = (offset) =>
+        players.find(
+          (player) => player.place === ((userplace + offset) % 4) + 1
+        );
 
       const updatePlayerState = {
         top: getRelativePlayer(1),
         left: getRelativePlayer(0),
         right: getRelativePlayer(2),
-        player: players.userplace
+        player: players.userplace,
       };
 
       setPlayerState({
         top: {
           cardCount: updatePlayerState.top?.handCards.length || 0,
           avatar: updatePlayerState.top?.avatar || "/avatar_test.jpg",
-          score: updatePlayerState.top?.Score || 0,
-          name: updatePlayerState.top?.username || "player"
+          score: updatePlayerState.top?.score || 0,
+          name: updatePlayerState.top?.username || "player",
+          place: updatePlayerState.top?.place || 0,
         },
         left: {
           cardCount: updatePlayerState.left?.handCards.length || 0,
           avatar: updatePlayerState.left?.avatar || "/avatar_test.jpg",
-          score: updatePlayerState.left?.Score || 0,
-          name: updatePlayerState.left?.username || "player"
+          score: updatePlayerState.left?.score || 0,
+          name: updatePlayerState.left?.username || "player",
+          place: updatePlayerState.left?.place || 0,
         },
         right: {
           cardCount: updatePlayerState.right?.handCards.length || 0,
           avatar: updatePlayerState.right?.avatar || "/avatar_test.jpg",
-          score: updatePlayerState.right?.Score || 0,
-          name: updatePlayerState.right?.username || "player"
+          score: updatePlayerState.right?.score || 0,
+          name: updatePlayerState.right?.username || "player",
+          place: updatePlayerState.right?.place || 0,
         },
         player: {
           cardCount: players.userplace?.handCards.length || 0,
           avatar: players.userplace?.avatar || "/avatar_test.jpg",
-          score: players.userplace?.Score || 0,
-          name: players.userplace?.username || "player"
-        }
+          score: players.userplace?.score || 0,
+          name: players.userplace?.username || "player",
+          place: updatePlayerState.userplace?.place || 0,
+        },
       });
     }
   }, [nowCards, players, userplace]);
@@ -85,6 +103,30 @@ export default function ChineseRummy({ prop }) {
       setHandCards(currentPlayer?.handCards || []);
     }
   }, [players, uid]);
+  useEffect(() => {
+    const checkNextState = async () => {
+      const areAllPlayersEnd = players.every(
+        (player) => player.handCards.length == 0
+      );
+      if (areAllPlayersEnd) {
+        const updatedPlayers = {};
+        players.forEach((player) => {
+          updatedPlayers[player.id] = {
+            ...player,
+            ready: false,
+            showResult: true,
+          };
+        });
+        await updateDoc(roomRef, {
+          state: "waiting",
+          isShuffled: false,
+          nowCards: [],
+          players: updatedPlayers,
+        });
+      }
+    };
+    checkNextState();
+  }, [nowCards]);
 
   const handleMiddleCardClick = (card) => {
     if (userplace === turn) {
@@ -144,7 +186,7 @@ export default function ChineseRummy({ prop }) {
         await updateDoc(roomRef, {
           nowCards: updatedMiddleCards,
           turn: (turn % 4) + 1,
-          [`players.${uid}.score`]: (roomData.players[uid]?.score || 0) + point,
+          [`players.${uid}.score`]: roomData.players[uid]?.score + point,
           deck: deck.slice(1),
         });
 
@@ -207,8 +249,11 @@ export default function ChineseRummy({ prop }) {
   };
   const renderOtherPlayer = (position) => {
     const player = playerState[position];
-    const infoPositionClass = `${styles.playerInfoContainer} ${styles[position + "Info"]}`;
-    
+    const isTurn = turn == player.place; // Check if it's this player's turn
+    const infoPositionClass = `${styles.playerInfoContainer} ${
+      isTurn ? styles.activeTurn : ""
+    } ${styles[position + "Info"]}`;
+
     return (
       <div className={styles[`${position}Player`]}>
         <div className={infoPositionClass}>
@@ -220,7 +265,9 @@ export default function ChineseRummy({ prop }) {
           <div className={styles.playerDetails}>
             <div className={styles.playerName}>{player.name}</div>
             <div className={styles.playerScore}>Score: {player.score}</div>
-            <div className={styles.playerCardsCount}>Cards: {player.cardCount}</div>
+            <div className={styles.playerCardsCount}>
+              Cards: {player.cardCount}
+            </div>
           </div>
         </div>
         <div className={styles.otherCardsContainer}>
@@ -233,8 +280,6 @@ export default function ChineseRummy({ prop }) {
       </div>
     );
   };
-  
-  
 
   return (
     <div className={styles.container}>

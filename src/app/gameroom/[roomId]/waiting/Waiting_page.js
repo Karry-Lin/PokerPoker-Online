@@ -47,7 +47,7 @@ export default function WaitingPage({ prop }) {
               />
               <div className={styles.playerInfo}>
                 <div className={styles.playerName}>{player.username}</div>
-                <div className={styles.playerScore}>Score: {player.Score}</div>
+                <div className={styles.playerScore}>Score: {player.score}</div>
               </div>
             </div>
           ))}
@@ -60,10 +60,6 @@ export default function WaitingPage({ prop }) {
       </Modal>
     );
   };
-  
-  
-  
-
   const CloseModal = async () => {
     try {
       await updateDoc(roomRef, {
@@ -87,7 +83,6 @@ export default function WaitingPage({ prop }) {
           if (a.place && b.place) {
             return a.place - b.place;
           }
-          // Put players with undefined places at the end
           if (!a.place) return 1;
           if (!b.place) return -1;
           return 0;

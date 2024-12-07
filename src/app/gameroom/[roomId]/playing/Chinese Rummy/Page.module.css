@@ -43,13 +43,18 @@
 /* Player Info Container */
 .playerInfoContainer {
   display: flex;
-  align-items: center; /* Align avatar and text content horizontally */
+  align-items: center;
   margin: 0 10px;
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+  background-color: rgba(255, 255, 255, 0.8); /* Default semi-transparent white */
   padding: 10px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
   z-index: 2;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+.playerInfoContainer.activeTurn {
+  background-color: gold; /* Golden background for the current turn */
+  box-shadow: 0 6px 12px rgba(255, 215, 0, 0.6); /* Add a golden glow */
 }
 .playerDetails {
   display: flex;
@@ -86,14 +91,14 @@
 
 .leftInfo {
   position: absolute;
-  right: -130px;
+  right: -140px;
   top: 50%;
   transform: translateY(-50%);
 }
 
 .rightInfo {
   position: absolute;
-  left: -130px;
+  left: -140px;
   top: 50%;
   transform: translateY(-50%);
 }
