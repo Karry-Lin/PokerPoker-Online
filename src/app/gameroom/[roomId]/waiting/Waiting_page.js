@@ -6,7 +6,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import styles from './Page.module.css';
 
 const DEFAULT_PLAYER = {
-  avatar: '/avator_test.jpg',
+  avatar: '/avatar_test.jpg',
   username: 'Waiting...',
   ready: false,
   score: 0,
