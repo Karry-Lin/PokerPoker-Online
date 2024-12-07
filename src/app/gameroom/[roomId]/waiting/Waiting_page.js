@@ -29,9 +29,8 @@ export default function WaitingPage({ prop }) {
 
   // ShowResultModal Component
   const ShowResultModal = ({ show, handleClose }) => {
-    // Sort players by score in descending order
-    const sortedPlayers = [...players].sort((a, b) => b.Score - a.Score);
-  
+    console.log('players',players)
+    const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
     return (
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>

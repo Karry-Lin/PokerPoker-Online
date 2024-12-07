@@ -51,7 +51,6 @@ const GameRoom = () => {
             const playersArray = Object.keys(data.players).map((key) => ({
               id: key,
               ...data.players[key],
-              score: 0
             }));
 
             setProp({

@@ -50,7 +50,7 @@ export default function ChineseRummy({ prop }) {
 
   useEffect(() => {
     setMiddleCards(nowCards);
-
+    console.log('players',players)
     if (players?.length === 4) {
       const getRelativePlayer = (offset) =>
         players.find(
@@ -214,7 +214,7 @@ export default function ChineseRummy({ prop }) {
 
         await updateDoc(roomRef, {
           [`players.${uid}.handCards`]: updatedHandCards,
-          [`players.${uid}.score`]: (roomData.players[uid]?.score || 0) + point,
+          [`players.${uid}.score`]: roomData.players[uid]?.score + point,
           nowCards: updatedMiddleCards,
           deck: deck.slice(1),
         });
