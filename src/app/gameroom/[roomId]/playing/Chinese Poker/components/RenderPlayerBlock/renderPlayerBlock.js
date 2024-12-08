@@ -14,15 +14,15 @@ export default function RenderPlayerBlock({ prop }) {
   const renderPlayerBlock = (player) => {
     if (!player) return null;
 
-    const handCards = player.handCards || [];
+    const showCards = player.showCards || [];
     const avatar = player.avatar;
     const name = player.username;
     const show = player.isPassed;
 
     const cardRows = [
-      handCards.slice(0, 3),
-      handCards.slice(3, 8),
-      handCards.slice(8, 13),
+      showCards.top,
+      showCards.middle,
+      showCards.bottom,
     ];
 
     return (
