@@ -25,7 +25,7 @@ const DEFAULT_PLAYERS = Array.from({ length: 4 }, (_, index) => ({
 export default function WaitingPage({ prop }) {
   const router = useRouter();
   const [players, setPlayers] = useState(DEFAULT_PLAYERS);
-  const { roomData, roomRef, showResult } = prop;
+  const { roomData, roomRef, showResult,roomId } = prop;
 
   // ShowResultModal Component
   const ShowResultModal = ({ show, handleClose }) => {
@@ -139,13 +139,29 @@ export default function WaitingPage({ prop }) {
   // Handle returning to lobby
   const handleReturnToLobby = async () => {
     if (!prop?.roomId || !prop?.uid) return;
+    const deleteRoom = async (roomId) => {
+      const response = await fetch('/api/gameroom', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ roomId })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
+      return data.message;
+    };
     try {
       if (roomData?.players?.[prop.uid]) {
         const updatedPlayers = { ...roomData.players };
         delete updatedPlayers[prop.uid];
         await setDoc(roomRef, { ...roomData, players: updatedPlayers });
       }
+      deleteRoom(roomId)
       router.push("/lobby");
+
     } catch (error) {
       console.error("Error leaving room:", error);
     }

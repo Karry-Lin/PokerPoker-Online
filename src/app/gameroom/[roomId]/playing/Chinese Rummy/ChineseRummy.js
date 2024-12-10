@@ -335,7 +335,7 @@ export default function ChineseRummy({ prop }) {
             onClick={handlePlayCard}
             disabled={userplace !== turn}
           >
-            出牌
+            吃牌
           </button>
           <button
             className={

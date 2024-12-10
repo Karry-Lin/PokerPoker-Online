@@ -63,7 +63,7 @@ export default function BigTwo({ prop }) {
         top: getRelativePlayer(1),
         left: getRelativePlayer(0),
         right: getRelativePlayer(2),
-        player: players.userplace,
+        player: getRelativePlayer(3),
       };
 
       setPlayerState({
@@ -89,11 +89,11 @@ export default function BigTwo({ prop }) {
           place: updatePlayerState.right?.place || 0,
         },
         player: {
-          cardCount: players.userplace?.handCards.length || 0,
-          avatar: players.userplace?.avatar || "/avatar_test.jpg",
-          score: players.userplace?.score || 0,
-          name: players.userplace?.username || "player",
-          place: updatePlayerState.userplace?.place || 0,
+          cardCount: updatePlayerState.player?.handCards.length || 0,
+          avatar:  updatePlayerState.player.avatar || "/avatar_test.jpg",
+          score:  updatePlayerState.player?.score || 0,
+          name:  updatePlayerState.player?.username || "player",
+          place:  updatePlayerState.player?.place || 0,
         },
       });
     }
@@ -174,18 +174,22 @@ export default function BigTwo({ prop }) {
       setSelectedCards([]);
       if (updatedHandCards.length === 0) {
         const updatedPlayers = {};
+        let win_point=0;
         players.forEach((player) => {
           updatedPlayers[player.id] = {
             ...player,
             ready: false,
             score: get_point(player.handCards),
-            showResult:true
+            showResult: true,
           };
+          win_point+=get_point(player.handCards)
         });
+        win_point-=updatedPlayers[uid];
+        updatedPlayers[uid].score=-win_point
         await updateDoc(roomRef, {
           state: "waiting",
-          isShuffled:false,
-          nowCards:[],
+          isShuffled: false,
+          nowCards: [],
           players: updatedPlayers,
         });
       }
@@ -245,6 +249,21 @@ export default function BigTwo({ prop }) {
 
       {/* Player's hand cards */}
       <div className={styles.cardRowWrapper}>
+        {/* debug here */}
+        <div className={styles.playerInfoContainer}>
+          <img
+            src={playerState.player.avatar}
+            alt="Player Avatar"
+            className={styles.avatar}
+          />
+          <div className={styles.playerDetails}>
+            <div className={styles.playerName}>{playerState.player.name}</div>
+            <div className={styles.playerScore}>Score: {playerState.player.score}</div>
+            <div className={styles.playerCardsCount}>
+              Cards: {playerState.player.cardCount}
+            </div>
+          </div>
+        </div>
         <div className={styles.handCards}>
           {handCards.map((card, index) => (
             <div
