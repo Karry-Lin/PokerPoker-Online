@@ -88,7 +88,7 @@ export default function WaitingPage({ prop }) {
         });
 
       setPlayers(mergedPlayers);
-      console.log(mergedPlayers);
+      // console.log(mergedPlayers);
     }
   }, [prop?.players]);
 

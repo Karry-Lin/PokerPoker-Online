@@ -53,8 +53,8 @@
   transition: background-color 0.3s, box-shadow 0.3s;
 }
 .playerInfoContainer.activeTurn {
-  background-color: gold; /* Golden background for the current turn */
-  box-shadow: 0 6px 12px rgba(255, 215, 0, 0.6); /* Add a golden glow */
+  background-color: gold;
+  box-shadow: 0 6px 12px rgba(255, 215, 0, 0.6); 
 }
 .playerDetails {
   display: flex;

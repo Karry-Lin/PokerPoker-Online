@@ -13,7 +13,7 @@ function getSuitPriority(card) {
 }
 function getValue(card) {
   if (card == 1) return 30;
-  else if (card == 14 || 27) return 20;
+  else if (card == 14 || card ==27) return 20;
   else if (card == 40) return 40;
   else if (getSuitPriority(card)) {
     return getRank(card) >= 9 ? 10 : getRank(card);
