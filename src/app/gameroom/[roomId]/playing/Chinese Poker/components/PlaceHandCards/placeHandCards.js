@@ -109,11 +109,12 @@ export default function PlaceHandCards({ prop }) {
     rows.middle.length === 5 &&
     rows.bottom.length === 5;
   const handleSubmit = async () => {
-    const updatedHandCards = [];
+    // const updatedHandCards = [];
     // updatedHandCards = {rows.top+middle+bottom}
 
     await updateDoc(roomRef, {
-      [`players.${uid}.showCards`]: updatedHandCards,
+      [`players.${uid}.showCards`]: rows,
+      [`players.${uid}.isPassed`]: true,
     });
     alert('commit sucessful');
   };
@@ -135,7 +136,7 @@ export default function PlaceHandCards({ prop }) {
     <div className={styles[`${position}Player`]}>
       {Array.from({ length: count }).map((_, index) => (
         <div key={`${position}-${index}`} className={styles.otherCard}>
-          <img src='/cards/0.jpg' alt="Other Player's Card" />
+          <img src='/cards/0.png' alt="Other Player's Card" />
         </div>
       ))}
     </div>

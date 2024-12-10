@@ -106,7 +106,6 @@ export default function PlayingPage({ prop }) {
               ...roomData,
               players: updatedPlayers,
               isShuffled: true,
-              startTurn: players[startingPlayerId].place,
             });
           } catch (error) {
             console.error("Error updating game state:", error);

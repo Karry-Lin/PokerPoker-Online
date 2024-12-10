@@ -64,7 +64,7 @@ const GameRoom = () => {
               turn: data.turn,
               roomRef,
               roomData: data,
-              isPassed: data.players[userStore.userId]?.isPassed || null,
+              isPassed: data.players[userStore.userId]?.isPassed || false,
               startTurn: data.startTurn,
               deck:data.deck||null,
               showResult:data.players[userStore.userId]?.showResult
