@@ -50,7 +50,7 @@ export default function ChineseRummy({ prop }) {
 
   useEffect(() => {
     setMiddleCards(nowCards);
-    console.log('players',players)
+    // console.log('players',players)
     if (players?.length === 4) {
       const getRelativePlayer = (offset) =>
         players.find(

@@ -10,24 +10,26 @@
   padding: 0 20px;
 }
 
-/* Player positions */
-.topPlayer, .leftPlayer, .rightPlayer {
+/* Player Positions */
+.topPlayer,
+.leftPlayer,
+.rightPlayer {
   position: absolute;
   display: flex;
+  align-items: center;
 }
 
 .topPlayer {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  flex-direction: row;
 }
 
-.leftPlayer, .rightPlayer {
+.leftPlayer,
+.rightPlayer {
   top: 50%;
   transform: translateY(-50%);
   margin-top: 50px;
-  flex-direction: column;
 }
 
 .leftPlayer {
@@ -38,14 +40,91 @@
   right: 50px;
 }
 
-/* Card styles */
+/* Player Info Container */
+.playerInfoContainer {
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+  background-color: rgba(255, 255, 255, 0.8); /* Default semi-transparent white */
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  z-index: 2;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+.playerInfoContainer.activeTurn {
+  background-color: gold;
+  box-shadow: 0 6px 12px rgba(255, 215, 0, 0.6); 
+}
+.playerDetails {
+  display: flex;
+  flex-direction: column; /* Stack name, score, and card count vertically */
+  align-items: flex-start; /* Align text to the left */
+}
+
+.playerInfoContainer img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.playerName {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333; /* Dark text for better contrast */
+  text-align: center;
+} 
+
+.playerScore,
+.playerCardsCount {
+  font-size: 12px;
+  color: #555; 
+  margin-bottom: 3px;
+}
+.topInfo {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.leftInfo {
+  position: absolute;
+  right: -140px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.rightInfo {
+  position: absolute;
+  left: -140px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.playerInfoContainer.bottomInfo {
+  position: absolute;
+  top: 210px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Card Overlapping Effect */
+.otherCardsContainer {
+  display: flex;
+  flex-wrap: nowrap;
+  position: relative;
+}
+
 .otherCard {
-  width: 100px;
-  height: 150px;
+  width: 90px;
+  height: 135px;
   background-color: #eaeaea;
   border: 2px solid black;
   border-radius: 8px;
-  position: relative;
+  margin-left: -70px; /* Overlapping effect */
+  z-index: 1;
 }
 
 .otherCard img {
@@ -54,22 +133,24 @@
   border-radius: 6px;
 }
 
-/* Positioning adjustments */
-.topPlayer .otherCard {
-  margin-left: -50px;
+/* Adjustments for Individual Positions */
+.topPlayer .otherCardsContainer {
+  flex-direction: row;
+  margin-top: 10px;
 }
 
-.leftPlayer .otherCard, .rightPlayer .otherCard {
-  margin-top: -100px;
-}
-
-.leftPlayer .otherCard {
+.leftPlayer .otherCardsContainer {
+  flex-direction:row;
+  margin-right: 10px;
   transform: rotate(90deg);
 }
 
-.rightPlayer .otherCard {
+.rightPlayer .otherCardsContainer {
+  flex-direction: row;
+  margin-left: 10px;
   transform: rotate(-90deg);
 }
+
 
 /* Middle cards */
 .middleCards {
