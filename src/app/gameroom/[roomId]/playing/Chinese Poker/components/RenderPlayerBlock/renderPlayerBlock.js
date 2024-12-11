@@ -20,9 +20,9 @@ export default function RenderPlayerBlock({ prop }) {
     const show = player.isPassed;
 
     const cardRows = [
-      showCards.top,
-      showCards.middle,
-      showCards.bottom,
+      showCards.top||[0,0,0],
+      showCards.middle||[0,0,0,0,0],
+      showCards.bottom||[0,0,0,0,0],
     ];
 
     return (

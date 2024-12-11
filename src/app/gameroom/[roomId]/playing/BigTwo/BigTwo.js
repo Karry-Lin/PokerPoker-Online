@@ -184,7 +184,7 @@ export default function BigTwo({ prop }) {
           };
           win_point+=get_point(player.handCards)
         });
-        win_point-=updatedPlayers[uid];
+        win_point-=updatedPlayers[uid].score;
         updatedPlayers[uid].score=-win_point
         await updateDoc(roomRef, {
           state: "waiting",

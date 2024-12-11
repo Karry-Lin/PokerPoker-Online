@@ -29,7 +29,7 @@ export default function WaitingPage({ prop }) {
 
   // ShowResultModal Component
   const ShowResultModal = ({ show, handleClose }) => {
-    console.log('players',players)
+    // console.log('players',players)
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
     return (
       <Modal show={show} onHide={handleClose}>
