@@ -37,6 +37,7 @@ export default function PlayingPage({ prop }) {
               updatedPlayers[playerId] = {
                 ...players[playerId],
                 handCards: playerCards,
+                score:0
               };
             });
             await setDoc(roomRef, {
@@ -102,6 +103,7 @@ export default function PlayingPage({ prop }) {
               updatedPlayers[playerId] = {
                 ...players[playerId],
                 handCards: playerCards,
+                score:0
               };
             });
             await setDoc(roomRef, {
@@ -109,6 +111,7 @@ export default function PlayingPage({ prop }) {
               players: updatedPlayers,
               isShuffled: true,
               startTime: new Date(),
+              
             });
           } catch (error) {
             console.error("Error updating game state:", error);

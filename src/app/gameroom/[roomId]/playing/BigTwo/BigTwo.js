@@ -73,6 +73,7 @@ export default function BigTwo({ prop }) {
           score: updatePlayerState.top?.score || 0,
           name: updatePlayerState.top?.username || "player",
           place: updatePlayerState.top?.place || 0,
+          pass: updatePlayerState.top?.isPassed || false,
         },
         left: {
           cardCount: updatePlayerState.left?.handCards.length || 0,
@@ -80,6 +81,7 @@ export default function BigTwo({ prop }) {
           score: updatePlayerState.left?.score || 0,
           name: updatePlayerState.left?.username || "player",
           place: updatePlayerState.left?.place || 0,
+          pass: updatePlayerState.left?.isPassed || false,
         },
         right: {
           cardCount: updatePlayerState.right?.handCards.length || 0,
@@ -87,6 +89,7 @@ export default function BigTwo({ prop }) {
           score: updatePlayerState.right?.score || 0,
           name: updatePlayerState.right?.username || "player",
           place: updatePlayerState.right?.place || 0,
+          pass: updatePlayerState.right?.isPassed || false,
         },
         player: {
           cardCount: updatePlayerState.player?.handCards.length || 0,
@@ -94,6 +97,7 @@ export default function BigTwo({ prop }) {
           score: updatePlayerState.player?.score || 0,
           name: updatePlayerState.player?.username || "player",
           place: updatePlayerState.player?.place || 0,
+          pass: updatePlayerState.player?.isPassed || false,
         },
       });
     }
@@ -202,7 +206,7 @@ export default function BigTwo({ prop }) {
     const isTurn = turn == player.place; // Check if it's this player's turn
     const infoPositionClass = `${styles.playerInfoContainer} ${
       isTurn ? styles.activeTurn : ""
-    } ${styles[position + "Info"]}`;
+    }${player.pass ? styles.passedTurn : ""} ${styles[position + "Info"]}`;
 
     return (
       <div className={styles[`${position}Player`]}>
@@ -252,7 +256,7 @@ export default function BigTwo({ prop }) {
         <div
           className={`${styles.playerInfoContainer} ${
             userplace === turn ? styles.activeTurn : ""
-          }`}
+          }${isPassed ? styles.passedTurn : ""}`}
         >
           <img
             src={playerState.player.avatar}

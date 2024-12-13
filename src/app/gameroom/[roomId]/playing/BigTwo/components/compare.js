@@ -31,14 +31,14 @@ const straight = [
 function isStraight(ranks) {
   // Sort the ranks to make comparison easier
   const sortedRanks = ranks.slice().sort((a, b) => a - b);
-  
+
   // Check against predefined straight combinations
-  return straight.some(straightCombo => {
+  return straight.some((straightCombo) => {
     // Create a set of the current straight combination for efficient lookup
     const straightSet = new Set(straightCombo);
-    
+
     // Check if all ranks are in the straight combination
-    return sortedRanks.every(rank => straightSet.has(rank));
+    return sortedRanks.every((rank) => straightSet.has(rank));
   });
 }
 
@@ -77,15 +77,19 @@ function getHandType(cards) {
 
 // Main comparison function
 export default function compare(cards1, cards2) {
-  if (cards1.length == 4 || cards1.length == 3) return false;
+  if (cards1.length == 4 || cards1.length == 3) {
+    alert("請出正確的牌型");
+    return false;
+  }
 
   if (cards1.length === 1 && cards2.length === 1) {
     // Single card comparison: by rank, then by suit
     const rank1 = getRank(cards1[0]);
     const rank2 = getRank(cards2[0]);
-    return rank1 !== rank2
-      ? rank1 > rank2
-      : getSuitPriority(cards1[0]) > getSuitPriority(cards2[0]);
+    if (rank1 > rank2) return true;
+    if (getSuitPriority(cards1[0]) > getSuitPriority(cards2[0])) return true;
+    alert("請出比牌面價值大的牌");
+    return false;
   }
 
   if (cards1.length === 2 && cards2.length === 2) {
@@ -101,10 +105,13 @@ export default function compare(cards1, cards2) {
     if (rank1 !== rank2) return rank1 > rank2;
 
     // If pairs are the same rank, compare highest suit
-    return (
+    if (
       Math.max(getSuitPriority(cards1[0]), getSuitPriority(cards1[1])) >
       Math.max(getSuitPriority(cards2[0]), getSuitPriority(cards2[1]))
-    );
+    )
+      return true;
+    alert("請出比牌面價值大的對子");
+    return false;
   }
 
   if (cards1.length === 5 && cards2.length === 5) {
@@ -132,7 +139,9 @@ export default function compare(cards1, cards2) {
         return hand1.value > hand2.value;
       }
     }
-    return hand1.value > hand2.value;
+    if(hand1.value > hand2.value) return true;
+      alert("請出比牌面價值大的牌");
+    return false;
   }
   if (cards1.length == 5) {
     const hand1 = getHandType(cards1);
@@ -145,19 +154,22 @@ export default function compare(cards1, cards2) {
       return true;
     } else if (cards1.length == 2) {
       if (getRank(cards1[0]) !== getRank(cards1[1])) {
+        alert("請出正確的牌型");
         return false;
       }
       return true;
     } else if (cards1.length == 5) {
       const hand1 = getHandType(cards1);
       if (hand1.type == "high_card") {
+        alert("請出正確的牌型");
         return false;
       }
       return true;
     } else {
+      alert("請出正確的牌型");
       return false;
     }
   }
-
+  alert("請出正確的牌型");
   return false; // Fallback case, should not occur if rules are adhered to
 }
