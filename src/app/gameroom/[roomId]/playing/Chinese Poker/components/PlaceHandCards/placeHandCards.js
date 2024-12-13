@@ -26,11 +26,11 @@ export default function PlaceHandCards({ prop }) {
     return 60;
   });
 
-  const randomizeCardPlacement = async() => {
+  const randomizeCardPlacement = () => {
     const allCards = [...handCards, ...rows.top, ...rows.middle, ...rows.bottom];
     const shuffled = allCards.sort(() => Math.random() - 0.5);
 
-    await setRows({
+    setRows({
       top: shuffled.slice(0, 3),
       middle: shuffled.slice(3, 8),
       bottom: shuffled.slice(8, 13)

@@ -13,34 +13,66 @@ function getSuitPriority(card) {
   return 1; // Clubs
 }
 
+// Predefined straight combinations
+const straight = [
+  [14, 15, 3, 4, 5],
+  [3, 4, 5, 6, 7],
+  [4, 5, 6, 7, 8],
+  [5, 6, 7, 8, 9],
+  [6, 7, 8, 9, 10],
+  [7, 8, 9, 10, 11],
+  [8, 9, 10, 11, 12],
+  [9, 10, 11, 12, 13],
+  [10, 11, 12, 13, 14],
+  [15, 3, 4, 5, 6],
+];
+
+// New improved isStraight function
+function isStraight(ranks) {
+  // Sort the ranks to make comparison easier
+  const sortedRanks = ranks.slice().sort((a, b) => a - b);
+  
+  // Check against predefined straight combinations
+  return straight.some(straightCombo => {
+    // Create a set of the current straight combination for efficient lookup
+    const straightSet = new Set(straightCombo);
+    
+    // Check if all ranks are in the straight combination
+    return sortedRanks.every(rank => straightSet.has(rank));
+  });
+}
+
 // Helper function to identify hand type for five-card hands
 function getHandType(cards) {
   const ranks = cards.map(getRank).sort((a, b) => a - b);
   const suits = cards.map(getSuitPriority);
 
   const isFlush = suits.every((suit) => suit === suits[0]);
-  const isStraight = ranks.every(
-    (rank, i, arr) => i === 0 || rank === arr[i - 1] + 1
-  );
 
   const rankCounts = {};
   ranks.forEach((rank) => (rankCounts[rank] = (rankCounts[rank] || 0) + 1));
   const counts = Object.values(rankCounts).sort((a, b) => b - a);
 
-  if (isFlush && isStraight)
-    return { type: 'straight_flush', value: Math.max(...ranks) };
+  if (isFlush && isStraight(ranks))
+    return {
+      type: "straight_flush",
+      value: Math.max(...ranks),
+      suit: suits[4],
+    };
   if (counts[0] === 4)
     return {
-      type: 'four_of_a_kind',
-      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 4)
+      type: "four_of_a_kind",
+      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 4),
     };
   if (counts[0] === 3 && counts[1] === 2)
     return {
-      type: 'full_house',
-      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 3)
+      type: "full_house",
+      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 3),
     };
-  if (isStraight) return { type: 'straight', value: Math.max(...ranks) };
-  return { type: 'high_card', value: Math.max(...ranks) };
+  if (isStraight(ranks))
+    return { type: "straight", value: Math.max(...ranks), suit: suits[4] };
+
+  return { type: "high_card", value: Math.max(...ranks) };
 }
 
 // Main comparison function
@@ -84,7 +116,7 @@ export default function compare(cards1, cards2) {
       straight: 1,
       full_house: 1,
       four_of_a_kind: 3,
-      straight_flush: 4
+      straight_flush: 4,
     };
 
     // Compare hand types by hierarchy
@@ -93,11 +125,18 @@ export default function compare(cards1, cards2) {
     }
 
     // If hand types are the same, compare by highest value
+    if (hand2.type == "straight") {
+      if (hand1.value == hand2.value) {
+        return hand1.suit > hand2.suit;
+      } else {
+        return hand1.value > hand2.value;
+      }
+    }
     return hand1.value > hand2.value;
   }
   if (cards1.length == 5) {
     const hand1 = getHandType(cards1);
-    if (hand1.type == 'straight_flush' || hand1.type == 'four_of_a_kind') {
+    if (hand1.type == "straight_flush" || hand1.type == "four_of_a_kind") {
       return true;
     }
   }
@@ -111,7 +150,7 @@ export default function compare(cards1, cards2) {
       return true;
     } else if (cards1.length == 5) {
       const hand1 = getHandType(cards1);
-      if (hand1.type == 'high_card') {
+      if (hand1.type == "high_card") {
         return false;
       }
       return true;
