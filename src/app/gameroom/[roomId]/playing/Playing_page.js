@@ -44,6 +44,7 @@ export default function PlayingPage({ prop }) {
               players: updatedPlayers,
               isShuffled: true,
               turn: players[startingPlayerId].place,
+              startTime: new Date()
             });
           } catch (error) {
             console.error("Error updating game state:", error);
@@ -75,7 +76,8 @@ export default function PlayingPage({ prop }) {
               isShuffled: true,
               turn:Math.floor(Math.random()*4)+1,
               nowCards:deck.slice(24, 28),
-              deck:deck.slice(28, 52)
+              deck:deck.slice(28, 52),
+              startTime: new Date()
             });
           } catch (error) {
             console.error("Error updating game state:", error);
@@ -106,6 +108,7 @@ export default function PlayingPage({ prop }) {
               ...roomData,
               players: updatedPlayers,
               isShuffled: true,
+              startTime: new Date(),
             });
           } catch (error) {
             console.error("Error updating game state:", error);

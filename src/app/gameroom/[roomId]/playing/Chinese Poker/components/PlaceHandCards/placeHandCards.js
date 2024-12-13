@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { updateDoc, doc } from 'firebase/firestore';
+import { updateDoc } from 'firebase/firestore';
 import styles from './Page.module.css';
 
 export default function PlaceHandCards({ prop }) {
-  const { roomRef, players, uid, userplace } = prop;
+  const { roomRef, players, uid, userplace, startTime } = prop;
 
   const [handCards, setHandCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
@@ -17,32 +17,37 @@ export default function PlaceHandCards({ prop }) {
     left: 13,
     right: 13
   });
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(() => {
+    const now = new Date().getTime() / 1000; // Fixed syntax
+    if (startTime) {
+      const elapsedTime = Math.floor(now - startTime.seconds);
+      return Math.max(0, 90 - elapsedTime);
+    }
+    return 60;
+  });
 
-  // Function to randomize card placement
-  const randomizeCardPlacement = () => {
-    const allCards = [
-      ...handCards,
-      ...rows.top,
-      ...rows.middle,
-      ...rows.bottom
-    ];
+  const randomizeCardPlacement = async() => {
+    const allCards = [...handCards, ...rows.top, ...rows.middle, ...rows.bottom];
     const shuffled = allCards.sort(() => Math.random() - 0.5);
 
-    setRows({
+    await setRows({
       top: shuffled.slice(0, 3),
       middle: shuffled.slice(3, 8),
       bottom: shuffled.slice(8, 13)
     });
     setHandCards([]); // Clear hand cards after placing them
+    // handleSubmit();
   };
+
   useEffect(() => {
     if (timer > 0) {
-      const countdown = setInterval(() => setTimer((prev) => prev - 1), 1000);
-      return () => clearInterval(countdown); // Clear interval on component unmount
+      const countdown = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(countdown); // Clear interval on component unmount or re-render
     } else {
-      // Time's up! Randomize card placement
-      randomizeCardPlacement();
+      randomizeCardPlacement(); // Time's up! Randomize card placement
+      handleSubmit();
     }
   }, [timer]);
 
@@ -58,7 +63,7 @@ export default function PlaceHandCards({ prop }) {
         right: rightPlayer.handCards.length
       });
     }
-  }, [prop]);
+  }, [players, userplace]);
 
   useEffect(() => {
     if (players && uid) {
@@ -108,15 +113,13 @@ export default function PlaceHandCards({ prop }) {
     rows.top.length === 3 &&
     rows.middle.length === 5 &&
     rows.bottom.length === 5;
-  const handleSubmit = async () => {
-    // const updatedHandCards = [];
-    // updatedHandCards = {rows.top+middle+bottom}
 
+  const handleSubmit = async () => {
     await updateDoc(roomRef, {
       [`players.${uid}.showCards`]: rows,
-      [`players.${uid}.isPassed`]: true,
+      [`players.${uid}.isPassed`]: true
     });
-    alert('commit sucessful');
+    alert('Commit successful');
   };
 
   const renderCardRow = (row) => (
@@ -132,11 +135,12 @@ export default function PlaceHandCards({ prop }) {
       ))}
     </div>
   );
+
   const renderOtherPlayerCards = (position, count) => (
     <div className={styles[`${position}Player`]}>
       {Array.from({ length: count }).map((_, index) => (
         <div key={`${position}-${index}`} className={styles.otherCard}>
-          <img src='/cards/0.png' alt="Other Player's Card" />
+          <img src="/cards/0.png" alt="Other Player's Card" />
         </div>
       ))}
     </div>
@@ -144,16 +148,14 @@ export default function PlaceHandCards({ prop }) {
 
   return (
     <div className={styles.container}>
-      {renderOtherPlayerCards('top', playerCardCounts.top)}
-      {renderOtherPlayerCards('left', playerCardCounts.left)}
-      {renderOtherPlayerCards('right', playerCardCounts.right)}
-      {/* Display rows */}
+  
+
       {renderCardRow('top')}
       {renderCardRow('middle')}
       {renderCardRow('bottom')}
+
       <div className={styles.timer}>Time left: {timer}s</div>
 
-      {/* Hand cards */}
       <div className={styles.handCardsWrapper}>
         <div className={styles.handCards}>
           {handCards.map((card, index) => (
