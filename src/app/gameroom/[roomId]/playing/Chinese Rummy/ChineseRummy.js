@@ -117,7 +117,7 @@ export default function ChineseRummy({ prop }) {
       // const areAllPlayersEnd = players.every(
       //   (player) => player.handCards.length == 0
       // );
-      if (areAllPlayersEnd <= 0) {
+      if (areAllPlayersEnd < 0) {
         const updatedPlayers = {};
         players.forEach((player) => {
           updatedPlayers[player.id] = {

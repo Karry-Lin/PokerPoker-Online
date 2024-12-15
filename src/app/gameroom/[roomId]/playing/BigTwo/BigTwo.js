@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import styles from "./Page.module.css";
-import { database } from "@/utils/firebase.js";
-import compare from "./components/compare";
-import get_point from "./components/get_point";
+import { useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import styles from './Page.module.css';
+import { database } from '@/utils/firebase.js';
+import compare from './components/compare';
+import get_point from './components/get_point';
 
 export default function BigTwo({ prop }) {
   console.log(prop);
@@ -17,7 +17,7 @@ export default function BigTwo({ prop }) {
     uid,
     userplace,
     turn,
-    isPassed,
+    isPassed
   } = prop;
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
@@ -26,28 +26,28 @@ export default function BigTwo({ prop }) {
   const [playerState, setPlayerState] = useState({
     top: {
       cardCount: 13,
-      avatar: "/avatar_test.jpg",
+      avatar: '/avatar_test.jpg',
       score: 0,
-      name: "player",
+      name: 'player'
     },
     left: {
       cardCount: 13,
-      avatar: "/avatar_test.jpg",
+      avatar: '/avatar_test.jpg',
       score: 0,
-      name: "player",
+      name: 'player'
     },
     right: {
       cardCount: 13,
-      avatar: "/avatar_test.jpg",
+      avatar: '/avatar_test.jpg',
       score: 0,
-      name: "player",
+      name: 'player'
     },
     player: {
       cardCount: 13,
-      avatar: "/avatar_test.jpg",
+      avatar: '/avatar_test.jpg',
       score: 0,
-      name: "player",
-    },
+      name: 'player'
+    }
   });
 
   useEffect(() => {
@@ -63,42 +63,42 @@ export default function BigTwo({ prop }) {
         top: getRelativePlayer(1),
         left: getRelativePlayer(0),
         right: getRelativePlayer(2),
-        player: getRelativePlayer(3),
+        player: getRelativePlayer(3)
       };
 
       setPlayerState({
         top: {
           cardCount: updatePlayerState.top?.handCards.length || 0,
-          avatar: updatePlayerState.top?.avatar || "/avatar_test.jpg",
+          avatar: updatePlayerState.top?.avatar || '/avatar_test.jpg',
           score: updatePlayerState.top?.score || 0,
-          name: updatePlayerState.top?.username || "player",
+          name: updatePlayerState.top?.username || 'player',
           place: updatePlayerState.top?.place || 0,
-          pass: updatePlayerState.top?.isPassed || false,
+          pass: updatePlayerState.top?.isPassed || false
         },
         left: {
           cardCount: updatePlayerState.left?.handCards.length || 0,
-          avatar: updatePlayerState.left?.avatar || "/avatar_test.jpg",
+          avatar: updatePlayerState.left?.avatar || '/avatar_test.jpg',
           score: updatePlayerState.left?.score || 0,
-          name: updatePlayerState.left?.username || "player",
+          name: updatePlayerState.left?.username || 'player',
           place: updatePlayerState.left?.place || 0,
-          pass: updatePlayerState.left?.isPassed || false,
+          pass: updatePlayerState.left?.isPassed || false
         },
         right: {
           cardCount: updatePlayerState.right?.handCards.length || 0,
-          avatar: updatePlayerState.right?.avatar || "/avatar_test.jpg",
+          avatar: updatePlayerState.right?.avatar || '/avatar_test.jpg',
           score: updatePlayerState.right?.score || 0,
-          name: updatePlayerState.right?.username || "player",
+          name: updatePlayerState.right?.username || 'player',
           place: updatePlayerState.right?.place || 0,
-          pass: updatePlayerState.right?.isPassed || false,
+          pass: updatePlayerState.right?.isPassed || false
         },
         player: {
           cardCount: updatePlayerState.player?.handCards.length || 0,
-          avatar: updatePlayerState.player.avatar || "/avatar_test.jpg",
+          avatar: updatePlayerState.player.avatar || '/avatar_test.jpg',
           score: updatePlayerState.player?.score || 0,
-          name: updatePlayerState.player?.username || "player",
+          name: updatePlayerState.player?.username || 'player',
           place: updatePlayerState.player?.place || 0,
-          pass: updatePlayerState.player?.isPassed || false,
-        },
+          pass: updatePlayerState.player?.isPassed || false
+        }
       });
     }
   }, [nowCards, players, userplace]);
@@ -121,12 +121,12 @@ export default function BigTwo({ prop }) {
       await updateDoc(roomRef, {
         ...roomData,
         players: updatedPlayers,
-        nowCards: [],
+        nowCards: []
       });
     };
     const pass = async () => {
       await updateDoc(roomRef, {
-        turn: (turn % 4) + 1,
+        turn: (turn % 4) + 1
       });
     };
     if (isPassed && turn == userplace) {
@@ -149,18 +149,19 @@ export default function BigTwo({ prop }) {
   const handlePass = async () => {
     await updateDoc(roomRef, {
       turn: (turn % 4) + 1,
-      [`players.${uid}.isPassed`]: true,
+      [`players.${uid}.isPassed`]: true
     });
   };
   const handleSubmit = async () => {
     if (!compare(selectedCards, middleCards)) {
-      console.log("Invalid card combination");
+      console.log('Invalid card combination');
+      alert('請出有效的牌');
       return;
     }
 
     try {
       if (!roomData.players || roomData.players.uid === -1) {
-        throw new Error("Invalid player data");
+        throw new Error('Invalid player data');
       }
 
       const updatedHandCards = handCards.filter(
@@ -171,7 +172,7 @@ export default function BigTwo({ prop }) {
         [`players.${uid}.handCards`]: updatedHandCards,
         nowCards: selectedCards,
         startTurn: userplace,
-        turn: (turn % 4) + 1,
+        turn: (turn % 4) + 1
       });
 
       setHandCards(updatedHandCards);
@@ -185,28 +186,29 @@ export default function BigTwo({ prop }) {
             ready: false,
             score: get_point(player.handCards),
             showResult: true,
+            isPassed: false
           };
           win_point += get_point(player.handCards);
         });
         win_point -= updatedPlayers[uid].score;
         updatedPlayers[uid].score = -win_point;
         await updateDoc(roomRef, {
-          state: "waiting",
+          state: 'waiting',
           isShuffled: false,
           nowCards: [],
-          players: updatedPlayers,
+          players: updatedPlayers
         });
       }
     } catch (error) {
-      console.error("Error updating game state:", error);
+      console.error('Error updating game state:', error);
     }
   };
   const renderOtherPlayer = (position) => {
     const player = playerState[position];
     const isTurn = turn == player.place; // Check if it's this player's turn
     const infoPositionClass = `${styles.playerInfoContainer} ${
-      isTurn ? styles.activeTurn : ""
-    }${player.pass ? styles.passedTurn : ""} ${styles[position + "Info"]}`;
+      isTurn ? styles.activeTurn : ''
+    }${player.pass ? styles.passedTurn : ''} ${styles[position + 'Info']}`;
 
     return (
       <div className={styles[`${position}Player`]}>
@@ -227,7 +229,7 @@ export default function BigTwo({ prop }) {
         <div className={styles.otherCardsContainer}>
           {Array.from({ length: player.cardCount }).map((_, index) => (
             <div key={`${position}-${index}`} className={styles.otherCard}>
-              <img src="/cards/0.png" alt="Other Player's Card" />
+              <img src='/cards/0.png' alt="Other Player's Card" />
             </div>
           ))}
         </div>
@@ -238,9 +240,9 @@ export default function BigTwo({ prop }) {
   return (
     <div className={styles.container}>
       {/* Other players' cards */}
-      {renderOtherPlayer("top")}
-      {renderOtherPlayer("left")}
-      {renderOtherPlayer("right")}
+      {renderOtherPlayer('top')}
+      {renderOtherPlayer('left')}
+      {renderOtherPlayer('right')}
 
       {/* Middle cards */}
       <div className={styles.middleCards}>
@@ -255,12 +257,12 @@ export default function BigTwo({ prop }) {
       <div className={styles.cardRowWrapper}>
         <div
           className={`${styles.playerInfoContainer} ${
-            userplace === turn ? styles.activeTurn : ""
-          }${isPassed ? styles.passedTurn : ""}`}
+            userplace === turn ? styles.activeTurn : ''
+          }${isPassed ? styles.passedTurn : ''}`}
         >
           <img
             src={playerState.player.avatar}
-            alt="Player Avatar"
+            alt='Player Avatar'
             className={styles.avatar}
           />
           <div className={styles.playerDetails}>
@@ -278,7 +280,7 @@ export default function BigTwo({ prop }) {
             <div
               key={`hand-${index}`}
               className={`${styles.card} ${
-                selectedCards.includes(card) ? styles.selected : ""
+                selectedCards.includes(card) ? styles.selected : ''
               }`}
               onClick={() => handleCardClick(card)}
             >
@@ -288,7 +290,7 @@ export default function BigTwo({ prop }) {
         </div>
         <button
           className={`${styles.submitButton} ${
-            userplace !== turn ? styles.disabledButton : ""
+            userplace !== turn ? styles.disabledButton : ''
           }`}
           onClick={userplace === turn ? handleSubmit : undefined}
           disabled={userplace !== turn || selectedCards.length === 0}
@@ -297,7 +299,7 @@ export default function BigTwo({ prop }) {
         </button>
         <button
           className={`${styles.submitButton} ${
-            userplace !== turn ? styles.disabledButton : ""
+            userplace !== turn ? styles.disabledButton : ''
           }`}
           onClick={userplace === turn ? handlePass : undefined}
           disabled={userplace !== turn}
