@@ -37,7 +37,7 @@ export default function PlayingPage({ prop }) {
               updatedPlayers[playerId] = {
                 ...players[playerId],
                 handCards: playerCards,
-                score:0
+                score: 0,
               };
             });
             await setDoc(roomRef, {
@@ -45,7 +45,7 @@ export default function PlayingPage({ prop }) {
               players: updatedPlayers,
               isShuffled: true,
               turn: players[startingPlayerId].place,
-              startTime: new Date()
+              startTime: new Date(),
             });
           } catch (error) {
             console.error("Error updating game state:", error);
@@ -68,17 +68,17 @@ export default function PlayingPage({ prop }) {
               updatedPlayers[playerId] = {
                 ...players[playerId],
                 handCards: playerCards,
-                score:0,
+                score: 0,
               };
             });
             await setDoc(roomRef, {
               ...roomData,
               players: updatedPlayers,
               isShuffled: true,
-              turn:Math.floor(Math.random()*4)+1,
-              nowCards:deck.slice(24, 28),
-              deck:deck.slice(28, 52),
-              startTime: new Date()
+              turn: Math.floor(Math.random() * 4) + 1,
+              nowCards: deck.slice(24, 28),
+              deck: deck.slice(28, 52),
+              startTime: new Date(),
             });
           } catch (error) {
             console.error("Error updating game state:", error);
@@ -103,7 +103,7 @@ export default function PlayingPage({ prop }) {
               updatedPlayers[playerId] = {
                 ...players[playerId],
                 handCards: playerCards,
-                score:0
+                score: 0,
               };
             });
             await setDoc(roomRef, {
@@ -111,7 +111,7 @@ export default function PlayingPage({ prop }) {
               players: updatedPlayers,
               isShuffled: true,
               startTime: new Date(),
-              
+              areAllPlayersEnd: 24,
             });
           } catch (error) {
             console.error("Error updating game state:", error);

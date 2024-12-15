@@ -153,7 +153,7 @@ function getRank(card) {
     return maxSuit1 === maxSuit2 ? 0 : (maxSuit1 > maxSuit2 ? 1 : -1);
   }
   
-  export default function compare3(cards1, cards2, card3, card4) {
+  export default function compare5(cards1, cards2, card3, card4) {
     // Create array of hands with their original indices
     const hands = [
       { hand: cards1, index: 1 },

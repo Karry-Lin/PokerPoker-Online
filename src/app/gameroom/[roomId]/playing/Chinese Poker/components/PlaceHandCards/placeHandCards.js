@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { updateDoc } from 'firebase/firestore';
-import styles from './Page.module.css';
+import React, { useState, useEffect } from "react";
+import { updateDoc } from "firebase/firestore";
+import styles from "./Page.module.css";
 
 export default function PlaceHandCards({ prop }) {
   const { roomRef, players, uid, userplace, startTime } = prop;
@@ -10,60 +10,23 @@ export default function PlaceHandCards({ prop }) {
   const [rows, setRows] = useState({
     top: [],
     middle: [],
-    bottom: []
-  });
-  const [playerCardCounts, setPlayerCardCounts] = useState({
-    top: 13,
-    left: 13,
-    right: 13
+    bottom: [],
   });
   const [timer, setTimer] = useState(() => {
-    const now = new Date().getTime() / 1000; // Fixed syntax
-    if (startTime) {
+    if (startTime?.seconds) {
+      const now = new Date().getTime() / 1000;
       const elapsedTime = Math.floor(now - startTime.seconds);
-      return Math.max(0, 90 - elapsedTime);
+      return Math.max(0, 12 - elapsedTime);
     }
-    return 60;
+    return 120; // Fallback
   });
-
-  const randomizeCardPlacement = () => {
-    const allCards = [...handCards, ...rows.top, ...rows.middle, ...rows.bottom];
-    const shuffled = allCards.sort(() => Math.random() - 0.5);
-
-    setRows({
-      top: shuffled.slice(0, 3),
-      middle: shuffled.slice(3, 8),
-      bottom: shuffled.slice(8, 13)
-    });
-    setHandCards([]); // Clear hand cards after placing them
-    // handleSubmit();
-  };
-
   useEffect(() => {
-    if (timer > 0) {
-      const countdown = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(countdown); // Clear interval on component unmount or re-render
-    } else {
-      randomizeCardPlacement(); // Time's up! Randomize card placement
-      handleSubmit();
-    }
-  }, [timer]);
+    const interval = setInterval(() => {
+      setTimer((prev) => Math.max(0, prev - 1));
+    }, 1000);
 
-  useEffect(() => {
-    if (players && players.length === 4) {
-      const topPlayer = players[(userplace + 1) % 4];
-      const leftPlayer = players[(userplace + 2) % 4];
-      const rightPlayer = players[(userplace + 3) % 4];
-
-      setPlayerCardCounts({
-        top: topPlayer.handCards.length,
-        left: leftPlayer.handCards.length,
-        right: rightPlayer.handCards.length
-      });
-    }
-  }, [players, userplace]);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (players && uid) {
@@ -81,14 +44,14 @@ export default function PlaceHandCards({ prop }) {
   };
 
   const handleMoveToRow = (row) => {
-    const maxCards = row === 'top' ? 3 : 5;
+    const maxCards = row === "top" ? 3 : 5;
     if (rows[row].length + selectedCards.length > maxCards) {
       alert(`The ${row} row is full.`);
       return;
     }
     setRows((prev) => ({
       ...prev,
-      [row]: [...prev[row], ...selectedCards]
+      [row]: [...prev[row], ...selectedCards],
     }));
     setHandCards((prev) =>
       prev.filter((card) => !selectedCards.includes(card))
@@ -100,12 +63,12 @@ export default function PlaceHandCards({ prop }) {
     setHandCards((prev) => [...prev, ...rows[row]]);
     setRows((prev) => ({
       ...prev,
-      [row]: []
+      [row]: [],
     }));
   };
 
   const isRowFull = (row) => {
-    const maxCards = row === 'top' ? 3 : 5;
+    const maxCards = row === "top" ? 3 : 5;
     return rows[row].length >= maxCards;
   };
 
@@ -117,9 +80,9 @@ export default function PlaceHandCards({ prop }) {
   const handleSubmit = async () => {
     await updateDoc(roomRef, {
       [`players.${uid}.showCards`]: rows,
-      [`players.${uid}.isPassed`]: true
+      [`players.${uid}.isPassed`]: true,
     });
-    alert('Commit successful');
+    alert("Commit successful");
   };
 
   const renderCardRow = (row) => (
@@ -136,23 +99,11 @@ export default function PlaceHandCards({ prop }) {
     </div>
   );
 
-  const renderOtherPlayerCards = (position, count) => (
-    <div className={styles[`${position}Player`]}>
-      {Array.from({ length: count }).map((_, index) => (
-        <div key={`${position}-${index}`} className={styles.otherCard}>
-          <img src="/cards/0.png" alt="Other Player's Card" />
-        </div>
-      ))}
-    </div>
-  );
-
   return (
     <div className={styles.container}>
-  
-
-      {renderCardRow('top')}
-      {renderCardRow('middle')}
-      {renderCardRow('bottom')}
+      {renderCardRow("top")}
+      {renderCardRow("middle")}
+      {renderCardRow("bottom")}
 
       <div className={styles.timer}>Time left: {timer}s</div>
 
@@ -162,7 +113,7 @@ export default function PlaceHandCards({ prop }) {
             <div
               key={`hand-${index}`}
               className={`${styles.card} ${
-                selectedCards.includes(card) ? styles.selected : ''
+                selectedCards.includes(card) ? styles.selected : ""
               }`}
               onClick={() => handleCardClick(card)}
             >
@@ -174,22 +125,22 @@ export default function PlaceHandCards({ prop }) {
           <div className={styles.buttons}>
             <button
               className={styles.button}
-              onClick={() => handleMoveToRow('top')}
-              disabled={isRowFull('top')}
+              onClick={() => handleMoveToRow("top")}
+              disabled={isRowFull("top")}
             >
               Move to Top Row
             </button>
             <button
               className={styles.button}
-              onClick={() => handleMoveToRow('middle')}
-              disabled={isRowFull('middle')}
+              onClick={() => handleMoveToRow("middle")}
+              disabled={isRowFull("middle")}
             >
               Move to Middle Row
             </button>
             <button
               className={styles.button}
-              onClick={() => handleMoveToRow('bottom')}
-              disabled={isRowFull('bottom')}
+              onClick={() => handleMoveToRow("bottom")}
+              disabled={isRowFull("bottom")}
             >
               Move to Bottom Row
             </button>
