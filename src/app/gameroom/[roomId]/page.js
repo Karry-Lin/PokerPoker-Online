@@ -68,7 +68,8 @@ const GameRoom = () => {
               startTurn: data.startTurn,
               deck:data.deck||null,
               showResult:data.players[userStore.userId]?.showResult,
-              startTime:data.startTime||null
+              startTime:data.startTime||null,
+              areAllPlayersEnd:data.areAllPlayersEnd||null
             });
           } else if (!userStore.userId) {
             setError('User not logged in');
