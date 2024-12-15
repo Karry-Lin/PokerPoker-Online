@@ -78,7 +78,7 @@ function getHandType(cards) {
 // Main comparison function
 export default function compare(cards1, cards2) {
   if (cards1.length == 4 || cards1.length == 3) {
-    alert('請出正確的牌型');
+    // alert('請出正確的牌型');
     return false;
   }
 
@@ -87,8 +87,8 @@ export default function compare(cards1, cards2) {
     const rank1 = getRank(cards1[0]);
     const rank2 = getRank(cards2[0]);
     if (rank1 > rank2) return true;
-    if (getSuitPriority(cards1[0]) > getSuitPriority(cards2[0])) return true;
-    alert('請出比牌面價值大的牌');
+    if ((rank1 == rank2)&&getSuitPriority(cards1[0]) > getSuitPriority(cards2[0])) return true;
+    // alert('請出比牌面價值大的牌');
     return false;
   }
 
@@ -98,7 +98,7 @@ export default function compare(cards1, cards2) {
       getRank(cards1[0]) !== getRank(cards1[1]) ||
       getRank(cards2[0]) !== getRank(cards2[1])
     ) {
-      alert('請出有效的對子');
+      // alert('請出有效的對子');
       return false;
     }
     const rank1 = getRank(cards1[0]);
@@ -107,7 +107,7 @@ export default function compare(cards1, cards2) {
       if (rank1 > rank2) {
         return true;
       } else {
-        alert('請出比牌面價值大的對子');
+        // alert('請出比牌面價值大的對子');
         return false;
       }
     }
@@ -118,7 +118,7 @@ export default function compare(cards1, cards2) {
       Math.max(getSuitPriority(cards2[0]), getSuitPriority(cards2[1]))
     )
       return true;
-    alert('請出比牌面價值大的對子');
+    // alert('請出比牌面價值大的對子');
     return false;
   }
 
@@ -148,7 +148,7 @@ export default function compare(cards1, cards2) {
       }
     }
     if (hand1.value > hand2.value) return true;
-    alert('請出比牌面價值大的牌');
+    // alert('請出比牌面價值大的牌');
     return false;
   }
   if (cards1.length == 5) {
@@ -162,22 +162,22 @@ export default function compare(cards1, cards2) {
       return true;
     } else if (cards1.length == 2) {
       if (getRank(cards1[0]) !== getRank(cards1[1])) {
-        alert('請出正確的牌型');
+        // alert('請出正確的牌型');
         return false;
       }
       return true;
     } else if (cards1.length == 5) {
       const hand1 = getHandType(cards1);
       if (hand1.type == 'high_card') {
-        alert('請出正確的牌型');
+        // alert('請出正確的牌型');
         return false;
       }
       return true;
     } else {
-      alert('請出正確的牌型');
+      // alert('請出正確的牌型');
       return false;
     }
   }
-  alert('請出正確的牌型');
+  // alert('請出正確的牌型');
   return false; // Fallback case, should not occur if rules are adhered to
 }
