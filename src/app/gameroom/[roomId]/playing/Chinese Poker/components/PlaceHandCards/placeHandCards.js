@@ -16,10 +16,11 @@ export default function PlaceHandCards({ prop }) {
     if (startTime?.seconds) {
       const now = new Date().getTime() / 1000;
       const elapsedTime = Math.floor(now - startTime.seconds);
-      return Math.max(0, 12 - elapsedTime);
+      return Math.max(0, 120 - elapsedTime);
     }
     return 120; // Fallback
   });
+
   useEffect(() => {
     const interval = setInterval(() => {
       setTimer((prev) => Math.max(0, prev - 1));
@@ -77,13 +78,48 @@ export default function PlaceHandCards({ prop }) {
     rows.middle.length === 5 &&
     rows.bottom.length === 5;
 
-  const handleSubmit = async () => {
+  const fillRowsToFull = (currentRows, currentHand) => {
+    const updatedRows = { ...currentRows };
+    let updatedHand = [...currentHand];
+
+    const fillRow = (rowName, max) => {
+      const diff = max - updatedRows[rowName].length;
+      if (diff > 0) {
+        const cardsToMove = updatedHand.splice(0, diff);
+        updatedRows[rowName] = [...updatedRows[rowName], ...cardsToMove];
+      }
+    };
+
+    fillRow("top", 3);
+    fillRow("middle", 5);
+    fillRow("bottom", 5);
+
+    return { updatedRows, updatedHand };
+  };
+
+  const handleSubmit = async (rowsToSubmit = rows) => {
     await updateDoc(roomRef, {
-      [`players.${uid}.showCards`]: rows,
+      [`players.${uid}.showCards`]: rowsToSubmit,
       [`players.${uid}.isPassed`]: true,
     });
     alert("Commit successful");
   };
+
+  // When time runs out, fill rows if needed and then submit immediately with the updated rows
+  useEffect(() => {
+    if (timer === 0) {
+      if (!isAllRowsFull()) {
+        const { updatedRows, updatedHand } = fillRowsToFull(rows, handCards);
+        // Submit immediately with the fully filled rows
+        handleSubmit(updatedRows);
+        // Update state after submitting
+        setRows(updatedRows);
+        setHandCards(updatedHand);
+      } else {
+        handleSubmit(rows);
+      }
+    }
+  }, [timer]);
 
   const renderCardRow = (row) => (
     <div className={`${styles.cardRow} ${styles[row]}`}>
@@ -147,7 +183,7 @@ export default function PlaceHandCards({ prop }) {
           </div>
         )}
         {isAllRowsFull() && (
-          <button className={styles.submitbutton} onClick={handleSubmit}>
+          <button className={styles.submitbutton} onClick={() => handleSubmit()}>
             Submit
           </button>
         )}
