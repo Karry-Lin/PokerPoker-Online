@@ -13,7 +13,7 @@ function getSuitPriority(card) {
 }
 function getValue(card) {
   if (card == 1) return 30;
-  else if (card == 14 || card ==27) return 20;
+  else if (card == 14 || card == 27) return 20;
   else if (card == 40) return 40;
   else if (getSuitPriority(card)) {
     return getRank(card) >= 9 ? 10 : getRank(card);
@@ -23,6 +23,9 @@ function getValue(card) {
 
 export default function getPoint(cards1, cards2) {
   // Get ranks of the cards
+  if ((cards1 == 18 && cards2 == 31) || (cards1 == 31 && cards2 == 18)) {
+    return -2;
+  }
   const rank1 = getRank(cards1);
   const rank2 = getRank(cards2);
 

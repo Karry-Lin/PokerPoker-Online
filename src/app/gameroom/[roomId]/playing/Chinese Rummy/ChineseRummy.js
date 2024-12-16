@@ -59,7 +59,6 @@ export default function ChineseRummy({ prop }) {
 
   useEffect(() => {
     setMiddleCards(nowCards);
-    // console.log('players',players)
     if (players?.length === 4) {
       const getRelativePlayer = (offset) =>
         players.find(
@@ -70,7 +69,7 @@ export default function ChineseRummy({ prop }) {
         top: getRelativePlayer(1),
         left: getRelativePlayer(0),
         right: getRelativePlayer(2),
-        player: players.userplace,
+        player: getRelativePlayer(3),
       };
 
       setPlayerState({
@@ -80,6 +79,7 @@ export default function ChineseRummy({ prop }) {
           score: updatePlayerState.top?.score || 0,
           name: updatePlayerState.top?.username || "player",
           place: updatePlayerState.top?.place || 0,
+          id:updatePlayerState.top?.id
         },
         left: {
           cardCount: updatePlayerState.left?.handCards.length || 0,
@@ -87,6 +87,7 @@ export default function ChineseRummy({ prop }) {
           score: updatePlayerState.left?.score || 0,
           name: updatePlayerState.left?.username || "player",
           place: updatePlayerState.left?.place || 0,
+          id:updatePlayerState.left?.id
         },
         right: {
           cardCount: updatePlayerState.right?.handCards.length || 0,
@@ -94,6 +95,7 @@ export default function ChineseRummy({ prop }) {
           score: updatePlayerState.right?.score || 0,
           name: updatePlayerState.right?.username || "player",
           place: updatePlayerState.right?.place || 0,
+          id:updatePlayerState.right?.id
         },
         player: {
           cardCount: players.userplace?.handCards.length || 0,
@@ -101,6 +103,8 @@ export default function ChineseRummy({ prop }) {
           score: players.userplace?.score || 0,
           name: players.userplace?.username || "player",
           place: updatePlayerState.userplace?.place || 0,
+          id:uid
+
         },
       });
     }
@@ -114,10 +118,7 @@ export default function ChineseRummy({ prop }) {
   }, [players, uid]);
   useEffect(() => {
     const checkNextState = async () => {
-      // const areAllPlayersEnd = players.every(
-      //   (player) => player.handCards.length == 0
-      // );
-      if (areAllPlayersEnd < 0) {
+      if (areAllPlayersEnd <= 0) {
         const updatedPlayers = {};
         players.forEach((player) => {
           updatedPlayers[player.id] = {
@@ -158,13 +159,8 @@ export default function ChineseRummy({ prop }) {
         nowCards: updatedMiddleCards,
         [`players.${uid}.handCards`]: updatedHandCards,
         deck: deck.slice(1),
-        areAllPlayersEnd: areAllPlayersEnd - 1,
+        
       });
-      // if (deck[0] == null) {
-      //   await updateDoc(roomRef, {
-      //     turn: (turn % 4) + 1,
-      //   });
-      // }
       setFlipCard(deck[0]);
       setSelectedHandCard(null);
     } catch (error) {
@@ -179,7 +175,7 @@ export default function ChineseRummy({ prop }) {
       await updateDoc(roomRef, {
         nowCards: updatedMiddleCards,
         turn: (turn % 4) + 1,
-        // deck: deck.slice(1),
+        areAllPlayersEnd: areAllPlayersEnd - 1,
       });
 
       setFlipCard(null);
@@ -196,13 +192,24 @@ export default function ChineseRummy({ prop }) {
         const updatedMiddleCards = middleCards.filter(
           (card) => card !== selectedMiddleCard
         );
-
-        await updateDoc(roomRef, {
-          nowCards: updatedMiddleCards,
-          turn: (turn % 4) + 1,
-          [`players.${uid}.score`]: roomData.players[uid]?.score + point,
-          // deck: deck.slice(1),
-        });
+        if (point == -2) {
+          await updateDoc(roomRef, {
+            nowCards: updatedMiddleCards,
+            turn: (turn % 4) + 1,
+            [`players.${uid}.score`]: roomData.players[uid]?.score + 40,
+            [`players.${playerState[top].id}.score`]:roomData.players[playerState[top].id]?.score -10,
+            [`players.${playerState[right].id}.score`]:roomData.players[playerState[right].id]?.score -10,
+            [`players.${playerState[left].id}.score`]:roomData.players[playerState[left].id]?.score -10,
+            areAllPlayersEnd: areAllPlayersEnd - 1,
+          });
+        } else {
+          await updateDoc(roomRef, {
+            nowCards: updatedMiddleCards,
+            turn: (turn % 4) + 1,
+            [`players.${uid}.score`]: roomData.players[uid]?.score + point,
+            areAllPlayersEnd: areAllPlayersEnd - 1,
+          });
+        }
 
         setSelectedMiddleCard(null);
         setFlipCard(null);
@@ -225,22 +232,18 @@ export default function ChineseRummy({ prop }) {
         const updatedHandCards = handCards.filter(
           (card) => card !== selectedHandCard
         );
-
+        if (point == -2) {
+        }
         await updateDoc(roomRef, {
           [`players.${uid}.handCards`]: updatedHandCards,
           [`players.${uid}.score`]: roomData.players[uid]?.score + point,
           nowCards: updatedMiddleCards,
           deck: deck.slice(1),
-          areAllPlayersEnd: areAllPlayersEnd - 1,
+          
         });
 
         setSelectedMiddleCard(null);
         setSelectedHandCard(null);
-        // if (deck[0] == null) {
-        //   await updateDoc(roomRef, {
-        //     turn: (turn % 4) + 1,
-        //   });
-        // }
         setFlipCard(deck[0]);
       } else {
         alert("Please select valid cards");
@@ -269,7 +272,7 @@ export default function ChineseRummy({ prop }) {
   };
   const renderOtherPlayer = (position) => {
     const player = playerState[position];
-    const isTurn = turn == player.place; // Check if it's this player's turn
+    const isTurn = turn == player.place; 
     const infoPositionClass = `${styles.playerInfoContainer} ${
       isTurn ? styles.activeTurn : ""
     } ${styles[position + "Info"]}`;
