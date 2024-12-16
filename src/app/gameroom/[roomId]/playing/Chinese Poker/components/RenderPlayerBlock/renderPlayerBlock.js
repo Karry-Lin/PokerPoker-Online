@@ -20,7 +20,7 @@ export default function RenderPlayerBlock({ prop }) {
   // Helper function to render a player block
   const renderPlayerBlock = (player) => {
     if (!player) return null;
-
+    // console.log(prop);
     const showCards = player.showCards || [];
     const avatar = player.avatar;
     const name = player.username;
