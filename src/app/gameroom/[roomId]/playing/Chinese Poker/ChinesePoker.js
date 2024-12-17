@@ -1,13 +1,21 @@
-import React from 'react';
-import { updateDoc, doc, getDoc } from 'firebase/firestore';
-import styles from './Page.module.css';
-import PlaceHandCards from './components/PlaceHandCards/placeHandCards';
-import RenderPlayerBlock from './components/RenderPlayerBlock/renderPlayerBlock';
+import React from "react";
+import { updateDoc, doc, getDoc } from "firebase/firestore";
+import styles from "./Page.module.css";
+import PlaceHandCards from "./components/PlaceHandCards/placeHandCards";
+import RenderPlayerBlock from "./components/RenderPlayerBlock/renderPlayerBlock";
 
 export default function ChinesePoker({ prop }) {
   const { isPassed } = prop;
 
-  return <>{isPassed ? <RenderPlayerBlock prop={prop}  /> : <PlaceHandCards prop={prop} />}</>;
+  return (
+    <>
+      {isPassed ? (
+        <RenderPlayerBlock prop={prop} />
+      ) : (
+        <PlaceHandCards prop={prop} />
+      )}
+    </>
+  );
 }
 
 // const ChinesePoker = () => {

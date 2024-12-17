@@ -30,24 +30,28 @@ export default function ChineseRummy({ prop }) {
       avatar: "/avatar_test.jpg",
       score: 0,
       name: "player",
+      id: null,
     },
     left: {
       cardCount: 13,
       avatar: "/avatar_test.jpg",
       score: 0,
       name: "player",
+      id: null,
     },
     right: {
       cardCount: 13,
       avatar: "/avatar_test.jpg",
       score: 0,
       name: "player",
+      id: null,
     },
     player: {
       cardCount: 13,
       avatar: "/avatar_test.jpg",
       score: 0,
       name: "player",
+      id: null,
     },
   });
 
@@ -103,8 +107,10 @@ export default function ChineseRummy({ prop }) {
           score: updatePlayerState.player?.score || 0,
           name: updatePlayerState.player?.username || "player",
           place: updatePlayerState.player?.place || 0,
+          id: updatePlayerState.player?.id,
         },
       });
+      console.log(updatePlayerState);
     }
   }, [nowCards, players, userplace]);
 
@@ -189,17 +195,19 @@ export default function ChineseRummy({ prop }) {
         const updatedMiddleCards = middleCards.filter(
           (card) => card !== selectedMiddleCard
         );
+        console.log(playerState.top.id);
         if (point == -2) {
+          console.log(playerState.top.id);
           await updateDoc(roomRef, {
             nowCards: updatedMiddleCards,
             turn: (turn % 4) + 1,
             [`players.${uid}.score`]: roomData.players[uid]?.score + 40,
-            [`players.${playerState[top].id}.score`]:
-              roomData.players[playerState[top].id]?.score - 10,
-            [`players.${playerState[right].id}.score`]:
-              roomData.players[playerState[right].id]?.score - 10,
-            [`players.${playerState[left].id}.score`]:
-              roomData.players[playerState[left].id]?.score - 10,
+            [`players.${playerState.top.id}.score`]:
+              roomData.players[playerState.top.id]?.score - 10,
+            [`players.${playerState.right.id}.score`]:
+              roomData.players[playerStateright.id]?.score - 10,
+            [`players.${playerState.left.id}.score`]:
+              roomData.players[playerState.left.id]?.score - 10,
             areAllPlayersEnd: areAllPlayersEnd - 1,
           });
         } else {
@@ -235,12 +243,12 @@ export default function ChineseRummy({ prop }) {
         if (point == -2) {
           await updateDoc(roomRef, {
             [`players.${uid}.score`]: roomData.players[uid]?.score + 40,
-            [`players.${playerState[top].id}.score`]:
-              roomData.players[playerState[top].id]?.score - 10,
-            [`players.${playerState[right].id}.score`]:
-              roomData.players[playerState[right].id]?.score - 10,
-            [`players.${playerState[left].id}.score`]:
-              roomData.players[playerState[left].id]?.score - 10,
+            [`players.${playerState.top.id}.score`]:
+              roomData.players[playerState.top.id]?.score - 10,
+            [`players.${playerState.right.id}.score`]:
+              roomData.players[playerState.right.id]?.score - 10,
+            [`players.${playerState.left.id}.score`]:
+              roomData.players[playerState.left.id]?.score - 10,
             nowCards: updatedMiddleCards,
             deck: deck.slice(1),
           });
