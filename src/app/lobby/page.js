@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Form, Card, Col, Button, Modal, Alert } from 'react-bootstrap';
+import { Alert, Button, Card, Col, Form, Modal } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import { HiLockClosed, HiLockOpen } from 'react-icons/hi2';
 import NavBar from '../components/navBar';
@@ -124,15 +124,36 @@ export default function GameRoomPage() {
     }
   };
 
+  const [userRank, setUserRank] = useState([]);
+  const getRank = async () => {
+      const response = await fetch(`/api/rank`, {method: 'GET'});
+      const rank = await response.json();
+      return rank.map((user, index) => ({
+        rank: index + 1,
+        ...user,
+      }));
+  }
+  const formatRank = (rank) => {
+    if (rank === 1) return "1st";
+    if (rank === 2) return "2nd";
+    if (rank === 3) return "3rd";
+    return `${rank}th`;
+  };
+  useEffect(() => {
+    const fetchRank = async () => {
+      const rank = await getRank();
+      setUserRank(rank);
+    };
+    fetchRank().then();
+  }, []);
   return (
     <div className={styles.page}>
       <NavBar
         avatar={userData.avatar}
         setAvatar={(avatar) => setUserData((prev) => ({ ...prev, avatar }))}
       />
-
       <div className='d-flex'>
-        <Col md={1}></Col>
+        <Col style={{ maxWidth: "100px" }} className='p-4'></Col>
         {/* Search and Filter Section */}
         <Col md={3} className='p-4'>
           <h2>搜尋房間</h2>
@@ -161,7 +182,7 @@ export default function GameRoomPage() {
         </Col>
 
         {/* Room List Section */}
-        <Col md={8} className='p-4'>
+        <Col md={4} className='p-4'>
           {filteredRooms.map((room) => (
             <Card key={room.id} className={styles.card}>
               <Card.Header className={styles.roomHeader}>
@@ -199,12 +220,67 @@ export default function GameRoomPage() {
             </Card>
           ))}
         </Col>
+        <Col style={{ maxWidth: "500px" }} className="p-4">
+          <h2
+            className="text-center mb-4 fw-bold"
+            style={{ fontSize: "2.5rem", textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)", marginTop: "26px" }}
+          >
+            排行榜
+          </h2>
+
+          <div className="d-flex flex-column gap-3">
+            {userRank?.map((user) => (
+              <div
+                key={user.rank}
+                className="d-flex align-items-center p-3 rounded shadow-sm border"
+                style={{
+                  backgroundColor: "#fff",
+                  border: "2px solid #ddd",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                  marginBottom: "1rem",
+                }}
+              >
+                {/* 名次 */}
+                <span
+                  className="fw-bold text-center"
+                  style={{
+                    fontSize: "2rem",
+                    minWidth: "50px",
+                    color: "#333",
+                    marginRight: "15px",
+                    marginLeft: "68px",
+                  }}
+                >
+          {formatRank(user.rank)}
+        </span>
+
+                {/* 頭像 */}
+                <img
+                  src={user.avatar}
+                  alt={user.username}
+                  className="rounded-circle me-3"
+                  style={{ width: "70px", height: "70px", objectFit: "cover" }}
+                />
+
+                {/* 使用者資訊 */}
+                <div className="flex-grow-1">
+                  <h5 className="mb-1 fw-bold" style={{ fontSize: "1.5rem" }}>
+                    {user.username}
+                  </h5>
+                  <p className="mb-0 text-secondary" style={{ fontSize: "1.2rem" }}>
+                    💰 {user.money.toLocaleString()} 金幣
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Col>
+
       </div>
 
       {/* Password Modal */}
       <Modal
         show={modalState.show}
-        onHide={() => setModalState((prev) => ({ ...prev, show: false }))}
       >
         <Modal.Header closeButton>
           <Modal.Title>Enter Room Password</Modal.Title>
@@ -214,7 +290,6 @@ export default function GameRoomPage() {
             type='password'
             value={modalState.password}
             onChange={(e) =>
-              setModalState((prev) => ({ ...prev, password: e.target.value }))
             }
           />
           {modalState.error && (
