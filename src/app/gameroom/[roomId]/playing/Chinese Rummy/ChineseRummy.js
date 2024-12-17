@@ -129,6 +129,7 @@ export default function ChineseRummy({ prop }) {
             ...player,
             ready: false,
             showResult: true,
+            money:player.money+((player.score)-70)*5
           };
         });
         await updateDoc(roomRef, {

@@ -156,7 +156,6 @@ export default function RenderPlayerBlock({ prop }) {
         {renderPlayerBlock(bottomPlayer)}
       </div>
 
-      {/* Optional: Add some animations or additional UI elements here if you want the web page to be more "active" */}
     </div>
   );
 }
