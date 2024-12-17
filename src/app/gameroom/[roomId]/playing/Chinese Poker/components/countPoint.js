@@ -8,6 +8,7 @@ export default async function countPoint({ prop }) {
   const numPlayers = players.length; // Expecting 4 players as given
   if (numPlayers < 4) return;
   // Extract each player's top/middle/bottom hands and compute their scores
+  const playerIds = Object.keys(players);
   const playerHands = players.map((player) => {
     const topScore = getCardTypeScore(player.showCards.top);
     const middleScore = getCardTypeScore(player.showCards.middle);
@@ -170,11 +171,17 @@ export default async function countPoint({ prop }) {
   }
 
   // Now we have all final score changes for each player
-  const updatedPlayers = players.map((player, index) => ({
-    ...player,
-    score: player.score + scoreChanges[index],
-  }));
-  console.log(updatedPlayers);
+  // const updatedPlayers = players.map((player, index) => ({
+  //   ...player,
+  //   score: player.score + scoreChanges[index],
+  // }));
+  console.log(updatedPlayers);const updatedPlayers = {};
+  playerIds.forEach((playerId, index) => {
+    updatedPlayers[playerId] = {
+      ...players[playerId],
+      score: playerId.score + scoreChanges[index],
+    };
+  });
   // Update the database
-  await updateDoc(roomRef, { players: updatedPlayers });
+  await updateDoc(roomRef, { players: updatedPlayers, });
 }
