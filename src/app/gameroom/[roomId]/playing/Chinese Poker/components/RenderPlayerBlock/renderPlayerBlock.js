@@ -6,22 +6,26 @@ import countPoint from "../countPoint";
 export default function RenderPlayerBlock({ prop }) {
   const { players, userplace, roomRef, startTime } = prop;
   const [allPassed, setAllPassed] = useState(false);
-  const [timer, setTimer] = useState(() => {
-    if (startTime?.seconds) {
-      const now = new Date().getTime() / 1000;
-      const elapsedTime = Math.floor(now - startTime.seconds);
-      return Math.max(0, 120 - elapsedTime);
-    }
-    return 120; // Fallback
-  });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((prev) => Math.max(0, prev - 1));
-    }, 1000);
+  // const [timer, setTimer] = useState(() => {
+  //   if (startTime) {
+  //     const now = Date.now();
+  //     const elapsedTime = Math.floor((now - startTime.toMillis()) / 1000);
+  //     return Math.max(0, 180 - elapsedTime);
+  //   }
+  //   return 180;
+  // });
 
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  // Decrement timer every second if timer > 0 and not allPassed
+  //   if (!allPassed && timer > 0) {
+  //     const interval = setInterval(() => {
+  //       setTimer((prev) => Math.max(0, prev - 1));
+  //     }, 1000);
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [allPassed, timer]);
+
   useEffect(() => {
     // Check if all players have passed
     const everyonePassed =
@@ -29,24 +33,28 @@ export default function RenderPlayerBlock({ prop }) {
 
     setAllPassed(everyonePassed);
 
-    // If userplace === 1 and prop exists, we do some counting (original logic)
+    // If userplace === 1 and prop exists, we do some counting
     if (userplace === 1 && prop) {
       countPoint({ prop });
     }
 
-    // If everyone has passed and we haven't started the timer yet, start it
-    if (everyonePassed && timer === null) {
-      setTimer(30); // 30 seconds countdown
-    }
-  }, [prop, players, userplace, timer]);
+    // If everyone has passed, start a new 30-second timer if needed
+    // For example, if we want a fresh 30-second countdown once everyone passes:
+    // if (everyonePassed && timer > 30) {
+    //   setTimer(30);
+    // }
+  }, [prop, players, userplace]);
+
   const goNext = async () => {
     const updatedPlayers = {};
+    const initRows = { top: [], middle: [], bottom: [] };
     players.forEach((player) => {
       updatedPlayers[player.id] = {
         ...player,
         ready: false,
         showResult: true,
         isPassed: false,
+        rows: initRows,
       };
     });
     await updateDoc(roomRef, {
@@ -56,41 +64,38 @@ export default function RenderPlayerBlock({ prop }) {
       players: updatedPlayers,
     });
   };
-  useEffect(() => {
-    let interval = null;
-    if (allPassed && timer !== null && timer > 0) {
-      // Start a countdown interval if needed
-      interval = setInterval(() => {
-        setTimer((prev) => {
-          const newTime = prev - 1;
-          if (newTime === 0) {
-            // When timer hits 0, alert 'end'
-            goNext();
-          }
-          return newTime;
-        });
-      }, 1000);
-    }
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [allPassed, timer]);
+  // useEffect(() => {
+  //   let interval = null;
+  //   // If all have passed and timer is running, start a countdown
+  //   if (allPassed && timer > 0) {
+  //     interval = setInterval(() => {
+  //       setTimer((prev) => {
+  //         const newTime = prev - 1;
+  //         if (newTime === 0) {
+  //           // When timer hits 0, goNext
+  //           goNext();
+  //         }
+  //         return newTime;
+  //       });
+  //     }, 1000);
+  //   }
 
-  // Players divided into positions: top, left, right, bottom
+  //   return () => {
+  //     if (interval) clearInterval(interval);
+  //   };
+  // }, [allPassed, timer]);
+
   const topPlayer = players?.[0];
   const leftPlayer = players?.[1];
   const rightPlayer = players?.[2];
   const bottomPlayer = players?.[3];
 
-  // Since we only show cards after all players have passed, we use 'allPassed' instead of 'player.isPassed'
   const renderPlayerBlock = (player) => {
     if (!player) return null;
     const showCards = player.showCards || [];
     const avatar = player.avatar;
     const name = player.username;
-
-    // If we only show cards after all have passed, 'show' depends on allPassed
     const show = allPassed;
 
     const cardRows = [
@@ -133,7 +138,8 @@ export default function RenderPlayerBlock({ prop }) {
 
   return (
     <div className={styles.gameBoard}>
-      {allPassed && timer !== null && (
+      {/* {allPassed && timer > 0 && ( */}
+      {/* {allPassed && (
         <div
           style={{
             position: "absolute",
@@ -147,7 +153,7 @@ export default function RenderPlayerBlock({ prop }) {
         >
           Time remaining: {timer}s
         </div>
-      )}
+      )} */}
 
       <div className={styles.topPlayer}>{renderPlayerBlock(topPlayer)}</div>
       <div className={styles.leftPlayer}>{renderPlayerBlock(leftPlayer)}</div>
@@ -155,7 +161,9 @@ export default function RenderPlayerBlock({ prop }) {
       <div className={styles.bottomPlayer}>
         {renderPlayerBlock(bottomPlayer)}
       </div>
-
+      <button className={styles.submitButton} onClick={goNext}>
+        Submit
+      </button>
     </div>
   );
 }

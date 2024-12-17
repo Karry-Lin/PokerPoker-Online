@@ -206,7 +206,7 @@ export default function ChineseRummy({ prop }) {
             [`players.${playerState.top.id}.score`]:
               roomData.players[playerState.top.id]?.score - 10,
             [`players.${playerState.right.id}.score`]:
-              roomData.players[playerStateright.id]?.score - 10,
+              roomData.players[playerState.right.id]?.score - 10,
             [`players.${playerState.left.id}.score`]:
               roomData.players[playerState.left.id]?.score - 10,
             areAllPlayersEnd: areAllPlayersEnd - 1,

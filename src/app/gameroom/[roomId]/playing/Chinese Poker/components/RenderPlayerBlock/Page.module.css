@@ -88,3 +88,15 @@
   border: 1px solid #000;
   z-index: 1; /* Ensure overlapping works */
 }
+.submitButton {
+  padding: 15px 25px;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #04aa6d;
+  border: none;
+  border-radius: 15px;
+  margin: 0 20px;
+}

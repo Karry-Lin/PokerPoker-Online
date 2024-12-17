@@ -19,7 +19,7 @@ export default function PlaceHandCards({ prop }) {
       const elapsedTime = Math.floor(now - startTime.seconds);
       return Math.max(0, 120 - elapsedTime);
     }
-    return 120; // Fallback
+    return 120; // Fallback if no startTime
   });
 
   useEffect(() => {
@@ -34,6 +34,10 @@ export default function PlaceHandCards({ prop }) {
       const currentPlayer = players.find((player) => player.id === uid);
       if (currentPlayer) {
         setHandCards(currentPlayer.handCards || []);
+        // If we also stored rows before, load them:
+        if (currentPlayer.rows) {
+          setRows(currentPlayer.rows);
+        }
       }
     }
   }, [players, uid]);
@@ -44,28 +48,46 @@ export default function PlaceHandCards({ prop }) {
     );
   };
 
-  const handleMoveToRow = (row) => {
+  const handleMoveToRow = async (row) => {
     const maxCards = row === "top" ? 3 : 5;
     if (rows[row].length + selectedCards.length > maxCards) {
       alert(`The ${row} row is full.`);
       return;
     }
-    setRows((prev) => ({
-      ...prev,
-      [row]: [...prev[row], ...selectedCards],
-    }));
-    setHandCards((prev) =>
-      prev.filter((card) => !selectedCards.includes(card))
-    );
+
+    const newRows = {
+      ...rows,
+      [row]: [...rows[row], ...selectedCards],
+    };
+
+    const newHand = handCards.filter((card) => !selectedCards.includes(card));
+    setRows(newRows);
+    setHandCards(newHand);
     setSelectedCards([]);
+
+    // Update Firestore after moving cards
+    await updateDoc(roomRef, {
+      [`players.${uid}.rows`]: newRows,
+      [`players.${uid}.handCards`]: newHand,
+    });
   };
 
-  const handleReturnToHand = (row) => {
-    setHandCards((prev) => [...prev, ...rows[row]]);
-    setRows((prev) => ({
-      ...prev,
+  const handleReturnToHand = async (row) => {
+    const returnedCards = rows[row];
+    const newHand = [...handCards, ...returnedCards];
+    const newRows = {
+      ...rows,
       [row]: [],
-    }));
+    };
+
+    setRows(newRows);
+    setHandCards(newHand);
+
+    // Update Firestore after returning cards
+    await updateDoc(roomRef, {
+      [`players.${uid}.rows`]: newRows,
+      [`players.${uid}.handCards`]: newHand,
+    });
   };
 
   const isRowFull = (row) => {
@@ -74,9 +96,7 @@ export default function PlaceHandCards({ prop }) {
   };
 
   const isAllRowsFull = () =>
-    rows.top.length === 3 &&
-    rows.middle.length === 5 &&
-    rows.bottom.length === 5;
+    rows.top.length === 3 && rows.middle.length === 5 && rows.bottom.length === 5;
 
   const fillRowsToFull = (currentRows, currentHand) => {
     const updatedRows = { ...currentRows };
@@ -97,7 +117,6 @@ export default function PlaceHandCards({ prop }) {
     return { updatedRows, updatedHand };
   };
 
-  // Helper to compare two score arrays lexicographically
   const compareScores = (a, b) => {
     for (let i = 0; i < Math.max(a.length, b.length); i++) {
       const aVal = a[i] !== undefined ? a[i] : 0;
@@ -110,38 +129,35 @@ export default function PlaceHandCards({ prop }) {
   };
 
   const handleSubmit = async (rowsToSubmit = rows) => {
-    // Get scores for each row
     const topScore = getCardTypeScore(rowsToSubmit.top);
     const middleScore = getCardTypeScore(rowsToSubmit.middle);
     const bottomScore = getCardTypeScore(rowsToSubmit.bottom);
 
-    // Ensure top < middle < bottom
-    // If any comparison is >= 0, order is wrong
+    // Check order
     if (compareScores(topScore, middleScore) >= 0) {
-      alert("Top row must be weaker (lower score) than the middle row.");
+      alert("Top row must be weaker than the middle row.");
       return;
     }
     if (compareScores(middleScore, bottomScore) >= 0) {
-      alert("Middle row must be weaker (lower score) than the bottom row.");
+      alert("Middle row must be weaker than the bottom row.");
       return;
     }
 
-    // If order is correct, submit to Firestore
+    // Update Firestore on final submit
     await updateDoc(roomRef, {
       [`players.${uid}.showCards`]: rowsToSubmit,
       [`players.${uid}.isPassed`]: true,
     });
+
     alert("Commit successful");
   };
 
-  // When time runs out, fill rows if needed and then submit immediately with the updated rows
   useEffect(() => {
     if (timer === 0) {
       if (!isAllRowsFull()) {
         const { updatedRows, updatedHand } = fillRowsToFull(rows, handCards);
-        // Submit immediately with fully filled rows, but also verify order
+        // Submit with fully filled rows
         handleSubmit(updatedRows);
-        // Update state after submitting
         setRows(updatedRows);
         setHandCards(updatedHand);
       } else {

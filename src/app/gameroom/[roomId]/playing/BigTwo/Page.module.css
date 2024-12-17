@@ -176,11 +176,11 @@
 }
 
 .middleCard {
-  width: 100px;
+  width: 105px;
   height: 150px;
   background-color: #eaeaea;
-  border: 2px solid black;
-  border-radius: 8px;
+  border: 1px solid black;
+  border-radius: 6px;
   overflow: hidden;
 }
 
