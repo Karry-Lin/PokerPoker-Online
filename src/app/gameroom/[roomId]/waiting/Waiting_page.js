@@ -47,6 +47,7 @@ export default function WaitingPage({ prop }) {
               <div className={styles.playerInfo}>
                 <div className={styles.playerName}>{player.username}</div>
                 <div className={styles.playerScore}>Score: {player.score}</div>
+                <div className={styles.playerMoney}>Money: {player.money}{'('}{player.score}{')'}</div>
               </div>
             </div>
           ))}

@@ -91,15 +91,15 @@
 
 .leftInfo {
   position: absolute;
-  right: -140px;
+  left: 250px;
   top: 50%;
   transform: translateY(-50%);
 }
 
 .rightInfo {
   position: absolute;
-  left: -140px;
   top: 50%;
+  right: 250px;
   transform: translateY(-50%);
 }
 
@@ -141,13 +141,13 @@
 
 .leftPlayer .otherCardsContainer {
   flex-direction:row;
-  margin-right: 10px;
+  /* margin-right: 10px; */
   transform: rotate(90deg);
 }
 
 .rightPlayer .otherCardsContainer {
   flex-direction: row;
-  margin-left: 10px;
+  /* margin-left: 10px; */
   transform: rotate(-90deg);
 }
 

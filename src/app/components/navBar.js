@@ -165,8 +165,6 @@ const NavBar = ({ avatar, setAvatar }) => {
         handleClose={() => setShowModal(false)}
         createRoom={createRoom}
       />
-      {error && <div className='error-message'>{error}</div>}{' '}
-      {/* Error message */}
     </>
   );
 };

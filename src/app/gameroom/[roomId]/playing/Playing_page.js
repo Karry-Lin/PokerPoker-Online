@@ -79,7 +79,7 @@ export default function PlayingPage({ prop }) {
               nowCards: deck.slice(24, 28),
               deck: deck.slice(28, 52),
               startTime: new Date(),
-              areAllPlayersEnd: 23,
+              areAllPlayersEnd: 24,
             });
           } catch (error) {
             console.error("Error updating game state:", error);

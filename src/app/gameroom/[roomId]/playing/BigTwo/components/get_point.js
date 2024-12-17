@@ -11,5 +11,5 @@ export default function get_point(card) {
         }
     }
 
-    return -n*1; // Return the final value of n
+    return -n; // Return the final value of n
 }

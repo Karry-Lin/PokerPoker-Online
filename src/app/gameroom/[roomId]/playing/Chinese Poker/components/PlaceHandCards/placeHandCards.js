@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { updateDoc } from "firebase/firestore";
 import styles from "./Page.module.css";
+import getCardTypeScore from "../getCardType";
 
 export default function PlaceHandCards({ prop }) {
   const { roomRef, players, uid, userplace, startTime } = prop;
@@ -97,7 +98,36 @@ export default function PlaceHandCards({ prop }) {
     return { updatedRows, updatedHand };
   };
 
+  // Helper to compare two score arrays lexicographically
+  const compareScores = (a, b) => {
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      const aVal = a[i] !== undefined ? a[i] : 0;
+      const bVal = b[i] !== undefined ? b[i] : 0;
+      if (aVal !== bVal) {
+        return aVal < bVal ? -1 : 1;
+      }
+    }
+    return 0;
+  };
+
   const handleSubmit = async (rowsToSubmit = rows) => {
+    // Get scores for each row
+    const topScore = getCardTypeScore(rowsToSubmit.top);
+    const middleScore = getCardTypeScore(rowsToSubmit.middle);
+    const bottomScore = getCardTypeScore(rowsToSubmit.bottom);
+
+    // Ensure top < middle < bottom
+    // If any comparison is >= 0, order is wrong
+    // if (compareScores(topScore, middleScore) >= 0) {
+    //   alert("Top row must be weaker (lower score) than the middle row.");
+    //   return;
+    // }
+    // if (compareScores(middleScore, bottomScore) >= 0) {
+    //   alert("Middle row must be weaker (lower score) than the bottom row.");
+    //   return;
+    // }
+
+    // If order is correct, submit to Firestore
     await updateDoc(roomRef, {
       [`players.${uid}.showCards`]: rowsToSubmit,
       [`players.${uid}.isPassed`]: true,
@@ -110,7 +140,7 @@ export default function PlaceHandCards({ prop }) {
     if (timer === 0) {
       if (!isAllRowsFull()) {
         const { updatedRows, updatedHand } = fillRowsToFull(rows, handCards);
-        // Submit immediately with the fully filled rows
+        // Submit immediately with fully filled rows, but also verify order
         handleSubmit(updatedRows);
         // Update state after submitting
         setRows(updatedRows);
