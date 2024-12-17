@@ -281,6 +281,7 @@ export default function GameRoomPage() {
       {/* Password Modal */}
       <Modal
         show={modalState.show}
+        onHide={() => setModalState((prev) => ({...prev, show: false}))}
       >
         <Modal.Header closeButton>
           <Modal.Title>Enter Room Password</Modal.Title>
@@ -290,6 +291,7 @@ export default function GameRoomPage() {
             type='password'
             value={modalState.password}
             onChange={(e) =>
+              setModalState((prev) => ({...prev, password: e.target.value}))
             }
           />
           {modalState.error && (

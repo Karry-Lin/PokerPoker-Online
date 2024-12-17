@@ -1,5 +1,5 @@
 import {database} from "@/utils/firebase.js";
-import {collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where} from 'firebase/firestore';
+import {collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where, orderBy} from 'firebase/firestore';
 import {v4 as uuidv4} from "uuid";
 
 export async function POST(request) {
@@ -81,8 +81,9 @@ export async function GET(request) {
         }
     } else {
         const roomCollection = collection(database, 'room');
-        const roomList = await getDocs(roomCollection);
+        const roomList = await getDocs(query(roomCollection, orderBy('time', 'desc')));
         const rooms = roomList.docs.map((doc) => doc.data());
         return Response.json(rooms, {status: 200});
     }
+
 }
