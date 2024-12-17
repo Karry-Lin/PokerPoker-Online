@@ -126,7 +126,7 @@ export default function GameRoomPage() {
 
   const [userRank, setUserRank] = useState([]);
   const getRank = async () => {
-      const response = await fetch(`/api/userRank`, {method: 'GET'});
+      const response = await fetch(`/api/userRank?id=user`, {method: 'GET'});
       const rank = await response.json();
       return rank.map((user, index) => ({
         rank: index + 1,
