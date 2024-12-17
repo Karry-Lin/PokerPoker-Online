@@ -7,6 +7,7 @@ export async function GET(request) {
         const querySnapshot = await getDocs(usersCollectionRef);
         const users = querySnapshot.docs.map((doc) => doc.data());
         users.sort((a, b) => b.money - a.money);
+        console.log(users)
         return Response.json(users, { status: 200 });
     } catch (error) {
         console.error("Error fetching user data:", error);
