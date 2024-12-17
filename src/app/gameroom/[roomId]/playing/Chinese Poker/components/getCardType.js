@@ -14,6 +14,7 @@ function getRank(card) {
   
   const straight = [
     [14, 2, 3, 4, 5],
+    [2, 3, 4, 5, 6],
     [3, 4, 5, 6, 7],
     [4, 5, 6, 7, 8],
     [5, 6, 7, 8, 9],
@@ -22,7 +23,7 @@ function getRank(card) {
     [8, 9, 10, 11, 12],
     [9, 10, 11, 12, 13],
     [10, 11, 12, 13, 14],
-    [2, 3, 4, 5, 6],
+    
   ];
   
   function isStraight(ranks) {
@@ -32,7 +33,37 @@ function getRank(card) {
       return sortedRanks.every((rank) => straightSet.has(rank));
     });
   }
+  function getHandTypeForThree(cards) {
+    const ranks = cards.map(getRank).sort((a, b) => a - b);
+    const rankCounts = {};
+    ranks.forEach((rank) => (rankCounts[rank] = (rankCounts[rank] || 0) + 1));
+    const counts = Object.values(rankCounts).sort((a, b) => b - a);
   
+    let type = "high_card";
+    let tiebreakers = []; // Default tiebreaker
+  
+    if (counts[0] === 3) {
+      type = "three_of_a_kind";
+      const threeRank = +Object.keys(rankCounts).find(
+        (key) => rankCounts[key] === 3
+      );
+      tiebreakers = [threeRank];
+    } else if (counts[0] === 2) {
+      type = "one_pair";
+      const pairRank = +Object.keys(rankCounts).find(
+        (key) => rankCounts[key] === 2
+      );
+      const kicker = Object.keys(rankCounts)
+        .filter((key) => rankCounts[key] === 1)
+        .map(Number)[0];
+      tiebreakers = [pairRank, kicker];
+    } else {
+      type = "high_card";
+      tiebreakers = ranks.slice().sort((a, b) => b - a);
+    }
+  
+    return { type, tiebreakers };
+  }
   function getHandType(cards) {
     const ranks = cards.map(getRank).sort((a, b) => a - b);
     const suits = cards.map(getSuitPriority);
@@ -120,7 +151,7 @@ function getRank(card) {
   }
   
   export default function getCardTypeScore(hand) {
-    const typeInfo = getHandType(hand);
+    // const typeInfo = getHandType(hand);
     const handHierarchy = {
       high_card: 1,
       one_pair: 2,
@@ -132,8 +163,15 @@ function getRank(card) {
       four_of_a_kind: 8,
       straight_flush: 9,
     };
+    if (hand.length === 3) {
+      const typeInfo = getHandTypeForThree(hand);
+      return [handHierarchy[typeInfo.type], ...typeInfo.tiebreakers];
+    } else if (hand.length === 5) {
+      const typeInfo = getHandType(hand);
+      return [handHierarchy[typeInfo.type], ...typeInfo.tiebreakers];
+    }
   
     // Return the hierarchy plus the tiebreaker array.
-    return [handHierarchy[typeInfo.type], ...typeInfo.tiebreakers];
+    // return [handHierarchy[typeInfo.type], ...typeInfo.tiebreakers];
   }
   

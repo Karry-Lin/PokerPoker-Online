@@ -4,10 +4,24 @@ import styles from "./Page.module.css";
 import countPoint from "../countPoint";
 
 export default function RenderPlayerBlock({ prop }) {
-  const { players, userplace,roomRef } = prop;
-  const [timer, setTimer] = useState(null); // Store remaining time
+  const { players, userplace, roomRef, startTime } = prop;
   const [allPassed, setAllPassed] = useState(false);
+  const [timer, setTimer] = useState(() => {
+    if (startTime?.seconds) {
+      const now = new Date().getTime() / 1000;
+      const elapsedTime = Math.floor(now - startTime.seconds);
+      return Math.max(0, 120 - elapsedTime);
+    }
+    return 120; // Fallback
+  });
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer((prev) => Math.max(0, prev - 1));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
   useEffect(() => {
     // Check if all players have passed
     const everyonePassed =

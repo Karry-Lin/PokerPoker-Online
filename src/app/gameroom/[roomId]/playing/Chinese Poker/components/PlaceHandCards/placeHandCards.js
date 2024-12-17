@@ -26,7 +26,6 @@ export default function PlaceHandCards({ prop }) {
     const interval = setInterval(() => {
       setTimer((prev) => Math.max(0, prev - 1));
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -118,14 +117,14 @@ export default function PlaceHandCards({ prop }) {
 
     // Ensure top < middle < bottom
     // If any comparison is >= 0, order is wrong
-    // if (compareScores(topScore, middleScore) >= 0) {
-    //   alert("Top row must be weaker (lower score) than the middle row.");
-    //   return;
-    // }
-    // if (compareScores(middleScore, bottomScore) >= 0) {
-    //   alert("Middle row must be weaker (lower score) than the bottom row.");
-    //   return;
-    // }
+    if (compareScores(topScore, middleScore) >= 0) {
+      alert("Top row must be weaker (lower score) than the middle row.");
+      return;
+    }
+    if (compareScores(middleScore, bottomScore) >= 0) {
+      alert("Middle row must be weaker (lower score) than the bottom row.");
+      return;
+    }
 
     // If order is correct, submit to Firestore
     await updateDoc(roomRef, {
