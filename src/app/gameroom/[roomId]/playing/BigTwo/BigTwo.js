@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import styles from "./Page.module.css";
-import { database } from "@/utils/firebase.js";
+import { getDatabase } from "@/utils/firebase.js";
 import compare from "./components/compare";
 import get_point from "./components/get_point";
 
@@ -182,22 +182,34 @@ export default function BigTwo({ prop }) {
       setHandCards(updatedHandCards);
       setSelectedCards([]);
       if (updatedHandCards.length === 0) {
+        const database = await getDatabase();
         const updatedPlayers = {};
+
         let win_point = 0;
-        players.forEach((player) => {
+
+        for (let i = 0; i < players.length; i++) {
+          const player = players[i];
           updatedPlayers[player.id] = {
             ...player,
             ready: false,
             score: get_point(player.handCards),
-            money: player.money + get_point(player.handCards)*5,
+            money: player.money + get_point(player.handCards) * 5,
             showResult: true,
             isPassed: false,
           };
           win_point += get_point(player.handCards);
-        });
-        updatedPlayers[uid].money  -= win_point*5;
+          const userRef = doc(database, "user", player.id);
+          await updateDoc(userRef, {
+            money: player.money + (player.score - 70) * 5,
+          });
+        }
+        updatedPlayers[uid].money -= win_point * 5;
         win_point -= updatedPlayers[uid].score;
         updatedPlayers[uid].score = -win_point;
+        const userRef = doc(database, "user", uid);
+        await updateDoc(userRef, {
+          money: players[uid].money + updatedPlayers[uid].score * 5,
+        });
         await updateDoc(roomRef, {
           state: "waiting",
           isShuffled: false,

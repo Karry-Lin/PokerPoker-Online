@@ -13,21 +13,21 @@ export default function PlaceHandCards({ prop }) {
     middle: [],
     bottom: [],
   });
-  const [timer, setTimer] = useState(() => {
-    if (startTime?.seconds) {
-      const now = new Date().getTime() / 1000;
-      const elapsedTime = Math.floor(now - startTime.seconds);
-      return Math.max(0, 120 - elapsedTime);
-    }
-    return 120; // Fallback if no startTime
-  });
+  // const [timer, setTimer] = useState(() => {
+  //   if (startTime?.seconds) {
+  //     const now = new Date().getTime() / 1000;
+  //     const elapsedTime = Math.floor(now - startTime.seconds);
+  //     return Math.max(0, 120 - elapsedTime);
+  //   }
+  //   return 120; 
+  // });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((prev) => Math.max(0, prev - 1));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimer((prev) => Math.max(0, prev - 1));
+  //   }, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   useEffect(() => {
     if (players && uid) {
@@ -98,24 +98,24 @@ export default function PlaceHandCards({ prop }) {
   const isAllRowsFull = () =>
     rows.top.length === 3 && rows.middle.length === 5 && rows.bottom.length === 5;
 
-  const fillRowsToFull = (currentRows, currentHand) => {
-    const updatedRows = { ...currentRows };
-    let updatedHand = [...currentHand];
+  // const fillRowsToFull = (currentRows, currentHand) => {
+  //   const updatedRows = { ...currentRows };
+  //   let updatedHand = [...currentHand];
 
-    const fillRow = (rowName, max) => {
-      const diff = max - updatedRows[rowName].length;
-      if (diff > 0) {
-        const cardsToMove = updatedHand.splice(0, diff);
-        updatedRows[rowName] = [...updatedRows[rowName], ...cardsToMove];
-      }
-    };
+  //   const fillRow = (rowName, max) => {
+  //     const diff = max - updatedRows[rowName].length;
+  //     if (diff > 0) {
+  //       const cardsToMove = updatedHand.splice(0, diff);
+  //       updatedRows[rowName] = [...updatedRows[rowName], ...cardsToMove];
+  //     }
+  //   };
 
-    fillRow("top", 3);
-    fillRow("middle", 5);
-    fillRow("bottom", 5);
+  //   fillRow("top", 3);
+  //   fillRow("middle", 5);
+  //   fillRow("bottom", 5);
 
-    return { updatedRows, updatedHand };
-  };
+  //   return { updatedRows, updatedHand };
+  // };
 
   const compareScores = (a, b) => {
     for (let i = 0; i < Math.max(a.length, b.length); i++) {
@@ -152,19 +152,19 @@ export default function PlaceHandCards({ prop }) {
     alert("Commit successful");
   };
 
-  useEffect(() => {
-    if (timer === 0) {
-      if (!isAllRowsFull()) {
-        const { updatedRows, updatedHand } = fillRowsToFull(rows, handCards);
-        // Submit with fully filled rows
-        handleSubmit(updatedRows);
-        setRows(updatedRows);
-        setHandCards(updatedHand);
-      } else {
-        handleSubmit(rows);
-      }
-    }
-  }, [timer]);
+  // useEffect(() => {
+  //   if (timer === 0) {
+  //     if (!isAllRowsFull()) {
+  //       const { updatedRows, updatedHand } = fillRowsToFull(rows, handCards);
+  //       // Submit with fully filled rows
+  //       handleSubmit(updatedRows);
+  //       setRows(updatedRows);
+  //       setHandCards(updatedHand);
+  //     } else {
+  //       handleSubmit(rows);
+  //     }
+  //   }
+  // }, [timer]);
 
   const renderCardRow = (row) => (
     <div className={`${styles.cardRow} ${styles[row]}`}>
@@ -186,7 +186,7 @@ export default function PlaceHandCards({ prop }) {
       {renderCardRow("middle")}
       {renderCardRow("bottom")}
 
-      <div className={styles.timer}>Time left: {timer}s</div>
+      {/* <div className={styles.timer}>Time left: {timer}s</div> */}
 
       <div className={styles.handCardsWrapper}>
         <div className={styles.handCards}>

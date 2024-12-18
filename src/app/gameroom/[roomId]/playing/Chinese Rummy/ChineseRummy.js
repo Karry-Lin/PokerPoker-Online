@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { updateDoc } from "firebase/firestore";
+import { updateDoc, doc } from "firebase/firestore";
 import styles from "./Page.module.css";
 import getPoint from "./components/getPoint";
+import { getDatabase } from "@/utils/firebase.js";
 
 export default function ChineseRummy({ prop }) {
   const {
@@ -123,15 +124,23 @@ export default function ChineseRummy({ prop }) {
   useEffect(() => {
     const checkNextState = async () => {
       if (areAllPlayersEnd <= 0) {
+        const database = await getDatabase();
         const updatedPlayers = {};
-        players.forEach((player) => {
+
+        for (let i = 0; i < players.length; i++) {
+          const player = players[i];
           updatedPlayers[player.id] = {
             ...player,
             ready: false,
             showResult: true,
-            money:player.money+((player.score)-70)*5
+            money: player.money + (player.score - 70) * 5,
           };
-        });
+
+          const userRef = doc(database, "user", player.id);
+          await updateDoc(userRef, {
+            money: player.money + (player.score - 70) * 5,
+          });
+        }
         await updateDoc(roomRef, {
           state: "waiting",
           isShuffled: false,

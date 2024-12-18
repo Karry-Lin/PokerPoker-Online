@@ -112,7 +112,7 @@ export default function PlayingPage({ prop }) {
               players: updatedPlayers,
               isShuffled: true,
               startTime: new Date(),
-              
+              calculated:false
             });
           } catch (error) {
             console.error("Error updating game state:", error);

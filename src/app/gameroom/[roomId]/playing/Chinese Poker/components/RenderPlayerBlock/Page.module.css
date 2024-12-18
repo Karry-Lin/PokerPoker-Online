@@ -41,28 +41,49 @@
 /* Player Block Styles */
 .playerBlock {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Stack elements vertically */
   align-items: center;
-  text-align: center;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.8
+  );
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Avatar Positioned Above Info */
 .avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  margin-bottom: 10px;
+  margin-bottom: 10px; /* Space below the avatar */
+}
+
+/* Player Info Positioned Below Avatar */
+.playerInfo {
+  text-align: center;
+  margin-bottom: 10px; /* Space below player info */
 }
 
 .playerName {
   font-size: 1rem;
   font-weight: bold;
-  margin-bottom: 10px;
 }
 
+.playerScore {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* Cards Positioned Underneath Avatar and Info */
 .cardContainer {
   display: flex;
   flex-direction: column;
   position: relative;
+  margin-top: 10px; /* Space above cards */
 }
 
 /* Card Rows */
@@ -88,9 +109,14 @@
   border: 1px solid #000;
   z-index: 1; /* Ensure overlapping works */
 }
+
+/* Submit Button at Bottom-Right Corner */
 .submitButton {
+  position: absolute;
+  bottom: 20px;
+  right: 20px; /* Align to the bottom-right corner */
   padding: 15px 25px;
-  font-size: 24px;
+  font-size: 18px;
   text-align: center;
   cursor: pointer;
   outline: none;
@@ -98,5 +124,5 @@
   background-color: #04aa6d;
   border: none;
   border-radius: 15px;
-  margin: 0 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

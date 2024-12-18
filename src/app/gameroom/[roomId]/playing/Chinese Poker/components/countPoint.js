@@ -1,29 +1,30 @@
-import { updateDoc } from "firebase/firestore";
+import { updateDoc, doc } from "firebase/firestore";
+import { getDatabase } from "@/utils/firebase.js";
 import getCardTypeScore from "./getCardType";
 
 export default async function countPoint({ prop }) {
-  const { roomRef, players } = prop;
+  const { roomRef, players, userRef } = prop;
 
-  // players is an object keyed by playerId.
-  // Extract playerIds
   const numPlayers = players.length;
   if (numPlayers < 4) return;
 
-  // Compute each player's scores
-  const playerHands = players.map((playerId) => {
-    const player = players[playerId];
-    const topScore = getCardTypeScore(player.showCards.top);
-    const middleScore = getCardTypeScore(player.showCards.middle);
-    const bottomScore = getCardTypeScore(player.showCards.bottom);
+  // Compute each player's scores for top, middle, and bottom rows
+  const playerHands = players.map((player) => {
+    const topScore = getCardTypeScore(player.rows.top);
+    const middleScore = getCardTypeScore(player.rows.middle);
+    const bottomScore = getCardTypeScore(player.rows.bottom);
     return { topScore, middleScore, bottomScore };
   });
 
   function compareHands(a, b) {
+    // Compare hand types first
     if (a[0] > b[0]) return 1;
     if (a[0] < b[0]) return -1;
+
     // If same hand type, compare their secondary value
     if (a[1] > b[1]) return 1;
     if (a[1] < b[1]) return -1;
+
     return 0;
   }
 
@@ -44,12 +45,8 @@ export default async function countPoint({ prop }) {
         playerHands[j].topScore
       );
       if (topCompare === 1) {
-        // scoreChanges[i] += 1;
-        // scoreChanges[j] -= 1;
         wins++;
       } else if (topCompare === -1) {
-        // scoreChanges[i] -= 1;
-        // scoreChanges[j] += 1;
         losses++;
       }
 
@@ -59,12 +56,8 @@ export default async function countPoint({ prop }) {
         playerHands[j].middleScore
       );
       if (middleCompare === 1) {
-        // scoreChanges[i] += 1;
-        // scoreChanges[j] -= 1;
         wins++;
       } else if (middleCompare === -1) {
-        // scoreChanges[i] -= 1;
-        // scoreChanges[j] += 1;
         losses++;
       }
 
@@ -74,16 +67,12 @@ export default async function countPoint({ prop }) {
         playerHands[j].bottomScore
       );
       if (bottomCompare === 1) {
-        // scoreChanges[i] += 1;
-        // scoreChanges[j] -= 1;
         wins++;
       } else if (bottomCompare === -1) {
-        // scoreChanges[i] -= 1;
-        // scoreChanges[j] += 1;
         losses++;
       }
 
-      // Check for sweep
+      // Check for sweep (winning all three rows)
       if (wins === 3) {
         scoreChanges[i] += 1;
         scoreChanges[j] -= 1;
@@ -95,6 +84,7 @@ export default async function countPoint({ prop }) {
   // Check if player sweeps all others
   for (let i = 0; i < numPlayers; i++) {
     if (sweeps[i] === numPlayers - 1 && numPlayers > 1) {
+      // If a player sweeps every other player
       for (let j = 0; j < numPlayers; j++) {
         if (i === j) continue;
         scoreChanges[i] += 3;
@@ -141,17 +131,21 @@ export default async function countPoint({ prop }) {
       }
     }
   }
-  console.log(scoreChanges)
-  // Now update the players object
-  const updatedPlayers = {};
-  players.forEach((playerId, index) => {
-    const player = players[playerId];
-    updatedPlayers[playerId] = {
-      ...player,
-      score: (player.score || 0) + scoreChanges[index],
-    };
-  });
 
-  // Update Firestore
-  await updateDoc(roomRef, { players: updatedPlayers });
+  console.log("Score Changes:", scoreChanges);
+  const database = await getDatabase();
+  const updatedPlayers = {};
+  for (let i = 0; i < players.length; i++) {
+    const player = players[i];
+    updatedPlayers[player.id] = {
+      ...player,
+      score: (player.score || 0) + scoreChanges[i],
+      money:player.money + scoreChanges[i] * 5
+    };
+
+    const userRef = doc(database, "user", player.id);
+    await updateDoc(userRef, { money: player.money + scoreChanges[i] * 5 });
+  }
+
+  await updateDoc(roomRef, { players: updatedPlayers, calculated: true });
 }

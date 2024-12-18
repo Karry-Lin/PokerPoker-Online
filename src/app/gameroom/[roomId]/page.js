@@ -21,6 +21,7 @@ const GameRoom = () => {
     getDatabase().then((database) => {
       // Set up real-time listener
       const roomRef = doc(database, 'room', roomId);
+      const userRef = doc(database, 'user', userStore.userId);
       const unsubscribe = onSnapshot(
         roomRef,
         (snapshot) => {
@@ -63,13 +64,15 @@ const GameRoom = () => {
               userplace: data.players[userStore.userId]?.place || null,
               turn: data.turn,
               roomRef,
+              userRef,
               roomData: data,
               isPassed: data.players[userStore.userId]?.isPassed || false,
               startTurn: data.startTurn,
               deck:data.deck||null,
               showResult:data.players[userStore.userId]?.showResult,
               startTime:data.startTime||null,
-              areAllPlayersEnd:data.areAllPlayersEnd||null
+              areAllPlayersEnd:data.areAllPlayersEnd||null,
+              calculated:data.calculated||null
             });
           } else if (!userStore.userId) {
             setError('User not logged in');
