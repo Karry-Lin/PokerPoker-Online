@@ -53,7 +53,7 @@ export default function WaitingPage({ prop }) {
                   {" ( "}
                   {roomData.type === "撿紅點" ? (
                     <>
-                      {player.score >= 0 ? "+" : ""}
+                      {(player.score - 70) >= 0 ? "+" : ""}
                       {(player.score - 70) * 5}
                     </>
                   ) : (
