@@ -18,6 +18,7 @@ export default function RenderPlayerBlock({ prop }) {
       countPoint({ prop });
       // await updateDoc(roomRef, { players: updatedPlayers });
     };
+    // console.log(prop)
     if (userplace == 1 && allPassed && !calculated) {
       calculate();
     }

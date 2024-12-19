@@ -21,7 +21,7 @@ const GameRoom = () => {
     getDatabase().then((database) => {
       // Set up real-time listener
       const roomRef = doc(database, 'room', roomId);
-      const userRef = doc(database, 'user', userStore.userId);
+      // const userRef = doc(database, 'user', userStore.userId);
       const unsubscribe = onSnapshot(
         roomRef,
         (snapshot) => {
@@ -64,7 +64,7 @@ const GameRoom = () => {
               userplace: data.players[userStore.userId]?.place || null,
               turn: data.turn,
               roomRef,
-              userRef,
+              database,
               roomData: data,
               isPassed: data.players[userStore.userId]?.isPassed || false,
               startTurn: data.startTurn,

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import styles from "./Page.module.css";
-import { getDatabase } from "@/utils/firebase.js";
 import compare from "./components/compare";
 import get_point from "./components/get_point";
 
@@ -18,6 +17,7 @@ export default function BigTwo({ prop }) {
     userplace,
     turn,
     isPassed,
+    database
   } = prop;
   const [middleCards, setMiddleCards] = useState([]);
   const [handCards, setHandCards] = useState([]);
@@ -182,7 +182,6 @@ export default function BigTwo({ prop }) {
       setHandCards(updatedHandCards);
       setSelectedCards([]);
       if (updatedHandCards.length === 0) {
-        const database = await getDatabase();
         const updatedPlayers = {};
 
         let win_point = 0;

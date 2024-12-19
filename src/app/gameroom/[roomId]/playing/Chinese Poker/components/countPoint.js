@@ -1,13 +1,12 @@
 import { updateDoc, doc } from "firebase/firestore";
-import { getDatabase } from "@/utils/firebase.js";
 import getCardTypeScore from "./getCardType";
 
 export default async function countPoint({ prop }) {
-  const { roomRef, players, userRef } = prop;
+  const { roomRef, players,database } = prop;
 
   const numPlayers = players.length;
   if (numPlayers < 4) return;
-
+// console.log(prop)
   // Compute each player's scores for top, middle, and bottom rows
   const playerHands = players.map((player) => {
     const topScore = getCardTypeScore(player.rows.top);
@@ -133,7 +132,6 @@ export default async function countPoint({ prop }) {
   }
 
   console.log("Score Changes:", scoreChanges);
-  const database = await getDatabase();
   const updatedPlayers = {};
   for (let i = 0; i < players.length; i++) {
     const player = players[i];
@@ -142,8 +140,8 @@ export default async function countPoint({ prop }) {
       score: (player.score || 0) + scoreChanges[i],
       money:player.money + scoreChanges[i] * 5
     };
-
-    const userRef = doc(database, "user", player.id);
+    console.log(player.id)
+    const userRef =doc(database, `user/${player.id}`);
     await updateDoc(userRef, { money: player.money + scoreChanges[i] * 5 });
   }
 

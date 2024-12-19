@@ -17,6 +17,7 @@ export default function ChineseRummy({ prop }) {
     turn,
     deck,
     areAllPlayersEnd,
+    database
   } = prop;
 
   const [middleCards, setMiddleCards] = useState([]);
@@ -124,7 +125,6 @@ export default function ChineseRummy({ prop }) {
   useEffect(() => {
     const checkNextState = async () => {
       if (areAllPlayersEnd <= 0) {
-        const database = await getDatabase();
         const updatedPlayers = {};
 
         for (let i = 0; i < players.length; i++) {
