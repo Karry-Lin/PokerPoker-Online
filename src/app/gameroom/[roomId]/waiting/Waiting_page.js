@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, ListGroup, Modal ,Button } from "react-bootstrap";
-import { doc, getDoc, setDoc,updateDoc } from "firebase/firestore";
+import { Card, ListGroup, Modal, Button } from "react-bootstrap";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import styles from "./Page.module.css";
 
 const DEFAULT_PLAYER = {
@@ -25,7 +25,7 @@ const DEFAULT_PLAYERS = Array.from({ length: 4 }, (_, index) => ({
 export default function WaitingPage({ prop }) {
   const router = useRouter();
   const [players, setPlayers] = useState(DEFAULT_PLAYERS);
-  const { roomData, roomRef, showResult,roomId } = prop;
+  const { roomData, roomRef, showResult, roomId } = prop;
 
   // ShowResultModal Component
   const ShowResultModal = ({ show, handleClose }) => {
@@ -47,7 +47,16 @@ export default function WaitingPage({ prop }) {
               <div className={styles.playerInfo}>
                 <div className={styles.playerName}>{player.username}</div>
                 <div className={styles.playerScore}>Score: {player.score}</div>
-                <div className={styles.playerMoney}>Money: {player.money}{'( '}{player.score>=0?'+':''}{player.score*5}{' )'}</div>
+
+                <div className={styles.playerMoney}>
+                  Money: {player.money}
+                  {"( "}
+                  {player.score >= 0 ? "+" : ""}
+                  {roomData.type === "撿紅點"
+                    ? (player.score - 70) * 5
+                    : player.score * 5}
+                  {" )"}
+                </div>
               </div>
             </div>
           ))}
@@ -141,16 +150,15 @@ export default function WaitingPage({ prop }) {
   const handleReturnToLobby = async () => {
     if (!prop?.roomId || !prop?.uid) return;
     const deleteRoom = async (roomId) => {
-      const response = await fetch('/api/gameroom', {
-        method: 'DELETE',
+      const response = await fetch("/api/gameroom", {
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ roomId })
+        body: JSON.stringify({ roomId }),
       });
       const data = await response.json();
       if (!response.ok) {
-        
       }
       return data.message;
     };
@@ -160,9 +168,8 @@ export default function WaitingPage({ prop }) {
         delete updatedPlayers[prop.uid];
         await setDoc(roomRef, { ...roomData, players: updatedPlayers });
       }
-      deleteRoom(roomId)
+      deleteRoom(roomId);
       router.push("/lobby");
-
     } catch (error) {
       console.error("Error leaving room:", error);
     }
