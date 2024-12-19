@@ -50,11 +50,18 @@ export default function WaitingPage({ prop }) {
 
                 <div className={styles.playerMoney}>
                   Money: {player.money}
-                  {"( "}
-                  {player.score >= 0 ? "+" : ""}
-                  {roomData.type === "撿紅點"
-                    ? (player.score - 70) * 5
-                    : player.score * 5}
+                  {" ( "}
+                  {roomData.type === "撿紅點" ? (
+                    <>
+                      {player.score >= 0 ? "+" : ""}
+                      {(player.score - 70) * 5}
+                    </>
+                  ) : (
+                    <>
+                      {player.score >= 0 ? "+" : ""}
+                      {player.score * 5}
+                    </>
+                  )}
                   {" )"}
                 </div>
               </div>

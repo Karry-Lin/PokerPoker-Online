@@ -123,7 +123,7 @@ export default function ChineseRummy({ prop }) {
   }, [players, uid]);
   useEffect(() => {
     const checkNextState = async () => {
-      if (areAllPlayersEnd <= 0) {
+      if (areAllPlayersEnd < 0) {
         const updatedPlayers = {};
 
         for (let i = 0; i < players.length; i++) {
@@ -149,7 +149,7 @@ export default function ChineseRummy({ prop }) {
       }
     };
     checkNextState();
-  }, [nowCards]);
+  }, [roomData]);
 
   const handleMiddleCardClick = (card) => {
     if (userplace === turn) {
@@ -204,9 +204,7 @@ export default function ChineseRummy({ prop }) {
         const updatedMiddleCards = middleCards.filter(
           (card) => card !== selectedMiddleCard
         );
-        console.log(playerState.top.id);
         if (point == -2) {
-          console.log(playerState.top.id);
           await updateDoc(roomRef, {
             nowCards: updatedMiddleCards,
             turn: (turn % 4) + 1,
@@ -217,6 +215,7 @@ export default function ChineseRummy({ prop }) {
               roomData.players[playerState.right.id]?.score - 10,
             [`players.${playerState.left.id}.score`]:
               roomData.players[playerState.left.id]?.score - 10,
+
             areAllPlayersEnd: areAllPlayersEnd - 1,
           });
         } else {
@@ -224,6 +223,7 @@ export default function ChineseRummy({ prop }) {
             nowCards: updatedMiddleCards,
             turn: (turn % 4) + 1,
             [`players.${uid}.score`]: roomData.players[uid]?.score + point,
+
             areAllPlayersEnd: areAllPlayersEnd - 1,
           });
         }
@@ -251,6 +251,7 @@ export default function ChineseRummy({ prop }) {
         );
         if (point == -2) {
           await updateDoc(roomRef, {
+            [`players.${uid}.handCards`]: updatedHandCards,
             [`players.${uid}.score`]: roomData.players[uid]?.score + 40,
             [`players.${playerState.top.id}.score`]:
               roomData.players[playerState.top.id]?.score - 10,
