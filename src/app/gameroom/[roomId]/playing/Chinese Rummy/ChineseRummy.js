@@ -136,7 +136,7 @@ export default function ChineseRummy({ prop }) {
             money: player.money + (player.score - 70) * 5,
           };
 
-          const userRef = doc(database, "user", player.id);
+          const userRef = doc(database, `user/${player.id}`);
           await updateDoc(userRef, {
             money: player.money + (player.score - 70) * 5,
           });

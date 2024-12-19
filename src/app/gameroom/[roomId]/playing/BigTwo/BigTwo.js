@@ -197,7 +197,7 @@ export default function BigTwo({ prop }) {
             isPassed: false,
           };
           win_point += get_point(player.handCards);
-          const userRef = doc(database, "user", player.id);
+          const userRef = doc(database, `user/${player.id}`);
           await updateDoc(userRef, {
             money: player.money + (player.score - 70) * 5,
           });
@@ -205,7 +205,7 @@ export default function BigTwo({ prop }) {
         updatedPlayers[uid].money -= win_point * 5;
         win_point -= updatedPlayers[uid].score;
         updatedPlayers[uid].score = -win_point;
-        const userRef = doc(database, "user", uid);
+        const userRef = doc(database, `user/${uid}`);
         await updateDoc(userRef, {
           money: players[uid].money + updatedPlayers[uid].score * 5,
         });
