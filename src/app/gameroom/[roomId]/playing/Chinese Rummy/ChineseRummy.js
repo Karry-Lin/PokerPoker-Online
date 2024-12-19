@@ -16,7 +16,7 @@ export default function ChineseRummy({ prop }) {
     turn,
     deck,
     areAllPlayersEnd,
-    database
+    database,
   } = prop;
 
   const [middleCards, setMiddleCards] = useState([]);
@@ -231,7 +231,7 @@ export default function ChineseRummy({ prop }) {
         setSelectedMiddleCard(null);
         setFlipCard(null);
       } else {
-        alert("Please select valid cards");
+        alert("請選擇正確組合");
         setSelectedMiddleCard(null);
       }
     } catch (error) {
@@ -274,7 +274,7 @@ export default function ChineseRummy({ prop }) {
         setSelectedHandCard(null);
         setFlipCard(deck[0]);
       } else {
-        alert("Please select valid cards");
+        alert("請選擇正確組合");
         setSelectedMiddleCard(null);
         setSelectedHandCard(null);
       }
