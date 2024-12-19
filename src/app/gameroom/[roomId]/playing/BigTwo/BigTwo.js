@@ -183,39 +183,63 @@ export default function BigTwo({ prop }) {
       setSelectedCards([]);
       if (updatedHandCards.length === 0) {
         const updatedPlayers = {};
-
-        let win_point = 0;
-
-        for (let i = 0; i < players.length; i++) {
-          const player = players[i];
+        let totalWinPoints = 0;
+      
+        // First, calculate scores and update players in a batch
+        const playerUpdates = players.map((player) => {
+          const playerScore = get_point(player.handCards);
+          const playerMoney = player.money + playerScore * 5;
+      
+          totalWinPoints += playerScore;
+      
           updatedPlayers[player.id] = {
             ...player,
             ready: false,
-            score: get_point(player.handCards),
-            money: player.money + get_point(player.handCards) * 5,
+            score: playerScore,
+            money: playerMoney,
             showResult: true,
             isPassed: false,
           };
-          win_point += get_point(player.handCards);
-          const userRef = doc(database, `user/${player.id}`);
-          await updateDoc(userRef, {
-            money: player.money + (player.score - 70) * 5,
-          });
-        }
-        updatedPlayers[uid].money -= win_point * 5;
-        win_point -= updatedPlayers[uid].score;
-        updatedPlayers[uid].score = -win_point;
+      
+          return {
+            id: player.id,
+            money: playerMoney,
+          };
+        });
+      
+        // Subtract win points for the current user
+        totalWinPoints -= updatedPlayers[uid]?.score || 0;
+        updatedPlayers[uid].money -= totalWinPoints * 5;
+        updatedPlayers[uid].score = -totalWinPoints;
+      
+        // Perform database updates in a batch
+        const dbPromises = playerUpdates.map(({ id, money }) => {
+          const userRef = doc(database, `user/${id}`);
+          return updateDoc(userRef, { money });
+        });
+      
+        // Update the current user
         const userRef = doc(database, `user/${uid}`);
-        await updateDoc(userRef, {
-          money: players[uid].money + updatedPlayers[uid].score * 5,
-        });
-        await updateDoc(roomRef, {
-          state: "waiting",
-          isShuffled: false,
-          nowCards: [],
-          players: updatedPlayers,
-        });
+        dbPromises.push(
+          updateDoc(userRef, {
+            money: updatedPlayers[uid].money,
+          })
+        );
+      
+        // Update room state
+        dbPromises.push(
+          updateDoc(roomRef, {
+            state: "waiting",
+            isShuffled: false,
+            nowCards: [],
+            players: updatedPlayers,
+          })
+        );
+      
+        // Wait for all updates to complete
+        await Promise.all(dbPromises);
       }
+      
     } catch (error) {
       console.error("Error updating game state:", error);
     }

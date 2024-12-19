@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { updateDoc, doc } from "firebase/firestore";
 import styles from "./Page.module.css";
 import getPoint from "./components/getPoint";
-import { getDatabase } from "@/utils/firebase.js";
 
 export default function ChineseRummy({ prop }) {
   const {
