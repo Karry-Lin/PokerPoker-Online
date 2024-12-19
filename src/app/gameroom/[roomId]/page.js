@@ -71,7 +71,7 @@ const GameRoom = () => {
               deck:data.deck||null,
               showResult:data.players[userStore.userId]?.showResult,
               startTime:data.startTime||null,
-              areAllPlayersEnd:data.areAllPlayersEnd||24,
+              areAllPlayersEnd:data.areAllPlayersEnd||23,
               calculated:data.calculated||null
             });
           } else if (!userStore.userId) {
