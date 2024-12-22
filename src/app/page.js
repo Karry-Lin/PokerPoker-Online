@@ -184,56 +184,65 @@ export default function Home() {
 
   ];
   return (
-    <div className={styles.container}>
-      <img src="/welcome-background.jpg" alt="background" className={styles.background}/>
-      <div className={styles.title}>PokerPoker</div>
-      <div className={styles.info}>
-        <div className={styles.intro}>
-          The universe's Best poker game platform.
-        </div>
-        <div className={styles.button}>
-          <Link href={userStore.isLogin() ? "/lobby" : "/login"}>
-            <button className={styles.btn}>
-              PLAY NOW
-            </button>
-          </Link>
-        </div>
+      <div className={styles.container}>
+          <img src="/welcome-background.jpg" alt="background" className={styles.background}/>
+          <div className={styles.title}>PokerPoker</div>
+          <div className={styles.info}>
+              <div className={styles.intro}>
+                  The universe's Best poker game platform.
+              </div>
+              <div className={styles.button}>
+                  <Link href={userStore.isLogin() ? "/lobby" : "/login"}>
+                      <button className={styles.btn}>
+                          PLAY NOW
+                      </button>
+                  </Link>
+              </div>
+          </div>
+          <div className={styles.gameinfo}>
+              <Card className={styles.card}>
+                  <Card.Header as="h2">十三支</Card.Header>
+                  <Card.Body>
+                      <Card.Text>
+                          十三支是一種撲克遊戲，通常由四個人一同遊玩，每位玩家會拿到十三張牌，需要排出三墩，第一墩有三張，第二、三敦則各有五張，根據每一墩的大小決定輸贏。
+                      </Card.Text>
+                      <Button variant="secondary" onClick={() => handleShow(0)}>details</Button>
+                  </Card.Body>
+              </Card>
+              <Card className={styles.card}>
+                  <Card.Header as="h2">大老二</Card.Header>
+                  <Card.Body>
+                      <Card.Text>
+                          十三支是一種撲克遊戲，通常由四個人一同遊玩，每位玩家會拿到十三張牌，有梅花三的玩家先出牌，直到先出完手牌者獲勝。
+                      </Card.Text>
+                      <Button variant="secondary" onClick={() => handleShow(1)}>details</Button>
+                  </Card.Body>
+              </Card>
+              <Card className={styles.card}>
+                  <Card.Header as="h2">撿紅點</Card.Header>
+                  <Card.Body>
+                      <Card.Text>
+                          撿紅點是一種撲克遊戲，通常由四個人一同遊玩，每位玩家會拿到六張牌，且桌上會亮出四張牌，根據吃牌分數算出輸贏。
+                      </Card.Text>
+                      <Button variant="secondary" onClick={() => handleShow(2)}>details</Button>
+                  </Card.Body>
+              </Card>
+              <MyVerticallyCenteredModal
+                  show={modalShow}
+                  onHide={() => setModalShow(false)}
+                  title={modalContent.title}
+                  text={modalContent.text}
+              />
+          </div>
+          <div className="d-flex justify-content-center">
+              <Button
+                  variant="success"
+                  style={{fontSize: '40px'}}
+                  onClick={() => window.open('https://docs.google.com/presentation/d/1S_HQW_xyXpowbELJo1pvlbygWBU8jN1rnGTAyBzY8VI/edit?usp=sharing', '_blank')}
+              >
+                  說明文件
+              </Button>
+          </div>
       </div>
-      <div className={styles.gameinfo}>
-        <Card className={styles.card}>
-          <Card.Header as="h2">十三支</Card.Header>
-        <Card.Body>
-          <Card.Text>
-            十三支是一種撲克遊戲，通常由四個人一同遊玩，每位玩家會拿到十三張牌，需要排出三墩，第一墩有三張，第二、三敦則各有五張，根據每一墩的大小決定輸贏。
-          </Card.Text>
-          <Button variant="secondary" onClick={() => handleShow(0)}>details</Button>
-        </Card.Body>
-      </Card>
-        <Card className={styles.card}>
-          <Card.Header as="h2">大老二</Card.Header>
-          <Card.Body>
-            <Card.Text>
-              十三支是一種撲克遊戲，通常由四個人一同遊玩，每位玩家會拿到十三張牌，有梅花三的玩家先出牌，直到先出完手牌者獲勝。
-            </Card.Text>
-            <Button variant="secondary" onClick={() => handleShow(1)}>details</Button>
-          </Card.Body>
-        </Card>
-        <Card className={styles.card}>
-          <Card.Header as="h2">撿紅點</Card.Header>
-          <Card.Body>
-            <Card.Text>
-              撿紅點是一種撲克遊戲，通常由四個人一同遊玩，每位玩家會拿到六張牌，且桌上會亮出四張牌，根據吃牌分數算出輸贏。
-            </Card.Text>
-            <Button variant="secondary" onClick={() => handleShow(2)}>details</Button>
-          </Card.Body>
-        </Card>
-        <MyVerticallyCenteredModal
-          show={modalShow}
-          onHide={() => setModalShow(false)}
-          title={modalContent.title}
-          text={modalContent.text}
-        />
-      </div>
-    </div>
   );
 }
