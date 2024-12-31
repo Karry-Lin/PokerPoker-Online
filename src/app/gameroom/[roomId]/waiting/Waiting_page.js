@@ -18,7 +18,7 @@ const DEFAULT_PLAYER = {
 // Create array of 4 default players
 const DEFAULT_PLAYERS = Array.from({ length: 4 }, (_, index) => ({
   ...DEFAULT_PLAYER,
-  id: `default${index + 1}`,
+  id: `default${index + 1}`,  // fixed template literal
   place: index + 1,
 }));
 
@@ -29,7 +29,6 @@ export default function WaitingPage({ prop }) {
 
   // ShowResultModal Component
   const ShowResultModal = ({ show, handleClose }) => {
-    // console.log('players',players)
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
     return (
       <Modal show={show} onHide={handleClose}>
@@ -76,39 +75,40 @@ export default function WaitingPage({ prop }) {
       </Modal>
     );
   };
+
   const CloseModal = async () => {
     try {
+      // Use bracket notation for dynamic fields
       await updateDoc(roomRef, {
-        [`players.${prop?.uid}.showResult`]: false,
+        [`players.${prop.uid}.showResult`]: false,
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
+  // Merge Firebase players with DEFAULT_PLAYERS
   useEffect(() => {
     if (prop?.players) {
-      const firebasePlayers = Object.entries(prop.players).map(
-        ([id, playerData]) => ({
-          ...playerData,
-          id,
-        })
-      );
+      const firebasePlayers = Object.entries(prop.players).map(([id, playerData]) => ({
+        ...playerData,
+        id,
+      }));
 
       const mergedPlayers = [...firebasePlayers, ...DEFAULT_PLAYERS]
         .slice(0, 4)
         .sort((a, b) => {
-          if (a.place && b.place) {
-            return a.place - b.place;
-          }
+          if (a.place && b.place) return a.place - b.place;
           if (!a.place) return 1;
           if (!b.place) return -1;
           return 0;
         });
 
       setPlayers(mergedPlayers);
-      // console.log(mergedPlayers);
     }
   }, [prop?.players]);
 
+  // Check if all players are ready; if so, set game state to "playing"
   useEffect(() => {
     const checkAndUpdateGameState = async () => {
       const areAllPlayersReady = players.every((player) => player.ready);
@@ -124,7 +124,7 @@ export default function WaitingPage({ prop }) {
     checkAndUpdateGameState();
   }, [players, prop?.roomId]);
 
-  // Handle ready status toggle
+  // Toggle current player's ready status
   const handleReadyToggle = async () => {
     try {
       if (roomData?.players?.[prop.uid]) {
@@ -153,7 +153,7 @@ export default function WaitingPage({ prop }) {
     }
   };
 
-  // Handle returning to lobby
+  // Return to lobby (delete room, etc.)
   const handleReturnToLobby = async () => {
     if (!prop?.roomId || !prop?.uid) return;
     const deleteRoom = async (roomId) => {
@@ -166,9 +166,11 @@ export default function WaitingPage({ prop }) {
       });
       const data = await response.json();
       if (!response.ok) {
+        // handle error
       }
       return data.message;
     };
+
     try {
       if (roomData?.players?.[prop.uid]) {
         const updatedPlayers = { ...roomData.players };
@@ -181,6 +183,19 @@ export default function WaitingPage({ prop }) {
       console.error("Error leaving room:", error);
     }
   };
+
+  // Manually intercept the browser back button
+  useEffect(() => {
+    const handlePopState = (event) => {
+      event.preventDefault();
+      handleReturnToLobby();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
 
   return (
     <div className={styles.body}>
@@ -209,12 +224,13 @@ export default function WaitingPage({ prop }) {
 
       <div className={styles.button_container}>
         <button onClick={handleReadyToggle} className={styles.button}>
-          {roomData?.players[prop.uid].ready ? "UnReady" : "Ready"}
+          {roomData?.players?.[prop.uid]?.ready ? "UnReady" : "Ready"}
         </button>
         <button onClick={handleReturnToLobby} className={styles.button}>
           Back To Lobby
         </button>
       </div>
+
       <ShowResultModal show={showResult} handleClose={CloseModal} />
     </div>
   );

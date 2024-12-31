@@ -24,7 +24,7 @@ const straight = [
   [8, 9, 10, 11, 12],
   [9, 10, 11, 12, 13],
   [10, 11, 12, 13, 14],
-  [15, 3, 4, 5, 6]
+  [15, 3, 4, 5, 6],
 ];
 
 // New improved isStraight function
@@ -55,30 +55,29 @@ function getHandType(cards) {
 
   if (isFlush && isStraight(ranks))
     return {
-      type: 'straight_flush',
+      type: "straight_flush",
       value: Math.max(...ranks),
-      suit: suits[4]
+      suit: suits[4],
     };
   if (counts[0] === 4)
     return {
-      type: 'four_of_a_kind',
-      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 4)
+      type: "four_of_a_kind",
+      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 4),
     };
   if (counts[0] === 3 && counts[1] === 2)
     return {
-      type: 'full_house',
-      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 3)
+      type: "full_house",
+      value: +Object.keys(rankCounts).find((key) => rankCounts[key] === 3),
     };
   if (isStraight(ranks))
-    return { type: 'straight', value: Math.max(...ranks), suit: suits[4] };
+    return { type: "straight", value: Math.max(...ranks), suit: suits[4] };
 
-  return { type: 'high_card', value: Math.max(...ranks) };
+  return { type: "high_card", value: Math.max(...ranks) };
 }
 
 // Main comparison function
 export default function compare(cards1, cards2) {
   if (cards1.length == 4 || cards1.length == 3) {
-    // alert('請出正確的牌型');
     return false;
   }
 
@@ -87,8 +86,11 @@ export default function compare(cards1, cards2) {
     const rank1 = getRank(cards1[0]);
     const rank2 = getRank(cards2[0]);
     if (rank1 > rank2) return true;
-    if ((rank1 == rank2)&&getSuitPriority(cards1[0]) > getSuitPriority(cards2[0])) return true;
-    // alert('請出比牌面價值大的牌');
+    if (
+      rank1 == rank2 &&
+      getSuitPriority(cards1[0]) > getSuitPriority(cards2[0])
+    )
+      return true;
     return false;
   }
 
@@ -98,28 +100,19 @@ export default function compare(cards1, cards2) {
       getRank(cards1[0]) !== getRank(cards1[1]) ||
       getRank(cards2[0]) !== getRank(cards2[1])
     ) {
-      // alert('請出有效的對子');
       return false;
     }
     const rank1 = getRank(cards1[0]);
     const rank2 = getRank(cards2[0]);
     if (rank1 !== rank2) {
-      if (rank1 > rank2) {
-        return true;
-      } else {
-        // alert('請出比牌面價值大的對子');
-        return false;
-      }
+      return rank1 > rank2;
     }
 
     // If pairs are the same rank, compare highest suit
-    if (
+    return (
       Math.max(getSuitPriority(cards1[0]), getSuitPriority(cards1[1])) >
       Math.max(getSuitPriority(cards2[0]), getSuitPriority(cards2[1]))
-    )
-      return true;
-    // alert('請出比牌面價值大的對子');
-    return false;
+    );
   }
 
   if (cards1.length === 5 && cards2.length === 5) {
@@ -127,11 +120,13 @@ export default function compare(cards1, cards2) {
     const hand1 = getHandType(cards1);
     const hand2 = getHandType(cards2);
 
+    // Give 'straight' and 'full_house' the same hierarchy
+    // so that neither is considered bigger by category alone.
     const handHierarchy = {
       straight: 1,
       full_house: 1,
       four_of_a_kind: 3,
-      straight_flush: 4
+      straight_flush: 4,
     };
 
     // Compare hand types by hierarchy
@@ -139,45 +134,61 @@ export default function compare(cards1, cards2) {
       return handHierarchy[hand1.type] > handHierarchy[hand2.type];
     }
 
-    // If hand types are the same, compare by highest value
-    if (hand2.type == 'straight') {
-      if (hand1.value == hand2.value) {
-        return hand1.suit > hand2.suit;
-      } else {
-        return hand1.value > hand2.value;
-      }
+    // SPECIAL CHECK: if one is straight and the other is full_house,
+    // we say hand1 is NOT bigger => return false
+    if (
+      (hand1.type === "straight" && hand2.type === "full_house") ||
+      (hand1.type === "full_house" && hand2.type === "straight")
+    ) {
+      return false;
     }
+
+    // If both are straights
+    if (hand1.type === "straight" && hand2.type === "straight") {
+      // Compare by highest rank, then by suit
+      if (hand1.value === hand2.value) {
+        // Compare suit only if same highest rank
+        return hand1.suit > hand2.suit;
+      }
+      return hand1.value > hand2.value;
+    }
+
+    // If both are full houses
+    if (hand1.type === "full_house" && hand2.type === "full_house") {
+      // Compare by the rank of the '3-of-a-kind' portion
+      return hand1.value > hand2.value;
+    }
+
+    // four_of_a_kind or straight_flush comparisons remain unchanged
     if (hand1.value > hand2.value) return true;
-    // alert('請出比牌面價值大的牌');
     return false;
   }
+
   if (cards1.length == 5) {
     const hand1 = getHandType(cards1);
-    if (hand1.type == 'straight_flush' || hand1.type == 'four_of_a_kind') {
+    if (hand1.type == "straight_flush" || hand1.type == "four_of_a_kind") {
       return true;
     }
   }
+
   if (cards2.length == 0) {
     if (cards1.length == 1) {
       return true;
     } else if (cards1.length == 2) {
       if (getRank(cards1[0]) !== getRank(cards1[1])) {
-        // alert('請出正確的牌型');
         return false;
       }
       return true;
     } else if (cards1.length == 5) {
       const hand1 = getHandType(cards1);
-      if (hand1.type == 'high_card') {
-        // alert('請出正確的牌型');
+      if (hand1.type == "high_card") {
         return false;
       }
       return true;
     } else {
-      // alert('請出正確的牌型');
       return false;
     }
   }
-  // alert('請出正確的牌型');
+
   return false; // Fallback case, should not occur if rules are adhered to
 }

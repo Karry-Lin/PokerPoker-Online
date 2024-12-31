@@ -111,7 +111,7 @@ export default function ChineseRummy({ prop }) {
           id: updatePlayerState.player?.id,
         },
       });
-      console.log(updatePlayerState);
+      // console.log(updatePlayerState);
     }
   }, [nowCards, players, userplace]);
 

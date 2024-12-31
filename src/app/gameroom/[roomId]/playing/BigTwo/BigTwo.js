@@ -7,7 +7,7 @@ import compare from "./components/compare";
 import get_point from "./components/get_point";
 
 export default function BigTwo({ prop }) {
-  console.log(prop);
+  // console.log(prop);
   const {
     roomRef,
     roomData,
